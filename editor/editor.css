@@ -1,0 +1,190 @@
+body {
+	background-color:#ccc;
+	overflow:hidden;
+}
+
+html, body {
+	width:100%;
+	height:100%;
+	margin:0;
+}
+
+header {
+	float:left;
+	position:absolute;
+	text-align:center;
+	top:0;
+	padding: 5px 10px;
+	background-color:rgba(10,10,10,0.25);
+	color:#ccc;
+}
+
+header h6 {
+	margin:0;
+}
+
+footer {
+	float:left;
+	position:absolute;
+	bottom:0;
+}
+
+footer p {
+	margin:0;
+	font-size:1rem;
+}
+
+canvas {
+}
+
+#progress {
+	opacity: 0;
+	color:#999;
+	width:100px;
+	padding:10px;
+	position:absolute;
+	left:5px;
+	top:30px;
+	margin: 0 auto;
+	text-align: center;
+	font-size: 1rem;
+	font-weight: bold;
+	border-radius: 15px;
+	background-color: rgba(0,0,0,0.5);
+	-webkit-transition: opacity 1s;
+    transition: opacity 1s;
+}
+
+#progress p {
+	line-height: 0.3em;
+	margin: 0 0 8%;
+}
+
+#progress_bg {
+	background-color: #000;
+	width:100%; 
+	height:5px;
+	border:1px solid #157; 
+	display:block;
+	margin: 0 auto;
+	border-radius: 15px;
+}
+
+#progress_bar {
+	background-color: #157;
+	-webkit-transition: width 0.5s;
+    transition: width 0.5s;
+}
+
+#view {
+	float:left;
+	width:100%;
+	height:100%;
+}
+
+#sidebar {
+	float:left;
+	position: absolute;
+	right:0;
+	width:280px;
+	height:100%;
+	padding:10px;
+	background-color:rgba(20,20,20,0.8);
+	color:#ccc;
+	-webkit-transition: width 0.3s;
+    transition: width 0.3s;
+}
+
+#sidebar label {
+	color:#ccc;
+	font-size:1rem;
+}
+
+#file {
+	padding-bottom:10px;
+	border-bottom:1px solid #ccc;
+}
+
+#file input {
+	color:#333;
+	font-size:1.2rem;
+	height:25px;
+	margin:0;
+	top:0;
+}
+
+
+
+#sidebar .button {
+	color:#444;
+	margin-left:10px;
+	background-color:#ccc;
+	border-color:#ddd;
+	padding:5px 10px;
+	height:25px;
+	font-size:1rem;
+	line-height:1rem;
+}
+
+#sidebar .button-primary {
+	color:#ccc;
+	background-color:#355;
+	border-color:#466;
+}
+
+#sidebar .button:hover {
+	border-color:#fff;
+	background-color:#eee;
+}
+
+#sidebar .button-primary:hover {
+	background-color:#466;
+	border-color:#577;
+}
+
+.close {
+	background-color: #555;
+	color:#aaa;
+	font-weight:bold;
+	font-size:1.2rem;
+	border-color: #aaa;
+	border-radius: 4px;
+	height:20px;
+	width:20px;
+	padding:4px;
+	margin:5px;
+	line-height:0rem;
+}
+
+#zoom {
+	float:left;
+	position:absolute;
+	bottom:40px;
+	left:20px;
+}
+
+.zoom-button {
+	float:left;
+	margin-right:15px;
+	height:30px;
+	width:30px;
+	line-height:30px;
+	text-align:center;
+	background-color:#000;
+	color:#fff;
+	border-radius:20px;
+	cursor:pointer;
+}
+
+.zoom-button:hover {
+	background-color: #444;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
