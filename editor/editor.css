@@ -105,10 +105,12 @@ canvas {
 	border-bottom:1px solid #ccc;
 }
 
-#file input {
+#file input[type="text"] {
 	color:#333;
 	font-size:1.2rem;
+	font-weight:bold;
 	height:25px;
+	width:120px;
 	margin:0;
 	top:0;
 }
@@ -153,7 +155,7 @@ canvas {
 	width:20px;
 	padding:4px;
 	margin:5px;
-	line-height:0rem;
+	line-height:0;
 }
 
 #zoom {
@@ -168,12 +170,16 @@ canvas {
 	margin-right:15px;
 	height:30px;
 	width:30px;
-	line-height:30px;
+	line-height:32px;
 	text-align:center;
 	background-color:#000;
 	color:#fff;
 	border-radius:20px;
 	cursor:pointer;
+}
+
+.plus {
+	line-height:34px;
 }
 
 .zoom-button:hover {
@@ -187,4 +193,25 @@ canvas {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+#dialog {
+	pointer-events:none;
+	opacity: 0;
+	float:left;
+	position:absolute;
+	top: 50%;
+	left: 50%;
+	padding:20px;
+	background-color:#333;
+	color:#ccc;
+	-ms-transform: translate(-50%,-50%); /* IE 9 */
+   	-webkit-transform: translate(-50%,-50%); /* Safari */
+    transform: translate(-50%,-50%);
+	-webkit-transition: opacity 0.5s;
+    transition: opacity 0.5s;
+}
+
+#dialog p {
+	margin:10px;
 }

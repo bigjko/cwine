@@ -48,13 +48,18 @@
   <div id="view"><canvas id="edit_canvas" width="500" height="50"></canvas></div>
   <div id="sidebar">
 		<div id="file" class="u-full-width">
-			<label for="filepath">JSON file</label>
-			<input class="" type="text" placeholder="path/to/json" id="filepath"><input class="button" type="submit" value="Load"><input class="button button-primary" type="submit" value="Save">
+			<label for="filepath">JSON file (in 'game/')</label>
+			<input class="" type="text" placeholder="path/to/json" value="panels.json" id="filepath"><input id="load" class="button" type="submit" value="Load"><input id="save" class="button button-primary" type="submit" value="Save">
 		</div>
 	  <!-- <div class="close noselect" onclick="hideSidebar()">></div> -->
 	</div>
 	<div id="zoom">
 		<div class="zoom-button noselect plus" onclick="zoom(1)">+</div><div class="zoom-button noselect" onclick="zoom(-1)">-</div>
+	</div>
+	<div id="dialog">
+		<p>
+			File saved!
+		</p>
 	</div>
 
 <!-- End Document
