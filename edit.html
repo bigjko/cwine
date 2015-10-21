@@ -5,7 +5,7 @@
   <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta charset="utf-8">
-  <title>Die Sieben Raben</title>
+  <title>cwine 0.01</title>
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -22,15 +22,17 @@
 
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
-  <link rel="stylesheet" href="editor/editor.css">
+  <link rel="stylesheet" href="css/editor.css">
 
   <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <link rel="icon" type="image/png" href="images/favicon.png">
 
-  <script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
-  <script src="https://code.createjs.com/tweenjs-0.6.1.min.js"></script>
-  <script src="editor/editor.js"></script>
+	<script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
+	<script src="https://code.createjs.com/tweenjs-0.6.1.min.js"></script>
+	<script src="editor/main.js"></script>
+	<script src="editor/editor.js"></script>
+	<script src="editor/loader.js"></script>
 
 </head>
 <body>
@@ -51,7 +53,35 @@
 			<label for="filepath">JSON file (in 'game/')</label>
 			<input class="" type="text" placeholder="path/to/json" value="panels.json" id="filepath"><input id="load" class="button" type="submit" value="Load"><input id="save" class="button button-primary" type="submit" value="Save">
 		</div>
-	  <!-- <div class="close noselect" onclick="hideSidebar()">></div> -->
+	  	
+			
+	  		<ul id="tabs">
+				<li class="selected">Properties</li>
+				<li>Images</li>
+				<li>Elements</li>
+			</ul>
+		<div id="properties" class="">
+			<div id="object-name">
+				<p>Panel 1 <span class="element-id">#000</span></p>
+			</div>
+			<div class="field labelside">
+				<p>Name:</p>
+				<input type="text" placeholder="Element name" id="property-name">
+			</div>
+			<div class="field labeltop">
+				<p>Image URL:</p>
+				<input type="text" placeholder="game/img/" id="property-imagepath">
+			</div>
+			<div class="field labelside">
+				<p>Size:</p>
+				<input type="number" placeholder="" id="property-size" min="1" max ="4">
+			</div>
+			<div class="field labelside">
+				<p>Next Panel:</p>
+				<input type="number" placeholder="" id="property-goto" min="0">
+			</div>
+	  	</div>
+	  	<!-- <div class="close noselect" onclick="hideSidebar()">></div> -->
 	</div>
 	<div id="zoom">
 		<div class="zoom-button noselect plus" onclick="zoom(1)">+</div><div class="zoom-button noselect" onclick="zoom(-1)">-</div>
@@ -63,7 +93,4 @@
 	</div>
 
 <!-- End Document
-  –––––––––––––––––––––––––––––––––––––––?? -->
-
-</body>
-</html>
+  –––––––––––––––––––––––�

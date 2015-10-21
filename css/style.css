@@ -165,8 +165,8 @@ header img {
 
 	.panel {
 		margin-top: 3%;
-		-webkit-transition: opacity 1s;
-    	transition: opacity 1s;
+		-webkit-transition: opacity 1s, margin-left 1s;
+    	transition: opacity 1s, margin-left 1s;
 	}
 }
 

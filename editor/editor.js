@@ -5,9 +5,11 @@ var viewContainer;
 var viewScale = 1;
 var dragoffset = {x:0, y:0};
 //var dragBox;
-var zoomStep = 0.2;
+var zoomNumber = 3;
+var zoomStep = [0.2, 0.3, 0.5, 0.75, 1, 1.5, 2];
 
 var defaultGamePath = "game/";
+var con_r = 6;
 /*window.onload = function() {
   setTimeout(function() {
     // preload image
@@ -90,7 +92,7 @@ function saveJSON (path) {
 		sendrequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		//sendrequest.responseType = 'json';
 		console.log(path);
-		sendrequest.send("json=" + JSON.stringify(panels) + "&path=" + path);
+		sendrequest.send("json=" + JSON.stringify(panels, null, 4) + "&path=" + path);
 	}
 }
 
@@ -197,6 +199,37 @@ function initPanels() {
 		console.log("Mouse Up! " + panelCt.x + ", " + panelCt.y );
 	}
 	
+	function dragLine(evt) {
+		var pan = evt.target.parent;
+		var cl = pan.getChildByName("connectionLines");
+		var sock = pan.getChildByName("panelSocket");
+		var id = viewContainer.getChildIndex(pan);
+		cl.graphics.clear();
+		var local = pan.globalToLocal(evt.stageX, evt.stageY);
+		//console.log(pan.globalToLocal(evt.stageX, evt.stageY));
+		cl.graphics.s("#000").mt(sock.x+con_r*viewScale, sock.y).lt(local.x,local.y);
+	}
+	
+	function releaseLine(evt) {		
+		var id = viewContainer.getChildIndex(evt.target.parent);
+		panels[id].goto = undefined;
+		drawConnections(viewContainer.children[id]);
+		
+		var targ = stage.getObjectUnderPoint(evt.stageX, evt.stageY);
+		
+		console.log("target name: " + targ.name + " parent: " + targ.parent.name + ", evt target: " + evt.target.name + " " + (targ.parent != evt.target.parent));
+		
+		if (targ.parent.name == "PanelContainer" && targ.parent != evt.target.parent) {
+			var goto_id = viewContainer.getChildIndex(targ.parent);
+			panels[id].goto = goto_id;
+			
+		}
+		else {
+			panels[id].goto = undefined;
+		}
+		drawConnections(viewContainer.children[id]);
+	}
+	
 	for (var i=0; i < panels.length; i++) {
 		var container = new createjs.Container();
 		
@@ -216,18 +249,116 @@ function initPanels() {
 		bitmap.name = "panelBitmap";
 		
 		var conn_out = new createjs.Shape();
-		conn_out.name = "connectionsOut";
+		conn_out.name = "connectionLines";
+		conn_out.cursor = "pointer";
 		
 		var scale = 0.25;
+		//if (panels[i].size == 4) scale = 0.35;
+		
+		scale = panels[i].size*400*scale / bitmap.image.width;
+		
 		bitmap.scaleX = scale;
 		bitmap.scaleY = scale;
 		bitmap.on("mousedown", handleMouseDown);
 		bitmap.on("pressmove", handleMouseMove);
 		bitmap.on("pressup", handleMouseUp);
+		bitmap.cursor = "move";
 		
-		container.addChild(bitmap, conn_out);
-		container.name = "Panel " + i.toString();
+		var connection = new createjs.Shape();
+		//connection.graphics.f("#000").dr(0,0,15,15).dc(0,0,30).f("#fff").dc(2,2,11);
+		connection.name = "panelSocket";
+		connection.regY = con_r;
+		connection.x = bitmap.image.width * bitmap.scaleX;
+		connection.y = bitmap.image.height/2 * bitmap.scaleY;
+		connection.graphics.f("#000").dr(0,0,con_r,con_r*2).dc(con_r,con_r,con_r).f("#fff").dc(con_r,con_r,con_r-2);
+		connection.scaleX = 1 / viewScale;
+		connection.scaleY = 1 / viewScale;
+		connection.cursor = "pointer";
+		
+		var elements = new createjs.Container();
+		elements.name = "Elements";
+		
+		container.addChild(bitmap, conn_out, connection, elements);
+		container.name = "PanelContainer";
+		
+		connection.on("pressmove", dragLine);
+		connection.on("pressup", releaseLine);
+		conn_out.on("pressmove", dragLine);	
+		conn_out.on("pressup", releaseLine);
+		
+		// ELEMENTS (speech bubbles, etc.)
+		for (var e=0; e < panels[i].elements.length; e++) {
+			var panel = panels[i];
+			var sb = panels[i].elements[e];
+			console.log(sb.text);
+			var div = document.querySelector("#view").appendChild(document.createElement("DIV"));
+			
+			var image = "";
+			var bubble_size = "medium";
+			if (sb.text.length < 4) {
+				bubble_size = "small";
+			}
+			var bubble_orient = sb.bubble_type;
+			image += bubble_size;
+			if (bubble_orient == "box") {
+				image += "_box.png";
+				box_class = "box";
+			}
+			else image += "_bubble_" + bubble_orient + ".png";
+			
+			div.innerHTML = "<p>" + sb.text + "</p>";
+			
+			div.className = "bubble";
+			if (bubble_orient == "box") div.className += " box";
+			div.className += " noselect";
+			
+			div.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";
+			div.style.position = "absolute";
+			div.style.top = 0;
+			div.style.left = 0;
 
+			var elm = new createjs.DOMElement(div);
+			
+			elm.scaleX = 0.6;
+			elm.scaleY = 0.6;
+			/*if (panel.size == 4) {
+				elm.scaleX = 0.4;
+				elm.scaleY = 0.4;
+				console.log("COOL SCALE. Fuck dig Mads!");
+			}*/
+			//div.style.transformOrigin = "0% -100%";
+			//div.style.transform = "translate(0, -100%)";
+			elm.x = (sb.position.x/100) * bitmap.image.width*bitmap.scaleX;
+			elm.y = (sb.position.y/100) * bitmap.image.height*bitmap.scaleY;
+			elm.regX = div.clientWidth/2;
+			elm.regY = div.clientHeight;
+			if (bubble_orient == "left") {
+				elm.regX = 0;
+			}
+			
+			var align_x = "left";
+			var align_y = "top";
+			if (sb.align !== undefined) {
+				align_x = sb.align.x;
+				align_y = sb.align.y;
+			}
+			if (align_x == "right") {
+				elm.regX = div.clientWidth;
+				elm.x = bitmap.image.width*bitmap.scaleX-elm.x;
+				console.log(bitmap.image.width*bitmap.scaleX);
+				console.log(elm.x);
+			}
+			if (align_y == "bottom") {
+				elm.regY = div.clientHeight;
+				elm.y = bitmap.image.height*bitmap.scaleY-elm.y;
+				console.log(bitmap.image.height*bitmap.scaleY);
+				console.log(elm.y);
+			}
+			
+			//elm.regY = elm.getBounds().height;
+			elements.addChild(elm);
+		}
+		
 		viewContainer.addChild(container);
 		
 		//drawConnections(container);
@@ -245,6 +376,8 @@ window.onresize = function(event) {
 
     stage.canvas.width = view.offsetWidth;
     stage.canvas.height = view.offsetHeight;
+	
+	stage.getChildByName("dragBox").graphics.beginFill("#ccc").drawRect(0,0,stage.canvas.width, stage.canvas.height);
     //stage.update();
 };
 
@@ -277,6 +410,8 @@ function init() {
 
 	stage.canvas.width = document.querySelector("#view").offsetWidth;
 	stage.canvas.height = document.querySelector("#view").offsetHeight;
+	stage.enableMouseOver(15);
+	stage.on("mousedown", function() { document.activeElement.blur(); });
 
 	stage.mouseMoveOutside = true;
 
@@ -310,32 +445,46 @@ function init() {
 function initviewContainer() {
 	var dragBox;
 	
+	//var corners = new createjs.Shape();
+	
+	viewContainer = new createjs.Container();
+	viewScale = zoomStep[zoomNumber];
+	viewContainer.scaleX = viewScale;
+	viewContainer.scaleY = viewScale;
+	viewContainer.name = "View Container";
+	
 	function dragView(evt) {
 		//console.log("Draggin view! " + evt.target);
 		viewContainer.x = evt.stageX - dragoffset.x;
 		viewContainer.y = evt.stageY - dragoffset.y;
+		
+		centerViewOrigin(evt.stageX - dragoffset.x, evt.stageY - dragoffset.y);
+	}
+	
+	function centerViewOrigin(x,y) {
+		viewContainer.regX = ((document.querySelector("#view").offsetWidth - 280)/2 - viewContainer.x)/viewScale;
+		viewContainer.regY = ((document.querySelector("#view").offsetHeight/2) - viewContainer.y)/viewScale;
+		//corners.graphics.clear();
+		//corners.graphics.f("red").dc(viewContainer.x,viewContainer.y,15).f("blue").dc(viewContainer.x+viewContainer.regX*viewScale, viewContainer.y+viewContainer.regY*viewScale, 15);
+		viewContainer.x = x + viewContainer.regX * viewScale;
+		viewContainer.y = y + viewContainer.regY * viewScale;
 	}
 	
 	dragBox = new createjs.Shape(new createjs.Graphics().beginFill("#ccc").drawRect(0,0,stage.canvas.width, stage.canvas.height));
 	dragBox.on("mousedown", function(evt) {
-		dragoffset.x = evt.stageX - viewContainer.x;
-		dragoffset.y = evt.stageY - viewContainer.y;
+		dragoffset.x = evt.stageX - viewContainer.x + viewContainer.regX*viewScale;
+		dragoffset.y = evt.stageY - viewContainer.y + viewContainer.regY*viewScale;
 	});
 	dragBox.on("pressmove", dragView);
-	dragBox.name = "Drag Box";
-
-	viewContainer = new createjs.Container();
-	viewScale = 0.5;
-	viewContainer.scaleX = viewScale;
-	viewContainer.scaleY = viewScale;
-	viewContainer.name = "View Container";
+	//dragBox.cursor = "grab";
+	dragBox.name = "dragBox";
 
 	stage.addChild(dragBox);
+	//stage.addChild(corners);
 	stage.addChild(viewContainer);
+
+	centerViewOrigin(0,0);
 }
-
-
-
 
 function drawAllConnections() {
 	for (var c = 0; c < viewContainer.children.length; c++) {
@@ -344,7 +493,7 @@ function drawAllConnections() {
 }
 
 function drawConnections(panel) {
-	var conn_shape = panel.getChildByName("connectionsOut");
+	var conn_shape = panel.getChildByName("connectionLines");
 	var bitmap = panel.getChildByName("panelBitmap");
 	//console.log(bitmap);
 
@@ -357,27 +506,57 @@ function drawConnections(panel) {
 		
 		var gotoPanel = viewContainer.children[goto];
 		var gotoBitmap = gotoPanel.getChildByName("panelBitmap");
-		start = { 
-			x: bitmap.image.width*bitmap.scaleX, 
+		var start = { 
+			x: bitmap.image.width*bitmap.scaleX + con_r, 
 			y: bitmap.image.height*bitmap.scaleY / 2
 		};
-		end = { 
+		var end = { 
 			x: gotoPanel.x - panel.x, 
 			y: gotoPanel.y + gotoBitmap.image.height*gotoBitmap.scaleY/2 - panel.y
 		};
 		//console.log("line to panel: " + goto + " - from (" + start.x + "," + start.y + ") to (" + end.x + "," + end.y + ")" );
 		
-		conn_shape.graphics.s("#222").mt(start.x, start.y).lt(end.x, end.y).es();
+		conn_shape.graphics.s("#222").ss(3/viewScale).mt(start.x, start.y).lt(end.x, end.y).es();
+	}
+	
+	for (var e=0; e < panels[viewContainer.getChildIndex(panel)].elements.length; e++) {
+		var id = panels[viewContainer.getChildIndex(panel)].elements[e].goto;
+		if (id !== undefined) {
+			var elementToPanel = viewContainer.children[id];
+			var elementToBitmap = elementToPanel.getChildByName("panelBitmap");
+			var element = panel.getChildByName("Elements").children[e];
+			var start = { 
+				x: element.x - element.regX*element.scaleX + element.htmlElement.clientWidth*element.scaleX/2, 
+				y: element.y - element.regY*element.scaleY + element.htmlElement.clientHeight*element.scaleY/2
+			};
+			var end = { 
+				x: elementToPanel.x - panel.x, 
+				y: elementToPanel.y + elementToBitmap.image.height*elementToBitmap.scaleY/2 - panel.y
+			};
+		
+			conn_shape.graphics.s("#fff").ss(2/viewScale).sd([10,5],0).mt(start.x, start.y).lt(end.x, end.y).es();
+		}
 	}
 }
 
 function zoom(zoomModifier) {
 	
-	viewScale += zoomStep * zoomModifier;
+	if (zoomNumber + zoomModifier < 0 || zoomNumber + zoomModifier >= zoomStep.length) return;
+	
+	var zoomspeed = 200;
+	
+	zoomNumber += zoomModifier;
+	viewScale = zoomStep[zoomNumber];
+	console.log(viewScale);
 	
 	createjs.Tween.get(viewContainer, {override: true})
-		.to({ scaleX: viewScale, scaleY: viewScale }, 200, createjs.Ease.cubicOut);
+		.to({ scaleX: viewScale, scaleY: viewScale }, zoomspeed, createjs.Ease.cubicOut);
 	
+	for (var c = 0; c < viewContainer.children.length; c++) {
+		var ps = viewContainer.children[c].getChildByName("panelSocket");
+		createjs.Tween.get(ps, {override: true}).to({scaleX: 1 / viewScale, scaleY: 1 / viewScale}, zoomspeed, createjs.Ease.cubicOut);
+		setTimeout(drawConnections(viewContainer.children[c]), 200);
+	}
 }
 
 var sidebarClosed = false;

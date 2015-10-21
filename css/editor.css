@@ -1,3 +1,20 @@
+@font-face {
+    font-family: UnmaskedBB;
+    src: url(/dsr/css/font/UnmaskedBB.otf);
+}
+
+@font-face {
+    font-family: UnmaskedBB;
+    src: url(/dsr/css/font/UnmaskedBB_ital.otf);
+    font-style:italic;
+}
+
+@font-face {
+    font-family: UnmaskedBB;
+    src: url(/dsr/css/font/UnmaskedBB_bold.otf);
+    font-weight:bold;
+}
+
 body {
 	background-color:#ccc;
 	overflow:hidden;
@@ -88,7 +105,8 @@ canvas {
 	right:0;
 	width:280px;
 	height:100%;
-	padding:10px;
+	padding:0;
+	background-color:#222;
 	background-color:rgba(20,20,20,0.8);
 	color:#ccc;
 	-webkit-transition: width 0.3s;
@@ -101,11 +119,10 @@ canvas {
 }
 
 #file {
-	padding-bottom:10px;
-	border-bottom:1px solid #ccc;
+	padding:10px;
 }
 
-#file input[type="text"] {
+input[type="text"] {
 	color:#333;
 	font-size:1.2rem;
 	font-weight:bold;
@@ -115,7 +132,89 @@ canvas {
 	top:0;
 }
 
+input[type="number"] {
+	color:#333;
+	font-size:1.2rem;
+	font-weight:bold;
+	height:30px;
+	width:100px;
+	margin:0;
+	top:0;
+}
 
+#properties {
+	padding:18px;
+	background-color:#222;
+}
+
+.field {
+	margin-top:10px;
+}
+
+.field p {
+	font-size:70%;
+	margin:0;
+	padding:0;
+}
+
+.labelside {
+	margin-top:20px;
+}
+
+.labeltop input[type="text"] {
+	width:100%;
+}
+
+.labeltop p {
+	
+}
+
+.labelside input[type="text"] {
+	width:70%;
+}
+
+.labelside p {
+	line-height:30px;
+	float:left;
+	clear:none;
+	margin-right:20px;
+}
+
+
+#object-name {
+	font-weight:bold;
+}
+
+#object-name span {
+	font-weight:normal;
+	color:#999;
+	font-size:75%;
+	margin-left:10px;
+}
+
+#tabs {
+	clear:left;
+	list-style:none;
+	padding:4px;
+}
+
+#tabs li {
+	float:left;
+	display:block;
+	background:#555;
+	color:#aaa;
+	font-size:80%;
+	font-weight:bolder;
+	padding:5px 10px;
+	margin:0;
+	margin-right:2px;
+	border-radius: 10px 10px 0 0;
+}
+
+#tabs .selected {
+	background-color:#222;
+	color:#ccc;
+}
 
 #sidebar .button {
 	color:#444;
@@ -214,4 +313,22 @@ canvas {
 
 #dialog p {
 	margin:10px;
+}
+
+.bubble {
+	font-family:UnmaskedBB;
+	text-align: center;
+	background-size: 100% 100%;
+}
+
+.bubble p {
+	padding: 12px 18px 20px;
+	margin:0;
+	font-size: 100%;
+	line-height: 1rem;
+}
+
+.box p {
+	padding: 15px;
+	font-size:100%;
 }
