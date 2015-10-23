@@ -1,0 +1,139 @@
+function checkPath(path)
+{
+	if (typeof path == "undefined" || path === "" ) {
+		window.alert("You forgot to enter a path!");
+		return false;
+	}
+	
+	var filename = path.split("/").pop();
+	var extension = filename.split(".").pop();
+	
+	if (extension != "json" && extension != "txt") {
+		window.alert("Please specify a .json or .txt file.");
+		return false;
+	}
+	
+	return true;
+}
+
+function saveJSON (path) {
+	
+	if (!checkPath(path)) return;
+	
+	var filename = path.split("/").pop();
+	
+	doesFileExist(path);
+	
+	function doesFileExist(urlToFile)
+	{
+		var xhr = new XMLHttpRequest();
+		xhr.open('HEAD', urlToFile, true);
+		xhr.send();
+		
+		xhr.onload = function() {
+			if (xhr.status == "404") {
+				// File not found
+				writeToFile();
+			} else {
+				// File exists
+				if (window.confirm("'"+path+"' already exists.\nDo you want to overwrite it?")) writeToFile();
+				else return null;
+			}
+		};
+	}
+	
+	function writeToFile() {
+		//window.alert("Writing to file! ..not really lol");
+		var sendrequest = new XMLHttpRequest();
+		sendrequest.onload = function() {
+			if (sendrequest.status >= 200 && sendrequest.status < 400) {
+				var dialog = document.querySelector("#dialog");
+				dialog.innerHTML = "<p>'" + path + "' saved successfully<p>";
+				//dialog.style.top = "50%";
+				//dialog.style.left = "50%";
+				dialog.style.opacity = 0.8;
+				setTimeout(function() {
+					dialog.style.opacity = 0;
+				}, 2000);
+			}
+			//window.alert(sendrequest.status + " - " + sendrequest.responseText);	
+		};
+		sendrequest.open("POST","json.php",true);
+		sendrequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		//sendrequest.responseType = 'json';
+		console.log(path);
+		sendrequest.send("json=" + JSON.stringify(panels, null, 4) + "&path=" + path);
+	}
+}
+
+function loadJSON (path, callback) {
+	
+	if (!checkPath(path)) return;
+	//clearAll();
+	
+	var request = new XMLHttpRequest();
+	request.open('GET', path + '?_=' + new Date().getTime(), true);
+
+	var mobile_small_panels = 0;
+
+	request.onload = function() {
+		if (request.status >= 200 && request.status < 400) {
+			// Success!
+			panels = JSON.parse(request.responseText);
+			preloadImages(panels, callback);
+		} else {
+		// We reached our target server, but it returned an error
+			if (request.status == 404) window.alert("File not found!");
+			else window.alert(request.responseText);
+		return null;
+		}
+	};
+	
+	request.onerror = function() {
+		alert(request.responseText);	
+	};
+	
+	request.send();
+}
+
+function preloadImages(array, callback) {
+	var loaded = 0;
+	var images = [];
+	images.push("game/img/bubbles/medium_bubble_left.png");
+	images.push("game/img/bubbles/medium_bubble_down.png");
+	images.push("game/img/bubbles/medium_box.png");
+	images.push("game/img/bubbles/small_box.png");
+	images.push("game/img/bubbles/small_bubble_down.png");
+	images.push("game/img/bubbles/x_small_bubble_left.png");
+	for (var i=0; i<array.length; i++) {
+		images.push("game/img/" + array[i].image);
+	}
+
+	function imageLoaded() {
+		loaded++;
+		updateProgress();
+	}
+
+	function updateProgress() {
+		document.getElementById("progress_bar").style.width = (loaded/images.length * 100).toString() + "%";
+		if (loaded == images.length) {
+			setTimeout(function() {
+				document.getElementById("progress").style.opacity = 0;
+			}, 100);
+			callback();
+		}
+	}
+
+	setTimeout(function() {
+		document.getElementById("progress").style.opacity = 1;
+	}, 100);
+
+	setTimeout(function() {
+		// preload image
+		for (var l=0; l<images.length; l++) {
+			var img = new Image();
+			img.src = images[l];
+			img.onload = imageLoaded;
+		}
+	}, 50);
+}

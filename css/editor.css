@@ -316,6 +316,7 @@ input[type="number"] {
 }
 
 .bubble {
+	cursor:move;
 	font-family:UnmaskedBB;
 	text-align: center;
 	background-size: 100% 100%;
