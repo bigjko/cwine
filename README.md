@@ -2,7 +2,7 @@
 
 ## A Comic Twine Web App/Tool/Something!
 
-** STILL MASSIVELY UNFINISHED! ** Ok, thanks!
+**STILL MASSIVELY UNFINISHED!** Ok, thanks!
 
 ## SORT OF WORKING FEATURES
 
