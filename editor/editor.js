@@ -8,6 +8,7 @@ var dragoffset = {x:0, y:0};
 //var dragBox;
 var zoomNumber = 3;
 var zoomStep = [0.2, 0.3, 0.5, 0.75, 1, 1.5, 2];
+var dragging_element;
 
 var defaultGamePath = "game/";
 var con_r = 6;
@@ -18,12 +19,21 @@ var con_r = 6;
   }, 1000);
 }; */
 
-window.onload = function() { 
+document.addEventListener("keydown", function(e) {
+  if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+    e.preventDefault();
+    // Process event...
+      saveJSON(nodeContainer.toObject(), defaultGamePath + document.querySelector("#filepath").value);
+  }
+}, false);
+
+
+window.onload = function() {
 	document.querySelector("#load").onclick = function() {
 		loadJSON(defaultGamePath + document.querySelector("#filepath").value, init);
 	};
 	document.querySelector("#save").onclick = function() {
-		saveJSON(defaultGamePath + document.querySelector("#filepath").value);
+		saveJSON(nodeContainer.toObject(), defaultGamePath + document.querySelector("#filepath").value);
 	};
 	//document.querySelector("#save");
 	loadJSON(defaultGamePath + "panels.json", init);
@@ -32,13 +42,13 @@ window.onload = function() {
 //request.send();
 
 function initNodes() {
-	nodeContainer = new createjs.Container();
+	nodeContainer = new NodeContainer();
 	for (var p=0; p<panels.length;p++) {
 		var panel = new Panel(panels[p]);
 		nodeContainer.addChild(panel);
 	}
 	viewContainer.addChild(nodeContainer);
-	
+
 	drawAllConnections();
 }
 
@@ -48,13 +58,13 @@ window.onresize = function(event) {
 
     stage.canvas.width = view.offsetWidth;
     stage.canvas.height = view.offsetHeight;
-	
+
 	stage.getChildByName("dragBox").graphics.beginFill("#ccc").drawRect(0,0,stage.canvas.width, stage.canvas.height);
     //stage.update();
 };
 
 function clearAll() {
-	
+
 	function clearEvents(disObj) {
 		console.log(disObj);
 		disObj.removeAllEventListeners();
@@ -67,7 +77,10 @@ function clearAll() {
 	if (stage !== undefined) clearEvents(stage);
 }
 
-function init() {	
+function init(obj) {
+    
+    panels = obj.nodes;
+    
 	if (stage === undefined) {
 		stage = new createjs.Stage("edit_canvas");
 		createjs.Ticker.setFPS(60);
@@ -78,14 +91,14 @@ function init() {
 		var bubbles = document.querySelectorAll(".bubble");
 		var view = document.querySelector("#view");
 		for (var b=0; b < bubbles.length; b++) {
-			view.removeChild(bubbles[b]);	
+			view.removeChild(bubbles[b]);
 		}
 	}
-	
-	var cool_mads_node = new Node("panel");
-	cool_mads_node.addSocket(true);
-	console.log(cool_mads_node instanceof createjs.Container);
-	console.log(cool_mads_node instanceof Node);
+
+	//var cool_mads_node = new Node("panel");
+	//cool_mads_node.addSocket(true);
+	//console.log(cool_mads_node instanceof createjs.Container);
+	//console.log(cool_mads_node instanceof Node);
 	//stage.canvas.width = document.documentElement.clientWidth;
 	//stage.canvas.height = document.documentElement.clientHeight;
 
@@ -95,30 +108,39 @@ function init() {
 	stage.on("mousedown", function() { document.activeElement.blur(); });
 
 	stage.mouseMoveOutside = true;
+	stage.on("stagemousemove", stageMouseMove);
 
 	initviewContainer();
 	initNodes();
+
+	function stageMouseMove(evt) {
+		if (dragging_element !== undefined && dragging_element !== null) {
+			var local = dragging_element.parent.globalToLocal(evt.stageX - dragoffset.x, evt.stageY - dragoffset.y);
+			dragging_element.x = local.x;
+			dragging_element.y = local.y;
+		}
+	}
 }
 
 function initviewContainer() {
 	var dragBox;
-	
+
 	//var corners = new createjs.Shape();
-	
+
 	viewContainer = new createjs.Container();
 	viewScale = zoomStep[zoomNumber];
 	viewContainer.scaleX = viewScale;
 	viewContainer.scaleY = viewScale;
 	viewContainer.name = "View Container";
-	
+
 	function dragView(evt) {
 		//console.log("Draggin view! " + evt.target);
 		viewContainer.x = evt.stageX - dragoffset.x;
 		viewContainer.y = evt.stageY - dragoffset.y;
-		
+
 		centerViewOrigin(evt.stageX - dragoffset.x, evt.stageY - dragoffset.y);
 	}
-	
+
 	function centerViewOrigin(x,y) {
 		viewContainer.regX = ((document.querySelector("#view").offsetWidth - 280)/2 - viewContainer.x)/viewScale;
 		viewContainer.regY = ((document.querySelector("#view").offsetHeight/2) - viewContainer.y)/viewScale;
@@ -127,8 +149,8 @@ function initviewContainer() {
 		viewContainer.x = x + viewContainer.regX * viewScale;
 		viewContainer.y = y + viewContainer.regY * viewScale;
 	}
-	
-	dragBox = new createjs.Shape(new createjs.Graphics().beginFill("#ccc").drawRect(0,0,stage.canvas.width, stage.canvas.height));
+
+	dragBox = new createjs.Shape(new createjs.Graphics().beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height));
 	dragBox.on("mousedown", function(evt) {
 		dragoffset.x = evt.stageX - viewContainer.x + viewContainer.regX*viewScale;
 		dragoffset.y = evt.stageY - viewContainer.y + viewContainer.regY*viewScale;
@@ -151,18 +173,18 @@ function drawAllConnections() {
 }
 
 function zoom(zoomModifier) {
-	
+
 	if (zoomNumber + zoomModifier < 0 || zoomNumber + zoomModifier >= zoomStep.length) return;
-	
+
 	var zoomspeed = 200;
-	
+
 	zoomNumber += zoomModifier;
 	viewScale = zoomStep[zoomNumber];
 	console.log(viewScale);
-	
+
 	createjs.Tween.get(viewContainer, {override: true})
 		.to({ scaleX: viewScale, scaleY: viewScale }, zoomspeed, createjs.Ease.cubicOut);
-	
+
 	/*for (var c = 0; c < viewContainer.children.length; c++) {
 		var ps = viewContainer.children[c].getChildByName("panelSocket");
 		createjs.Tween.get(ps, {override: true}).to({scaleX: 1 / viewScale, scaleY: 1 / viewScale}, zoomspeed, createjs.Ease.cubicOut);
@@ -185,3 +207,12 @@ function hideSidebar() {
 	}
 }
 
+function mouseUp() {
+	console.log("Mouse Up on HTML Element");
+	dragging_element = undefined;
+}
+
+function mouseDown(elm) {
+	console.log("Mouse Down on HTML Element");
+	dragging_element = elm;
+}

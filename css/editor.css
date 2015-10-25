@@ -1,17 +1,17 @@
 @font-face {
     font-family: UnmaskedBB;
-    src: url(/dsr/css/font/UnmaskedBB.otf);
+    src: url(font/UnmaskedBB.otf);
 }
 
 @font-face {
     font-family: UnmaskedBB;
-    src: url(/dsr/css/font/UnmaskedBB_ital.otf);
+    src: url(font/UnmaskedBB_ital.otf);
     font-style:italic;
 }
 
 @font-face {
     font-family: UnmaskedBB;
-    src: url(/dsr/css/font/UnmaskedBB_bold.otf);
+    src: url(font/UnmaskedBB_bold.otf);
     font-weight:bold;
 }
 
@@ -316,13 +316,14 @@ input[type="number"] {
 }
 
 .bubble {
-	cursor:move;
+	pointer-events:none;
 	font-family:UnmaskedBB;
 	text-align: center;
 	background-size: 100% 100%;
 }
 
 .bubble p {
+	pointer-events:none;
 	padding: 12px 18px 20px;
 	margin:0;
 	font-size: 100%;
@@ -330,6 +331,7 @@ input[type="number"] {
 }
 
 .box p {
+	pointer-events:none;
 	padding: 15px;
 	font-size:100%;
 }

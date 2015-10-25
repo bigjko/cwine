@@ -4,34 +4,34 @@ function checkPath(path)
 		window.alert("You forgot to enter a path!");
 		return false;
 	}
-	
+
 	var filename = path.split("/").pop();
 	var extension = filename.split(".").pop();
-	
+
 	if (extension != "json" && extension != "txt") {
 		window.alert("Please specify a .json or .txt file.");
 		return false;
 	}
-	
+
 	return true;
 }
 
-function saveJSON (path) {
-	
+function saveJSON (obj, path) {
+
 	if (!checkPath(path)) return;
-	
+
 	var filename = path.split("/").pop();
-	
+
 	doesFileExist(path);
-	
+
 	function doesFileExist(urlToFile)
 	{
 		var xhr = new XMLHttpRequest();
 		xhr.open('HEAD', urlToFile, true);
 		xhr.send();
-		
+
 		xhr.onload = function() {
-			if (xhr.status == "404") {
+			if (xhr.status == 404) {
 				// File not found
 				writeToFile();
 			} else {
@@ -41,36 +41,37 @@ function saveJSON (path) {
 			}
 		};
 	}
-	
+
 	function writeToFile() {
 		//window.alert("Writing to file! ..not really lol");
 		var sendrequest = new XMLHttpRequest();
 		sendrequest.onload = function() {
 			if (sendrequest.status >= 200 && sendrequest.status < 400) {
+                window.alert(sendrequest.responseText);
 				var dialog = document.querySelector("#dialog");
 				dialog.innerHTML = "<p>'" + path + "' saved successfully<p>";
 				//dialog.style.top = "50%";
 				//dialog.style.left = "50%";
-				dialog.style.opacity = 0.8;
+				dialog.style.opacity = "0.8";
 				setTimeout(function() {
-					dialog.style.opacity = 0;
+					dialog.style.opacity = "0";
 				}, 2000);
 			}
-			//window.alert(sendrequest.status + " - " + sendrequest.responseText);	
+			//window.alert(sendrequest.status + " - " + sendrequest.responseText);
 		};
 		sendrequest.open("POST","json.php",true);
 		sendrequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		//sendrequest.responseType = 'json';
 		console.log(path);
-		sendrequest.send("json=" + JSON.stringify(panels, null, 4) + "&path=" + path);
+		sendrequest.send("json=" + JSON.stringify(obj, null, 4) + "&path=" + path);
 	}
 }
 
 function loadJSON (path, callback) {
-	
+
 	if (!checkPath(path)) return;
 	//clearAll();
-	
+
 	var request = new XMLHttpRequest();
 	request.open('GET', path + '?_=' + new Date().getTime(), true);
 
@@ -79,8 +80,9 @@ function loadJSON (path, callback) {
 	request.onload = function() {
 		if (request.status >= 200 && request.status < 400) {
 			// Success!
-			panels = JSON.parse(request.responseText);
-			preloadImages(panels, callback);
+			//panels = JSON.parse(request.responseText);
+            var obj = JSON.parse(request.responseText);
+			preloadImages(obj, callback);
 		} else {
 		// We reached our target server, but it returned an error
 			if (request.status == 404) window.alert("File not found!");
@@ -88,15 +90,15 @@ function loadJSON (path, callback) {
 		return null;
 		}
 	};
-	
+
 	request.onerror = function() {
-		alert(request.responseText);	
+		alert(request.responseText);
 	};
-	
+
 	request.send();
 }
 
-function preloadImages(array, callback) {
+function preloadImages(obj, callback) {
 	var loaded = 0;
 	var images = [];
 	images.push("game/img/bubbles/medium_bubble_left.png");
@@ -105,8 +107,8 @@ function preloadImages(array, callback) {
 	images.push("game/img/bubbles/small_box.png");
 	images.push("game/img/bubbles/small_bubble_down.png");
 	images.push("game/img/bubbles/x_small_bubble_left.png");
-	for (var i=0; i<array.length; i++) {
-		images.push("game/img/" + array[i].image);
+	for (var i=0; i<obj.nodes.length; i++) {
+		images.push("game/img/" + obj.nodes[i].image);
 	}
 
 	function imageLoaded() {
@@ -118,14 +120,14 @@ function preloadImages(array, callback) {
 		document.getElementById("progress_bar").style.width = (loaded/images.length * 100).toString() + "%";
 		if (loaded == images.length) {
 			setTimeout(function() {
-				document.getElementById("progress").style.opacity = 0;
+				document.getElementById("progress").style.opacity = "0";
 			}, 100);
-			callback();
+			callback(obj);
 		}
 	}
 
 	setTimeout(function() {
-		document.getElementById("progress").style.opacity = 1;
+		document.getElementById("progress").style.opacity = "1";
 	}, 100);
 
 	setTimeout(function() {

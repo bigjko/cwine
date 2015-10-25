@@ -1,138 +1,136 @@
-[
-    {
-        "name": "intro",
-        "size": 4,
-        "elements": [
-            {
-                "type": "bubble",
-                "text": "Copenhagen, Denmark - <strong>1879</strong>",
-                "bubble_type": "box",
-                "align": {
-                    "x": "right",
-                    "y": "bottom"
-                },
-                "position": {
-                    "x": 1,
-                    "y": 1
-                }
-            }
-        ],
-        "image": "panel_01.jpg",
-        "editor": {
-            "position": {
-                "x": -270,
-                "y": 340
-            }
-        },
-        "goto": 2
+{
+    "config": {
+        "startnode": 0
     },
-    {
-        "name": "panel1",
-        "size": 1,
-        "elements": [
-            {
-                "type": "bubble",
-                "text": "Hey!<br>Fuck dig Mads!",
-                "bubble_type": "down",
+    "nodes": [
+        {
+            "name": null,
+            "size": 4,
+            "image": "panel_01.jpg",
+            "goto": 2,
+            "editor": {
                 "position": {
-                    "x": 25,
-                    "y": 25
-                },
-                "goto": 3
-            },
-            {
-                "type": "bubble",
-                "text": "Hi!",
-                "bubble_type": "down",
-                "position": {
-                    "x": 80,
-                    "y": 35
-                },
-                "goto": 4
-            }
-        ],
-        "image": "panel_06.jpg",
-        "editor": {
-            "position": {
-                "x": 350,
-                "y": 460
-            }
-        }
-    },
-    {
-        "name": "panel2",
-        "size": 1,
-        "elements": [
-            {
-                "type": "bubble",
-                "text": "lol!",
-                "bubble_type": "left",
-                "position": {
-                    "x": 35,
-                    "y": 40
+                    "x": -270,
+                    "y": 340
                 }
             },
-            {
-                "type": "bubble",
-                "text": "Wut?",
-                "bubble_type": "down",
-                "position": {
-                    "x": 90,
-                    "y": 30
+            "elements": [
+                {
+                    "text": "Copenhagen, Denmark - <strong>1879</strong>",
+                    "bubble_type": "box",
+                    "align": {
+                        "x": "right",
+                        "y": "bottom"
+                    },
+                    "position": {
+                        "x": 1,
+                        "y": 1
+                    }
                 }
-            }
-        ],
-        "image": "panel_04.jpg",
-        "editor": {
-            "position": {
-                "x": 210,
-                "y": 470
-            }
+            ]
         },
-        "goto": 1
-    },
-    {
-        "name": "panel2",
-        "size": 1,
-        "elements": [
-            {
-                "type": "bubble",
-                "text": "Meh..",
-                "bubble_type": "down",
+        {
+            "name": null,
+            "size": 1,
+            "image": "panel_06.jpg",
+            "editor": {
                 "position": {
-                    "x": 65,
-                    "y": 40
+                    "x": 350,
+                    "y": 460
                 }
-            }
-        ],
-        "image": "panel_04.jpg",
-        "editor": {
-            "position": {
-                "x": 710,
-                "y": 140
-            }
-        }
-    },
-    {
-        "name": "panel_fuckdigmads",
-        "size": 1,
-        "elements": [
-            {
-                "type": "bubble",
-                "text": "Hallo..",
-                "bubble_type": "down",
+            },
+            "elements": [
+                {
+                    "text": "Hey!<br>Fuck dig Mads!",
+                    "bubble_type": "down",
+                    "position": {
+                        "x": 25,
+                        "y": 25
+                    },
+                    "goto": 3
+                },
+                {
+                    "text": "Hi!",
+                    "bubble_type": "down",
+                    "position": {
+                        "x": 80,
+                        "y": 35
+                    },
+                    "goto": 4
+                }
+            ]
+        },
+        {
+            "name": null,
+            "size": 1,
+            "image": "panel_04.jpg",
+            "goto": 1,
+            "editor": {
                 "position": {
-                    "x": 65,
-                    "y": 40
+                    "x": 170,
+                    "y": 360
                 }
-            }
-        ],
-        "image": "panel_09.jpg",
-        "editor": {
-            "position": {
-                "x": 770,
-                "y": 640
-            }
+            },
+            "elements": [
+                {
+                    "text": "lol!",
+                    "bubble_type": "left",
+                    "position": {
+                        "x": 35,
+                        "y": 40
+                    }
+                },
+                {
+                    "text": "Wut?",
+                    "bubble_type": "down",
+                    "position": {
+                        "x": 88.49999999999997,
+                        "y": 45.357142857142854
+                    }
+                }
+            ]
+        },
+        {
+            "name": null,
+            "size": 1,
+            "image": "panel_04.jpg",
+            "editor": {
+                "position": {
+                    "x": 510,
+                    "y": 300
+                }
+            },
+            "elements": [
+                {
+                    "text": "Meh..",
+                    "bubble_type": "down",
+                    "position": {
+                        "x": 28.333333333333314,
+                        "y": 36.1904761904762
+                    }
+                }
+            ]
+        },
+        {
+            "name": null,
+            "size": 1,
+            "image": "panel_09.jpg",
+            "editor": {
+                "position": {
+                    "x": 510,
+                    "y": 480
+                }
+            },
+            "elements": [
+                {
+                    "text": "Hallo..",
+                    "bubble_type": "down",
+                    "position": {
+                        "x": 61.08892805640118,
+                        "y": 32.83068783068773
+                    }
+                }
+            ]
         }
-    }
-]
+    ]
+}
