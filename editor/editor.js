@@ -1,4 +1,5 @@
 var panels;
+var config;
 var stage;
 var viewContainer;
 var nodeContainer;
@@ -43,6 +44,7 @@ window.onload = function() {
 
 function initNodes() {
 	nodeContainer = new NodeContainer();
+	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
 		var panel = new Panel(panels[p]);
 		nodeContainer.addChild(panel);
@@ -80,6 +82,7 @@ function clearAll() {
 function init(obj) {
     
     panels = obj.nodes;
+    config = obj.config;
     
 	if (stage === undefined) {
 		stage = new createjs.Stage("edit_canvas");
@@ -152,6 +155,7 @@ function initviewContainer() {
 
 	dragBox = new createjs.Shape(new createjs.Graphics().beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height));
 	dragBox.on("mousedown", function(evt) {
+		nodeContainer.showProperties();
 		dragoffset.x = evt.stageX - viewContainer.x + viewContainer.regX*viewScale;
 		dragoffset.y = evt.stageY - viewContainer.y + viewContainer.regY*viewScale;
 	});

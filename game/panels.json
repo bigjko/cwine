@@ -1,6 +1,6 @@
 {
     "config": {
-        "startnode": 0
+        "startnode": "0"
     },
     "nodes": [
         {
@@ -41,7 +41,7 @@
             },
             "elements": [
                 {
-                    "text": "<b>WHAT?!</b>",
+                    "text": "That steak\nlooks real\njuicy",
                     "bubble_type": "down",
                     "position": {
                         "x": 74.66666666666663,
@@ -53,8 +53,8 @@
                     "text": "Hey",
                     "bubble_type": "down",
                     "position": {
-                        "x": 25.833333333333314,
-                        "y": 25.119047619047592
+                        "x": 25.16666666666666,
+                        "y": 15.595238095238063
                     },
                     "goto": 4
                 }
@@ -92,21 +92,21 @@
         },
         {
             "name": "er",
-            "size": 1,
-            "image": "panel_09.jpg",
+            "size": 4,
+            "image": "panel_01.jpg",
             "editor": {
                 "position": {
-                    "x": 500,
-                    "y": 550
+                    "x": 580,
+                    "y": 540
                 }
             },
             "elements": [
                 {
-                    "text": "I am\njuicy",
+                    "text": "I am way juicy",
                     "bubble_type": "down",
                     "position": {
-                        "x": 64.33333333333331,
-                        "y": 32.97619047619047
+                        "x": 66.0776439089692,
+                        "y": 37.079510703363894
                     }
                 }
             ]
@@ -117,8 +117,8 @@
             "image": "panel_09.jpg",
             "editor": {
                 "position": {
-                    "x": 550,
-                    "y": 360
+                    "x": 660,
+                    "y": 340
                 }
             },
             "elements": [

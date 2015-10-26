@@ -74,7 +74,7 @@
 		if (currentlySelected == node) return;
 		currentlySelected = node;
 
-		console.log("Showing properties for node " + node.name );
+		//console.log("Showing properties for node " + node.name );
 
 		var property_panel = document.querySelector("#properties");
 
@@ -257,7 +257,7 @@
 		for (s=0; s < ps.children.length; s++) {
 			ps.children[s].className = (s+1 == this.size) ? "selected" : "";
 		}
-	}
+	};
 
 	window.Panel = createjs.promote(Panel, "Node");
 
@@ -377,7 +377,7 @@
 		if (this.align !== undefined && this.align.x == "right") {
 			this.regX = element.clientWidth;
 		}
-	}
+	};
 
 	PanelElement.prototype.showProperties = function(evt) {
 		var node = evt.target;
@@ -463,8 +463,36 @@
 
 	function NodeContainer() {
 		this.Container_constructor();
+		this.startnode = 0;
 	} createjs.extend(NodeContainer, createjs.Container);
 
+
+	NodeContainer.prototype.showProperties = function() {
+
+		console.log(this);
+
+		if (currentlySelected == this) return;
+		currentlySelected = this;
+
+		var property_panel = document.querySelector("#properties");
+
+		var property_header = 	'<div id="object-name">' +
+									'<p>Project Properties</p>' +
+								'</div>';
+		property_panel.innerHTML = property_header;
+
+		var prop_startnode = '<div class="field labelside"><p>Start node:</p><input type="number" value="' + this.startnode + '" id="property-startnode"></div>';
+		property_panel.innerHTML += prop_startnode;
+
+		var propstart = document.querySelector("#property-startnode");
+		var container = this;
+		propstart.onchange = function() {
+			console.log("Start node changed", propstart.value);
+			container.startnode = propstart.value;
+			console.log(container.startnode);
+		};
+		
+	};
 
 	// toObject - For outputting editor parameters to a JSON object
 
@@ -473,7 +501,7 @@
 		var output = new Object();
 
 		output.config = {
-			startnode: 0
+			startnode: this.startnode
 		};
 
 		output.nodes = [];
@@ -520,7 +548,7 @@
 		}
 
 		return output;
-	}
+	};
 
 	window.NodeContainer = createjs.promote(NodeContainer, "Container");
 

@@ -1,4 +1,5 @@
 var panels;
+var config;
 
 var request = new XMLHttpRequest();
 request.open('GET', 'game/panels.json', true);
@@ -9,7 +10,9 @@ request.onload = function() {
   if (request.status >= 200 && request.status < 400) {
     // Success!
 	//alert(request.responseText);
-    panels = JSON.parse(request.responseText).nodes;
+    var json = JSON.parse(request.responseText)
+    panels = json.nodes;
+    config = json.config;
     preloadImages(panels, start);
   } else {
     // We reached our target server, but it returned an error
@@ -94,9 +97,11 @@ function speechBubble(sb) {
   }
 
   var clickable = "";
+  var onclick = "";
   if (sb.goto !== undefined) {
 
     clickable = "clickable";
+    onclick = ' onclick="addPanel(' + sb.goto + ')" '
 
   }
 
@@ -105,7 +110,7 @@ function speechBubble(sb) {
 
   bubble_html = "<div class='bubble " + center + " " + box_class + " " + clickable + " noselect'" +
                 "style='background-image:url(\"game/img/bubbles/" + image + "\");" + 
-                position + "'>" +
+                position + "'" + onclick + ">" +
                 "<p>" + sb.text.replace(/\n/g, "<br>") + "</p></div>";
 
 
@@ -118,38 +123,38 @@ var row_count = 0;
 
 
 function start() {
-	var start_id = 0;
+	var start_id = config.startnode;
 	
 	var id = start_id;
 	var count = 0;
 	
 	document.getElementById("panels").innerHTML = "<div class='row'></div>";
 	addPanel(start_id);
-
-	setTimeout(function() {
-		var panel_divs = document.querySelectorAll(".panel");
-		for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
-	},100);
 }
 
-/*function movePanels(row) {
-	console.log("row: " + row + ", row size: " + row_size);
-	switch (row_size) {
+function movePanels(row, size) {
+	console.log("row: " + row + ", row size: " + size);
+	switch (size) {
 		case 3:
-		document.getElementById("panels").children[row].children[0].className += " .offset-by-one-half";
+		document.querySelector("#panels").children[row].children[0].className += " offset-by-one-half";
 		break;
 		
 		case 2:
-		document.getElementById("panels").children[row].children[0].className += " .offset-by-three";
+		document.querySelector("#panels").children[row].children[0].className += " offset-by-three";
 		break;
 		
 		case 1:
-		document.getElementById("panels").children[row].children[0].className += " .offset-by-five";
+		document.querySelector("#panels").children[row].children[0].className += " offset-by-five";
 		break;
 	}
-}*/
+}
 
 function addPanel(id) {
+  var bubbles = document.querySelectorAll(".clickable");
+  for (b=0; b<bubbles.length; b++) {
+    removeClass(bubbles[b], "clickable");
+  }
+
 	//var output = "";
 	var count = 0;
 	//output += newPanelElement(id);
@@ -157,7 +162,7 @@ function addPanel(id) {
 	if (panels[id].size + row_size > 4) {
 	  // NEW ROW
 		//output += "</div><div class='row'>";
-		
+		//if (row_size < 4) movePanels(row_count,row_size);
 		document.getElementById("panels").innerHTML += "<div class='row'></div>";
 		row_size = 0;
 		row_count++;
@@ -171,15 +176,22 @@ function addPanel(id) {
 		count++;
 		if (panels[id].size + row_size > 4) {
 		  // NEW ROW
-			//if (row_size < 4) movePanels(row_count);
+			//if (row_size < 4) movePanels(row_count,row_size);
 			document.getElementById("panels").innerHTML += "<div class='row'></div>";
 			row_size = 0;
 			row_count++;
 		}
 		document.getElementById("panels").children[row_count].innerHTML += newPanelElement(id);
 		row_size += panels[id].size;
+
+    // In case of infinite looping comic: Abort
 		if (count > 50) break;
 	}
+
+  setTimeout(function() {
+    var panel_divs = document.querySelectorAll(".panel");
+    for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
+  },100);
 	/*
 	setTimeout(function() {
 		var panel_divs = document.querySelectorAll(".panel");
@@ -248,4 +260,15 @@ function newPanelElement(id) {
 	
 	
 	return output;
+}
+
+function hasClass(ele,cls) {
+    return ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
+}
+
+function removeClass(ele,cls) {
+    if (hasClass(ele,cls)) {
+        var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+        ele.className=ele.className.replace(reg,' ');
+    }
 }
