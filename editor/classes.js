@@ -62,8 +62,8 @@
 		var targ = stage.getObjectUnderPoint(evt.stageX, evt.stageY);
 		if (targ.parent instanceof Node) {
 			evt.target.parent.goto = nodeContainer.getChildIndex(targ.parent);
+			evt.target.parent.owner.goto = nodeContainer.getChildIndex(targ.parent);
 		}
-        else evt.target.owner.goto = nodeContainer.getChildIndex(targ.parent);
 		evt.target.parent.parent.drawConnections();
 	};
 

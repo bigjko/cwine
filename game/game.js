@@ -9,7 +9,7 @@ request.onload = function() {
   if (request.status >= 200 && request.status < 400) {
     // Success!
 	//alert(request.responseText);
-    panels = JSON.parse(request.responseText);
+    panels = JSON.parse(request.responseText).nodes;
     preloadImages(panels, start);
   } else {
     // We reached our target server, but it returned an error
@@ -84,7 +84,7 @@ function speechBubble(sb) {
   }
   else image += "_bubble_" + bubble_orient + ".png";
 
-  if (bubble_orient == "down") center = "center-bubble";
+  if (bubble_orient == "down") center = "center-origin";
 
   var align_x = "left";
   var align_y = "top";
@@ -93,10 +93,12 @@ function speechBubble(sb) {
     align_y = sb.align.y;
   }
 
+  var transform = "transform: translate(" + sb.position.x.toString() + "%, " + sb.position.y.toString() + "%);";
+  var position = align_x + ":" + sb.position.x.toString() + "%;" + align_y + ":" + sb.position.y.toString() + "%;";
+
   bubble_html = "<div class='bubble " + center + " " + box_class + "'" +
                 "style='background-image:url(\"game/img/bubbles/" + image + "\");" + 
-                align_x + ":"+ sb.position.x +"%; " + 
-                align_y + ":"+ sb.position.y +"%;'>" +
+                position + "'>" +
                 "<p>" + sb.text + "</p></div>";
 
 
@@ -206,11 +208,7 @@ function start() {
 		
 		if (count > 20) break;
 	}
-	
-	//output += "</div>";
-	addPanel(0);
-	addPanel(0);
-	//document.getElementById("panels").innerHTML = output;
+
 	setTimeout(function() {
 		var panel_divs = document.querySelectorAll(".panel");
 		for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }

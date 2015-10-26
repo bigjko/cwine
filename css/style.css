@@ -85,32 +85,35 @@ header img {
 }
 
 .bubble {
+	z-index:20 !important;
 	float:left;
 	position:absolute;
 	text-align: center;
 	background-size: 100% 100%;
-	-ms-transform: translate(0,-100%); /* IE 9 */
-   	-webkit-transform: translate(0,-100%); /* Safari */
-    transform: translate(0,-100%);
+	-ms-transform: translate(0%, -100%); /* IE 9 */
+   	-webkit-transform: translate(0%, -100%); /* Safari */
+    transform: translate(0%, -100%);
 }
 
 .bubble p {
+	white-space:nowrap;
 	padding: 15px 15px 22px 15px;
 	margin:0;
 	font-size: 90%;
 	line-height: 1.2rem;
+	display:block;
 }
 
-.center-bubble {
-	-ms-transform: translate(-50%,-100%); /* IE 9 */
-   	-webkit-transform: translate(-50%,-100%); /* Safari */
-    transform: translate(-50%,-100%);
+.center-origin {
+	-ms-transform: translate(-50%, -100%); /* IE 9 */
+   	-webkit-transform: translate(-50%, -100%); /* Safari */
+    transform: translate(-50%, -100%);
 }
 
 .box {
-	-ms-transform: translate(0,0); /* IE 9 */
-   	-webkit-transform: translate(0,0); /* Safari */
-    transform: translate(0,0);
+	-ms-transform: translate(0, 0); /* IE 9 */
+   	-webkit-transform: translate(0, 0); /* Safari */
+    transform: translate(0, 0);
 }
 
 .box p {
