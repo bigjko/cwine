@@ -22,7 +22,8 @@ function saveJSON (obj, path) {
 
 	var filename = path.split("/").pop();
 
-	doesFileExist(path);
+	//doesFileExist(path);
+	writeToFile();
 
 	function doesFileExist(urlToFile)
 	{
@@ -47,7 +48,7 @@ function saveJSON (obj, path) {
 		var sendrequest = new XMLHttpRequest();
 		sendrequest.onload = function() {
 			if (sendrequest.status >= 200 && sendrequest.status < 400) {
-                window.alert(sendrequest.responseText);
+                //window.alert(sendrequest.responseText);
 				var dialog = document.querySelector("#dialog");
 				dialog.innerHTML = "<p>'" + path + "' saved successfully<p>";
 				//dialog.style.top = "50%";

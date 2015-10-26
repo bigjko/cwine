@@ -54,7 +54,6 @@
 			<label for="filepath">JSON file (in 'game/')</label>
 			<input class="" type="text" placeholder="path/to/json" value="panels.json" id="filepath"><input id="load" class="button" type="submit" value="Load"><input id="save" class="button button-primary" type="submit" value="Save">
 		</div>
-	  	
 			
 	  		<ul id="tabs">
 				<li class="selected">Properties</li>
@@ -75,7 +74,12 @@
 			</div>
 			<div class="field labelside">
 				<p>Size:</p>
-				<input type="number" placeholder="" id="property-size" min="1" max ="4">
+				<ul class="numberbuttons noselect">
+					<li class="selected">1</li>
+					<li>2</li>
+					<li>3</li>
+					<li>4</li>
+				</ul>
 			</div>
 	  	</div>
 	  	<!-- <div class="close noselect" onclick="hideSidebar()">></div> -->

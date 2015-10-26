@@ -93,10 +93,17 @@ function speechBubble(sb) {
     align_y = sb.align.y;
   }
 
-  var transform = "transform: translate(" + sb.position.x.toString() + "%, " + sb.position.y.toString() + "%);";
-  var position = align_x + ":" + sb.position.x.toString() + "%;" + align_y + ":" + sb.position.y.toString() + "%;";
+  var clickable = "";
+  if (sb.goto !== undefined) {
 
-  bubble_html = "<div class='bubble " + center + " " + box_class + "'" +
+    clickable = "clickable";
+
+  }
+
+  var transform = "transform: translate(" + sb.position.x.toString() + "%, " + sb.position.y.toString() + "%);";
+  var position = align_x + ":" + Math.round(sb.position.x).toString() + "%;" + align_y + ":" + Math.round(sb.position.y).toString() + "%;";
+
+  bubble_html = "<div class='bubble " + center + " " + box_class + " " + clickable + " noselect'" +
                 "style='background-image:url(\"game/img/bubbles/" + image + "\");" + 
                 position + "'>" +
                 "<p>" + sb.text + "</p></div>";
@@ -105,80 +112,6 @@ function speechBubble(sb) {
   return bubble_html;
 }
 
-function showAllPanels() {
-  var output = "";
-  //var row_size = 0;
-  output += "<div class='row'>";
-	for (var i = 0; i < panels.length; i++) {
-
-    var panel_html = "";
-
-    if (panels[i].size + row_size > 4) {
-      // NEW ROW
-      output += "</div><div class='row'>";
-      row_size = 0;
-    }
-
-    var mobile_small = "";
-
-    if (panels[i].size == 1) {
-      if (mobile_small_panels === 0) {
-        mobile_small = "mobile-margin";
-        mobile_small_panels++;
-      }
-      else mobile_small_panels = 0;
-    }
-    else mobile_small_panels = 0;
-
-    var column_size;
-    switch (panels[i].size) {
-      case 1:
-      column_size = "three columns";
-      break;
-      case 2:
-      column_size = "six columns";
-      break;
-      case 3:
-      column_size = "nine columns";
-      break;
-      case 4:
-      column_size = "twelve columns";
-      break;
-    }
-		panel_html += "<div class='panel " + column_size + " " + mobile_small + "' style='opacity:0;'>";   
-
-    var height = 280;
-    if (panels[i].height !== undefined) height = panels[i].height;
-
-		//panel_html += "<img class='u-max-full-width' src='game/img/" + panels[i].image + "' />";
-    panel_html += "<img class='u-max-full-width' src='game/img/" + panels[i].image + "' />";
-    
-    for (var e=0; e < panels[i].elements.length; e++) {
-      var el = panels[i].elements[e];
-      
-      panel_html += speechBubble(el);
-      /*"<div class='bubble center-bubble' " + 
-      "style='"+ speechBubble(el.bubble_type) +
-      align_x + ":"+ el.position.x +"%; " + 
-      align_y + ":"+ el.position.y +"%;'>" +
-      "<p>" + el.text + "</p>" +
-      "</div>";*/
-    }
-
-    panel_html += "</div>";
-
-    output += panel_html;
-
-    row_size += panels[i].size;
-	}
-  output += "</div>";
-  //output = "IS THIS WORKING?!";
-  document.getElementById("panels").innerHTML = output;
-  setTimeout(function() {
-    var panel_divs = document.querySelectorAll(".panel");
-    for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
-  },50);
-}
 
 var row_size = 0;
 var row_count = 0;
@@ -191,23 +124,7 @@ function start() {
 	var count = 0;
 	
 	document.getElementById("panels").innerHTML = "<div class='row'></div>";
-	document.getElementById("panels").children[row_count].innerHTML += newPanelElement(id);
-	row_size += panels[id].size;
-	
-	while (panels[id].goto !== undefined) {
-		id = panels[id].goto;
-		count++;
-		if (panels[id].size + row_size > 4) {
-		  // NEW ROW
-			document.getElementById("panels").innerHTML += "<div class='row'></div>";
-			row_size = 0;
-			row_count++;
-		}
-		document.getElementById("panels").children[row_count].innerHTML += newPanelElement(id);
-		row_size += panels[id].size;
-		
-		if (count > 20) break;
-	}
+	addPanel(start_id);
 
 	setTimeout(function() {
 		var panel_divs = document.querySelectorAll(".panel");
@@ -303,7 +220,7 @@ function newPanelElement(id) {
       column_size = "twelve columns";
       break;
     }
-		panel_html += "<div class='panel " + column_size + " " + mobile_small + "' style='opacity:0;'>";   
+		panel_html += "<div class='panel noselect " + column_size + " " + mobile_small + "' style='opacity:0;'>";   
 
     var height = 280;
     if (panels[i].height !== undefined) height = panels[i].height;

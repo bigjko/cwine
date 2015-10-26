@@ -45,6 +45,18 @@ header img {
 	.mobile-margin { margin-right: 4%; }
 }
 
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    user-drag: none; 
+	-moz-user-select: none;
+	-webkit-user-drag: none;
+}
+
 #progress {
 	opacity: 0;
 	color:#999;
@@ -90,9 +102,23 @@ header img {
 	position:absolute;
 	text-align: center;
 	background-size: 100% 100%;
+	cursor:default;
 	-ms-transform: translate(0%, -100%); /* IE 9 */
    	-webkit-transform: translate(0%, -100%); /* Safari */
     transform: translate(0%, -100%);
+	
+}
+
+.clickable {
+	-webkit-filter: brightness(70%) sepia(100%) saturate(200%);
+	filter: brightness(70%) sepia(100%) hue-rotate(300deg) saturate(200%);  
+	-webkit-transition: -webkit-filter 0.5s;
+	cursor:pointer;
+}
+
+.clickable:hover {
+	-webkit-filter: brightness(90%) sepia(100%) saturate(75%);
+	filter: brightness(90%) sepia(100%) saturate(75%); 
 }
 
 .bubble p {

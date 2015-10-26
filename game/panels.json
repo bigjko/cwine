@@ -4,13 +4,13 @@
     },
     "nodes": [
         {
-            "name": null,
+            "name": "intro",
             "size": 4,
             "image": "panel_01.jpg",
             "goto": 2,
             "editor": {
                 "position": {
-                    "x": -270,
+                    "x": -280,
                     "y": 340
                 }
             },
@@ -30,10 +30,9 @@
             ]
         },
         {
-            "name": null,
+            "name": "du",
             "size": 1,
             "image": "panel_06.jpg",
-            "goto": 3,
             "editor": {
                 "position": {
                     "x": 350,
@@ -45,8 +44,8 @@
                     "text": "Hey!<br>Fuck dig Mads!",
                     "bubble_type": "down",
                     "position": {
-                        "x": 78,
-                        "y": 34.285714285714285
+                        "x": 74.66666666666663,
+                        "y": 35.119047619047635
                     },
                     "goto": 3
                 },
@@ -54,15 +53,15 @@
                     "text": "Hi!",
                     "bubble_type": "down",
                     "position": {
-                        "x": 24,
-                        "y": 14.285714285714285
+                        "x": 20.333333333333314,
+                        "y": 18.333333333333307
                     },
                     "goto": 4
                 }
             ]
         },
         {
-            "name": null,
+            "name": "cool",
             "size": 1,
             "image": "panel_04.jpg",
             "goto": 1,
@@ -92,13 +91,13 @@
             ]
         },
         {
-            "name": null,
+            "name": "er",
             "size": 1,
-            "image": "panel_04.jpg",
+            "image": "panel_09.jpg",
             "editor": {
                 "position": {
-                    "x": 510,
-                    "y": 300
+                    "x": 500,
+                    "y": 550
                 }
             },
             "elements": [
@@ -106,20 +105,20 @@
                     "text": "Meh..",
                     "bubble_type": "down",
                     "position": {
-                        "x": 64.83333333333331,
-                        "y": 37.61904761904763
+                        "x": 67.5,
+                        "y": 10.47619047619049
                     }
                 }
             ]
         },
         {
-            "name": null,
-            "size": 1,
+            "name": "mads",
+            "size": 2,
             "image": "panel_09.jpg",
             "editor": {
                 "position": {
-                    "x": 510,
-                    "y": 480
+                    "x": 540,
+                    "y": 230
                 }
             },
             "elements": [
@@ -127,8 +126,8 @@
                     "text": "Hallo..",
                     "bubble_type": "down",
                     "position": {
-                        "x": 63.08892805640119,
-                        "y": 28.187830687830584
+                        "x": 63.75559472306788,
+                        "y": 34.85449735449725
                     }
                 }
             ]

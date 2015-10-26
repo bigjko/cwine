@@ -59,7 +59,7 @@ window.onresize = function(event) {
     stage.canvas.width = view.offsetWidth;
     stage.canvas.height = view.offsetHeight;
 
-	stage.getChildByName("dragBox").graphics.beginFill("#ccc").drawRect(0,0,stage.canvas.width, stage.canvas.height);
+	stage.getChildByName("dragBox").graphics.beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height);
     //stage.update();
 };
 
