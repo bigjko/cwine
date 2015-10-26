@@ -54,6 +54,7 @@ function saveJSON (obj, path) {
 				//dialog.style.top = "50%";
 				//dialog.style.left = "50%";
 				dialog.style.opacity = "0.8";
+				dialog.style.backgroundColor = "#333";
 				setTimeout(function() {
 					dialog.style.opacity = "0";
 				}, 2000);

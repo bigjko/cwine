@@ -41,7 +41,7 @@
             },
             "elements": [
                 {
-                    "text": "Hey!<br>Fuck dig Mads!",
+                    "text": "<b>WHAT?!</b>",
                     "bubble_type": "down",
                     "position": {
                         "x": 74.66666666666663,
@@ -50,11 +50,11 @@
                     "goto": 3
                 },
                 {
-                    "text": "Hi!",
+                    "text": "Hey",
                     "bubble_type": "down",
                     "position": {
-                        "x": 20.333333333333314,
-                        "y": 18.333333333333307
+                        "x": 25.833333333333314,
+                        "y": 25.119047619047592
                     },
                     "goto": 4
                 }
@@ -76,16 +76,16 @@
                     "text": "lol!",
                     "bubble_type": "left",
                     "position": {
-                        "x": 34,
-                        "y": 37.857142857142854
+                        "x": 33.5,
+                        "y": 42.142857142857146
                     }
                 },
                 {
                     "text": "Wut?",
                     "bubble_type": "down",
                     "position": {
-                        "x": 86.99999999999997,
-                        "y": 22.857142857142858
+                        "x": 86.49999999999997,
+                        "y": 23.57142857142857
                     }
                 }
             ]
@@ -102,32 +102,32 @@
             },
             "elements": [
                 {
-                    "text": "Meh..",
+                    "text": "I am\njuicy",
                     "bubble_type": "down",
                     "position": {
-                        "x": 67.5,
-                        "y": 10.47619047619049
+                        "x": 64.33333333333331,
+                        "y": 32.97619047619047
                     }
                 }
             ]
         },
         {
             "name": "mads",
-            "size": 2,
+            "size": 1,
             "image": "panel_09.jpg",
             "editor": {
                 "position": {
-                    "x": 540,
-                    "y": 230
+                    "x": 550,
+                    "y": 360
                 }
             },
             "elements": [
                 {
-                    "text": "Hallo..",
+                    "text": "I am\na steak",
                     "bubble_type": "down",
                     "position": {
-                        "x": 63.75559472306788,
-                        "y": 34.85449735449725
+                        "x": 65.75559472306787,
+                        "y": 32.94973544973534
                     }
                 }
             ]

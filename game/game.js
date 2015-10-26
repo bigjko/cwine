@@ -106,7 +106,7 @@ function speechBubble(sb) {
   bubble_html = "<div class='bubble " + center + " " + box_class + " " + clickable + " noselect'" +
                 "style='background-image:url(\"game/img/bubbles/" + image + "\");" + 
                 position + "'>" +
-                "<p>" + sb.text + "</p></div>";
+                "<p>" + sb.text.replace(/\n/g, "<br>") + "</p></div>";
 
 
   return bubble_html;

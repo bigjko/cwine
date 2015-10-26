@@ -41,8 +41,8 @@
 				var goto = nodeContainer.children[socket.goto];
 				var local = nodeContainer.localToLocal(goto.x, goto.y+goto.height/2, socket);
 				socket.line.graphics.clear();
-				if (socket.owner instanceof PanelElement) socket.line.graphics.s(socket.color).ss(socket.strokewidth).sd([10,5]).mt(0+con_r, 0).lt(local.x, local.y );
-				else socket.line.graphics.s(socket.color).ss(socket.strokewidth).mt(0+con_r, 0).lt(local.x, local.y );
+				if (socket.owner instanceof PanelElement) socket.line.graphics.s(socket.color).ss(socket.strokewidth).sd([10,5]).mt(0+socket.radius, 0).lt(local.x, local.y );
+				else socket.line.graphics.s(socket.color).ss(socket.strokewidth).mt(0+socket.radius, 0).lt(local.x, local.y );
 				socket.alpha = 1;
 			}
 			else socket.alpha = 0.5;
@@ -91,26 +91,27 @@
 			var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
 			property_panel.innerHTML += panel_image;
 
-			var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="numberbuttons noselect"></ul></div>';
+			var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="buttons noselect">';
 			
 			//panel_size += '</ul></div>';
-			property_panel.innerHTML += panel_size;
+			
 
-			var propsize = document.querySelector("#property-size");
+			//var propsize = document.querySelector("#property-size");
 			for (s=1; s <= 4; s++) {
-				var li = document.createElement("li");
-				if (node.size == s) li.className = "selected";
-				li.innerHTML = s.toString();
+				//var li = document.createElement("li");
+				//if (node.size == s) li.className = "selected";
+				//li.innerHTML = s.toString();
 				/*li.onclick = function() {
 					console.log("set to size " + s);
 					node.size = s;
 					this.className = "selected";
 				};*/
-				propsize.appendChild(li);
-				//if (s == node.size) panel_size += '<li class="selected">' + s.toString() + '</li>';
-				//else panel_size += '<li>' + s.toString() + '</li>';
+				//propsize.appendChild(li);
+				var selected = (s == node.size) ? 'class="selected"' : '';
+				panel_size += '<li ' + selected + ' onclick="currentlySelected.changeSize(' + s.toString() + ')">' + s.toString() + '</li>';
 			}
-
+			panel_size += '</ul></div>';
+			property_panel.innerHTML += panel_size;
 			var propname = document.querySelector("#property-name");
 			propname.onchange = function() {
 				node.name = propname.value;
@@ -118,7 +119,24 @@
 
 			var propimage = document.querySelector("#property-imagepath");
 			propimage.onchange = function() {
-				node.image = propimage.value;
+				//node.image = propimage.value;
+				var img = new Image();
+				img.src = "game/img/" + propimage.value;
+				img.onload = function() {
+					node.image = propimage.value;
+					node.panelbitmap.image = img;
+				}
+				img.onerror = function() {
+					var dialog = document.querySelector("#dialog");
+					dialog.innerHTML = "<p>'game/img/" + propimage.value + "' could not be loaded<p>";
+					//dialog.style.top = "50%";
+					//dialog.style.left = "50%";
+					dialog.style.opacity = "0.8";
+					dialog.style.backgroundColor = "#522";
+					setTimeout(function() {
+						dialog.style.opacity = "0";
+					}, 2000);
+				}
 			};
 		}
 		
@@ -233,6 +251,14 @@
 		}
 	};
 
+	Panel.prototype.changeSize = function(size) {
+		this.size = size;
+		var ps = document.querySelector("#property-size");
+		for (s=0; s < ps.children.length; s++) {
+			ps.children[s].className = (s+1 == this.size) ? "selected" : "";
+		}
+	}
+
 	window.Panel = createjs.promote(Panel, "Node");
 
 	// ------------ //
@@ -269,7 +295,7 @@
 		}
 		else image += "_bubble_" + bubble_orient + ".png";
 
-		div.innerHTML = "<p>" + sb.text + "</p>";
+		div.innerHTML = "<p>" + sb.text.replace(/\n/g, "<br>") + "</p>";
 
 		div.className = "bubble";
 		if (bubble_orient == "box") div.className += " box";
@@ -322,8 +348,81 @@
 		//this.addChild(hitshape);
 		this.on("mousedown", this.setDragOffset);
 		this.on("pressmove", this.dragElement);
+		this.on("click", this.showProperties);
 		//elm.regY = elm.getBounds().height;
 		//elements.addChild(elm);
+	};
+
+	PanelElement.prototype.updateElement = function() {
+		var element = this.children[0].htmlElement; 
+		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
+		this.width = element.clientWidth;
+		this.height = element.clientHeight;
+		this.regX = element.clientWidth/2;
+		this.regY = element.clientHeight;
+
+		var image = "";
+		var bubble_size = "medium";
+		if (this.text.length < 4) {
+			bubble_size = "small";
+		}
+		var bubble_orient = this.bubble_type;
+		image += bubble_size;
+		if (bubble_orient == "box") {
+			image += "_box.png";
+		}
+		else image += "_bubble_" + bubble_orient + ".png";
+		element.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";
+
+		if (this.align !== undefined && this.align.x == "right") {
+			this.regX = element.clientWidth;
+		}
+	}
+
+	PanelElement.prototype.showProperties = function(evt) {
+		var node = evt.target;
+		if (currentlySelected == node) return;
+		currentlySelected = node;
+
+		console.log("Showing properties for node " + node.name );
+
+		var property_panel = document.querySelector("#properties");
+
+		var property_header = 	'<div id="object-name">' +
+									'<p>' + node.parent.name + '<span class="element-id">' + node.parent.constructor.name + ' #' + nodeContainer.getChildIndex(node.parent) + ' - ' + node.constructor.name + '</span></p>' +
+								'</div>';
+		property_panel.innerHTML = property_header;
+
+		//var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
+		//property_panel.innerHTML += node_name;
+
+		if (node instanceof PanelElement) {
+			var prop_text = '<div class="field labeltop"><p>Text:</p><textarea id="property-text">' +
+			node.text +
+			'</textarea></div>';
+
+			//var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
+			property_panel.innerHTML += prop_text;
+
+			//var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="numberbuttons noselect">';
+			
+			//panel_size += '</ul></div>';
+			
+			/*panel_size += '</ul></div>';
+			property_panel.innerHTML += panel_size;*/
+			/*var propname = document.querySelector("#property-name");
+			propname.onchange = function() {
+				node.name = propname.value;
+			}*/
+
+			var proptext = document.querySelector("#property-text");
+			proptext.onkeyup = function() {
+				//console.log(proptext.value);
+				node.text = proptext.value;
+				node.updateElement();
+			};
+		}
+		
 	};
 
 	PanelElement.prototype.setDragOffset = function(evt) {
@@ -332,6 +431,7 @@
 			x: evt.stageX - global.x,
 			y: evt.stageY - global.y
 		};
+		evt.target.parent.showProperties(evt);
 	};
 
 	PanelElement.prototype.dragElement = function(evt) {
