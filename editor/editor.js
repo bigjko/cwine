@@ -30,6 +30,8 @@ document.addEventListener("keydown", function(e) {
 
 
 window.onload = function() {
+	loadAllImages();
+
 	document.querySelector("#load").onclick = function() {
 		loadJSON(defaultGamePath + document.querySelector("#filepath").value, init);
 	};

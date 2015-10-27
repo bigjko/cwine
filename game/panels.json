@@ -16,15 +16,15 @@
             },
             "elements": [
                 {
-                    "text": "Copenhagen, Denmark - <strong>1879</strong>",
+                    "text": "Cool Town, Rad Island <b>21xx</b>",
                     "bubble_type": "box",
+                    "position": {
+                        "x": 0.791666666666643,
+                        "y": 1.059489678899027
+                    },
                     "align": {
                         "x": "right",
                         "y": "bottom"
-                    },
-                    "position": {
-                        "x": 1,
-                        "y": 1
                     }
                 }
             ]
@@ -35,17 +35,17 @@
             "image": "panel_06.jpg",
             "editor": {
                 "position": {
-                    "x": 350,
+                    "x": 340,
                     "y": 460
                 }
             },
             "elements": [
                 {
-                    "text": "That steak\nlooks real\njuicy",
+                    "text": "You smell\nnice!",
                     "bubble_type": "down",
                     "position": {
-                        "x": 74.66666666666663,
-                        "y": 35.119047619047635
+                        "x": 77.33333333333331,
+                        "y": 33.214285714285715
                     },
                     "goto": 3
                 },
@@ -81,32 +81,32 @@
                     }
                 },
                 {
-                    "text": "Wut?",
+                    "text": "Huh?",
                     "bubble_type": "down",
                     "position": {
-                        "x": 86.49999999999997,
-                        "y": 23.57142857142857
+                        "x": 86.99999999999997,
+                        "y": 23.214285714285715
                     }
                 }
             ]
         },
         {
             "name": "er",
-            "size": 4,
-            "image": "panel_01.jpg",
+            "size": 1,
+            "image": "panel_04.jpg",
             "editor": {
                 "position": {
-                    "x": 580,
+                    "x": 570,
                     "y": 540
                 }
             },
             "elements": [
                 {
-                    "text": "I am way juicy",
+                    "text": "<b>THANKS!</b>",
                     "bubble_type": "down",
                     "position": {
-                        "x": 66.0776439089692,
-                        "y": 37.079510703363894
+                        "x": 60.41666666666651,
+                        "y": 42.91666666666655
                     }
                 }
             ]
@@ -126,8 +126,8 @@
                     "text": "I am\na steak",
                     "bubble_type": "down",
                     "position": {
-                        "x": 65.75559472306787,
-                        "y": 32.94973544973534
+                        "x": 65.75559472306782,
+                        "y": 32.949735449735314
                     }
                 }
             ]

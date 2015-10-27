@@ -16,6 +16,29 @@ function checkPath(path)
 	return true;
 }
 
+function loadAllImages() {
+	var request = new XMLHttpRequest();
+	request.open('GET', "editor/img-folder.php", true);
+
+	var mobile_small_panels = 0;
+
+	request.onload = function() {
+		if (request.status >= 200 && request.status < 400) {
+			document.querySelector("#properties").innerHTML = request.responseText;
+		} else {
+		// We reached our target server, but it returned an error
+		alert(request.responseText);
+		return null;
+		}
+	};
+
+	request.onerror = function() {
+		alert(request.responseText);
+	};
+
+	request.send();
+}
+
 function saveJSON (obj, path) {
 
 	if (!checkPath(path)) return;

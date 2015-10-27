@@ -532,10 +532,13 @@
 							elem.text = r_elem.text;
 						}
 						elem.bubble_type = r_elem.bubble_type;
-						if (r_elem.align !== undefined) {
-							elem.align = { x: r_elem.align.x, y:r_elem.align.y };
-						}
+						
 						elem.position = r_elem.position;
+						if (r_elem.align !== undefined) {
+							elem.align = r_elem.align;
+							if (elem.align.x == "right") elem.position.x = 100 - elem.position.x;
+							if (elem.align.y == "bottom") elem.position.y = 100 - elem.position.y;
+						}
 						elem.goto = r_elem.goto;
 
 						node.elements.push(elem);
