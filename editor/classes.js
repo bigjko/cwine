@@ -71,7 +71,7 @@
 
 	Node.prototype.showProperties = function(evt) {
 		var node = evt.target.parent;
-		if (currentlySelected == node) return;
+		//if (currentlySelected == node) return;
 		currentlySelected = node;
 
 		//console.log("Showing properties for node " + node.name );
@@ -203,7 +203,7 @@
 		}
 
 		if (obj.image !== undefined) {
-			this.panelbitmap = new createjs.Bitmap("game/img/" + obj.image);
+			this.panelbitmap = new createjs.Bitmap(obj.image);
             this.image = obj.image;
 			var scale = 0.25;
 			//if (panels[i].size == 4) scale = 0.35;
@@ -235,24 +235,31 @@
         this.goto = obj.goto;
 
 		this.elements = [];
-		for (e=0; e < obj.elements.length; e++) {
-			var element = new PanelElement(obj.elements[e], this.panelbitmap);
 
-			this.elements.push(element);
-			this.addChild(element);
-			console.log(element.children.length);
-			socketpos = {
-				x: element.x + element.width*element.scaleX,
-				y: element.y + element.height/2*element.scaleY
-			};
-			sock = this.addSocket(socketpos.x, socketpos.y, element.goto, this, 3, "#fff");
-			sock.owner = element;
-			sock.dashes = [10,5];
+		if (obj.elements !== undefined) {
+			for (e=0; e < obj.elements.length; e++) {
+				var element = new PanelElement(obj.elements[e], this.panelbitmap);
+
+				this.elements.push(element);
+				this.addChild(element);
+				console.log(element.children.length);
+				socketpos = {
+					x: element.x + element.width*element.scaleX,
+					y: element.y + element.height/2*element.scaleY
+				};
+				sock = this.addSocket(socketpos.x, socketpos.y, element.goto, this, 3, "#fff");
+				sock.owner = element;
+				sock.dashes = [10,5];
+			}
 		}
 	};
 
 	Panel.prototype.changeSize = function(size) {
 		this.size = size;
+		var scale = 0.25;
+		scale = this.size*400*scale / this.panelbitmap.image.width;
+		this.panelbitmap.scaleX = scale;
+		this.panelbitmap.scaleY = scale;
 		var ps = document.querySelector("#property-size");
 		for (s=0; s < ps.children.length; s++) {
 			ps.children[s].className = (s+1 == this.size) ? "selected" : "";
@@ -313,8 +320,8 @@
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
 
-		this.x = (sb.position.x/100) * this.panelbitmap.image.width*this.panelbitmap.scaleX;
-		this.y = (sb.position.y/100) * this.panelbitmap.image.height*this.panelbitmap.scaleY;
+		this.x = sb.position.x * this.panelbitmap.image.width*this.panelbitmap.scaleX;
+		this.y = sb.position.y * this.panelbitmap.image.height*this.panelbitmap.scaleY;
 		//this.x = elm.x;
 		//this.y = elm.y;
 		this.regX = div.clientWidth/2;
@@ -381,7 +388,7 @@
 
 	PanelElement.prototype.showProperties = function(evt) {
 		var node = evt.target;
-		if (currentlySelected == node) return;
+		//if (currentlySelected == node) return;
 		currentlySelected = node;
 
 		console.log("Showing properties for node " + node.name );
@@ -431,6 +438,7 @@
 			x: evt.stageX - global.x,
 			y: evt.stageY - global.y
 		};
+		//currentlySelected = evt.target.parent;
 		evt.target.parent.showProperties(evt);
 	};
 
@@ -448,9 +456,9 @@
 		if (local.y > panel.height) local.y = panel.height;
 		evt.target.x = local.x;
 		evt.target.y = local.y;
-        evt.target.position = { 
+        /*evt.target.position = { 
             x: local.x/evt.target.panelbitmap.image.width/evt.target.panelbitmap.scaleX*100, 
-            y: local.y/evt.target.panelbitmap.image.height/evt.target.panelbitmap.scaleY*100 }
+            y: local.y/evt.target.panelbitmap.image.height/evt.target.panelbitmap.scaleY*100 }*/
 		evt.target.parent.drawConnections();
 	};
 
@@ -469,9 +477,9 @@
 
 	NodeContainer.prototype.showProperties = function() {
 
-		console.log(this);
+		//console.log(this);
 
-		if (currentlySelected == this) return;
+		//f (currentlySelected == this) return;
 		currentlySelected = this;
 
 		var property_panel = document.querySelector("#properties");
@@ -533,11 +541,14 @@
 						}
 						elem.bubble_type = r_elem.bubble_type;
 						
-						elem.position = r_elem.position;
+						elem.position = {
+							x:r_elem.x/(r_elem.panelbitmap.image.width*r_elem.panelbitmap.scaleX),
+							y:r_elem.y/(r_elem.panelbitmap.image.height*r_elem.panelbitmap.scaleY)
+						}
 						if (r_elem.align !== undefined) {
 							elem.align = r_elem.align;
-							if (elem.align.x == "right") elem.position.x = 100 - elem.position.x;
-							if (elem.align.y == "bottom") elem.position.y = 100 - elem.position.y;
+							if (elem.align.x == "right") elem.position.x = 1 - elem.position.x;
+							if (elem.align.y == "bottom") elem.position.y = 1 - elem.position.y;
 						}
 						elem.goto = r_elem.goto;
 

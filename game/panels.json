@@ -6,7 +6,7 @@
         {
             "name": "intro",
             "size": 4,
-            "image": "panel_01.jpg",
+            "image": "game/img/panel_01.jpg",
             "goto": 2,
             "editor": {
                 "position": {
@@ -19,8 +19,8 @@
                     "text": "Cool Town, Rad Island <b>21xx</b>",
                     "bubble_type": "box",
                     "position": {
-                        "x": 0.791666666666643,
-                        "y": 1.059489678899027
+                        "x": 0.006666666666666599,
+                        "y": 0.009610091743119331
                     },
                     "align": {
                         "x": "right",
@@ -32,11 +32,11 @@
         {
             "name": "du",
             "size": 1,
-            "image": "panel_06.jpg",
+            "image": "game/img/panel_06.jpg",
             "editor": {
                 "position": {
-                    "x": 340,
-                    "y": 460
+                    "x": 360,
+                    "y": 450
                 }
             },
             "elements": [
@@ -44,8 +44,8 @@
                     "text": "You smell\nnice!",
                     "bubble_type": "down",
                     "position": {
-                        "x": 77.33333333333331,
-                        "y": 33.214285714285715
+                        "x": 0.7900003020833333,
+                        "y": 0.35000012974330363
                     },
                     "goto": 3
                 },
@@ -53,8 +53,8 @@
                     "text": "Hey",
                     "bubble_type": "down",
                     "position": {
-                        "x": 25.16666666666666,
-                        "y": 15.595238095238063
+                        "x": 0.2400000983072914,
+                        "y": 0.2285714894903273
                     },
                     "goto": 4
                 }
@@ -63,12 +63,11 @@
         {
             "name": "cool",
             "size": 1,
-            "image": "panel_04.jpg",
-            "goto": 1,
+            "image": "game/img/panel_04.jpg",
             "editor": {
                 "position": {
-                    "x": 170,
-                    "y": 360
+                    "x": 140,
+                    "y": 410
                 }
             },
             "elements": [
@@ -76,16 +75,17 @@
                     "text": "lol!",
                     "bubble_type": "left",
                     "position": {
-                        "x": 33.5,
-                        "y": 42.142857142857146
-                    }
+                        "x": 0.30000013085937494,
+                        "y": 0.4142858789062499
+                    },
+                    "goto": 1
                 },
                 {
                     "text": "Huh?",
                     "bubble_type": "down",
                     "position": {
-                        "x": 86.99999999999997,
-                        "y": 23.214285714285715
+                        "x": 0.8800003398437503,
+                        "y": 0.30714294782366075
                     }
                 }
             ]
@@ -93,7 +93,7 @@
         {
             "name": "er",
             "size": 1,
-            "image": "panel_04.jpg",
+            "image": "game/img/panel_04.jpg",
             "editor": {
                 "position": {
                     "x": 570,
@@ -105,8 +105,8 @@
                     "text": "<b>THANKS!</b>",
                     "bubble_type": "down",
                     "position": {
-                        "x": 60.41666666666651,
-                        "y": 42.91666666666655
+                        "x": 0.6500002360026041,
+                        "y": 0.39285731050037215
                     }
                 }
             ]
@@ -114,7 +114,7 @@
         {
             "name": "mads",
             "size": 1,
-            "image": "panel_09.jpg",
+            "image": "game/img/panel_09.jpg",
             "editor": {
                 "position": {
                     "x": 660,
@@ -126,8 +126,8 @@
                     "text": "I am\na steak",
                     "bubble_type": "down",
                     "position": {
-                        "x": 65.75559472306782,
-                        "y": 32.949735449735314
+                        "x": 0.6500002568577918,
+                        "y": 0.32857155728133264
                     }
                 }
             ]

@@ -16,7 +16,7 @@ function checkPath(path)
 	return true;
 }
 
-function loadAllImages() {
+function loadAllImages(callback) {
 	var request = new XMLHttpRequest();
 	request.open('GET', "editor/img-folder.php", true);
 
@@ -24,7 +24,9 @@ function loadAllImages() {
 
 	request.onload = function() {
 		if (request.status >= 200 && request.status < 400) {
-			document.querySelector("#properties").innerHTML = request.responseText;
+			//document.querySelector("#properties").innerHTML = request.responseText;
+			//console.log(request.responseText);
+			callback(JSON.parse(request.responseText));
 		} else {
 		// We reached our target server, but it returned an error
 		alert(request.responseText);
@@ -133,7 +135,7 @@ function preloadImages(obj, callback) {
 	images.push("game/img/bubbles/small_bubble_down.png");
 	images.push("game/img/bubbles/x_small_bubble_left.png");
 	for (var i=0; i<obj.nodes.length; i++) {
-		images.push("game/img/" + obj.nodes[i].image);
+		images.push(obj.nodes[i].image);
 	}
 
 	function imageLoaded() {

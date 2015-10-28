@@ -48,17 +48,16 @@
     <p>loading..</p>
     <div id="progress_bg"><div id="progress_bar" style="height:100%; width:0%;"></div></div>
   </div>
-  <div id="view"><canvas id="edit_canvas" width="500" height="50"></canvas></div>
+  <div id="view"><canvas id="edit_canvas" width="500" height="50" ondrop="drop(event)" ondragover="allowDrop(event)"></canvas></div>
   <div id="sidebar">
 		<div id="file" class="u-full-width">
 			<label for="filepath">JSON file (in 'game/')</label>
 			<input class="" type="text" placeholder="path/to/json" value="panels.json" id="filepath"><input id="load" class="button" type="submit" value="Load"><input id="save" class="button button-primary" type="submit" value="Save">
 		</div>
 			
-	  		<ul id="tabs">
-				<li class="selected">Properties</li>
-				<li>Images</li>
-				<li>Elements</li>
+	  		<ul id="tabs" class="noselect">
+				<li onclick="openTab('propertyTab')" class="selected" id="propertyTab">Properties</li>
+				<li onclick="openTab('imagesTab')" id="imagesTab">Images</li>
 			</ul>
 		<div id="properties" class="">
 			<div id="object-name">

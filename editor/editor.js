@@ -30,7 +30,6 @@ document.addEventListener("keydown", function(e) {
 
 
 window.onload = function() {
-	loadAllImages();
 
 	document.querySelector("#load").onclick = function() {
 		loadJSON(defaultGamePath + document.querySelector("#filepath").value, init);
@@ -178,6 +177,17 @@ function drawAllConnections() {
 	}
 }
 
+function newPanel(x, y, image) {
+	var obj = new Object();
+	obj.image = image;
+	obj.editor = new Object();
+	obj.editor.position = {
+		x: x,
+		y: y
+	}
+	nodeContainer.addChild(new Panel(obj));
+}
+
 function zoom(zoomModifier) {
 
 	if (zoomNumber + zoomModifier < 0 || zoomNumber + zoomModifier >= zoomStep.length) return;
@@ -197,6 +207,41 @@ function zoom(zoomModifier) {
 		setTimeout(drawConnections(viewContainer.children[c]), 200);
 	}*/
 }
+
+var currentlySelected;
+var currentTab = "properties";
+
+function openTab(tab) {
+
+	if (tab == currentTab) return;
+	currentTab = tab;
+
+	switch(tab) {
+
+		case "propertyTab":
+		console.log("cool");
+		if (currentlySelected !== undefined) currentlySelected.showProperties();
+		else nodeContainer.showProperties();
+		break;
+
+		case "imagesTab":
+		loadAllImages(function(obj) {
+			var properties = document.querySelector("#properties");
+			properties.innerHTML = "";
+			for (i=0; i<obj.length; i++) {
+				console.log(obj[i]);
+				properties.innerHTML += '<img width="100" style="margin-left:10px;" src="' + obj[i].replace("../", "") + '" draggable="true" ondragstart="drag(event, \'' + obj[i].replace("../", "") + '\')" />';
+			}
+		});
+		break;
+	}
+
+	var tabs = document.querySelector("#tabs");
+	for (t=0; t<tabs.children.length; t++) {
+		tabs.children[t].className = (tabs.children[t].id == currentTab) ? "selected" : "";
+	}
+}
+
 
 var sidebarClosed = false;
 
@@ -221,4 +266,24 @@ function mouseUp() {
 function mouseDown(elm) {
 	console.log("Mouse Down on HTML Element");
 	dragging_element = elm;
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev, path) {
+    ev.dataTransfer.setData("text/plain", path);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    if (ev.target == stage.canvas) {
+    	console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
+    	var local = nodeContainer.globalToLocal(ev.clientX, ev.clientY);
+    	console.log(ev.dataTransfer.getData("text/plain"));
+    	newPanel(local.x, local.y, ev.dataTransfer.getData("text/plain"));
+    }
+    //var data = ev.dataTransfer.getData("text");
+    //ev.target.appendChild(document.getElementById(data));
 }

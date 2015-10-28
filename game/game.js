@@ -34,7 +34,7 @@ function preloadImages(array, callback) {
   images.push("game/img/bubbles/small_bubble_down.png");
   images.push("game/img/bubbles/x_small_bubble_left.png");
   for (var i=0; i<array.length; i++) {
-    images.push("game/img/" + array[i].image);
+    images.push(array[i].image);
   }
 
   function updateProgress() {
@@ -238,7 +238,7 @@ function newPanelElement(id) {
     if (panels[i].height !== undefined) height = panels[i].height;
 
 		//panel_html += "<img class='u-max-full-width' src='game/img/" + panels[i].image + "' />";
-    panel_html += "<img class='u-max-full-width' src='game/img/" + panels[i].image + "' />";
+    panel_html += "<img class='u-max-full-width' src='" + panels[i].image + "' />";
     
     for (var e=0; e < panels[i].elements.length; e++) {
       var el = panels[i].elements[e];
