@@ -35,8 +35,8 @@
             "image": "game/img/panel_06.jpg",
             "editor": {
                 "position": {
-                    "x": 360,
-                    "y": 450
+                    "x": 340,
+                    "y": 400
                 }
             },
             "elements": [
@@ -44,8 +44,8 @@
                     "text": "You smell\nnice!",
                     "bubble_type": "down",
                     "position": {
-                        "x": 0.7900003020833333,
-                        "y": 0.35000012974330363
+                        "x": 0.7800003020833333,
+                        "y": 0.37023822498139874
                     },
                     "goto": 3
                 },
@@ -53,8 +53,8 @@
                     "text": "Hey",
                     "bubble_type": "down",
                     "position": {
-                        "x": 0.2400000983072914,
-                        "y": 0.2285714894903273
+                        "x": 0.2666667649739577,
+                        "y": 0.2190476799665177
                     },
                     "goto": 4
                 }
@@ -64,10 +64,11 @@
             "name": "cool",
             "size": 1,
             "image": "game/img/panel_04.jpg",
+            "goto": 1,
             "editor": {
                 "position": {
-                    "x": 140,
-                    "y": 410
+                    "x": 150,
+                    "y": 400
                 }
             },
             "elements": [
@@ -77,8 +78,7 @@
                     "position": {
                         "x": 0.30000013085937494,
                         "y": 0.4142858789062499
-                    },
-                    "goto": 1
+                    }
                 },
                 {
                     "text": "Huh?",
@@ -96,8 +96,8 @@
             "image": "game/img/panel_04.jpg",
             "editor": {
                 "position": {
-                    "x": 570,
-                    "y": 540
+                    "x": 540,
+                    "y": 480
                 }
             },
             "elements": [
@@ -105,20 +105,20 @@
                     "text": "<b>THANKS!</b>",
                     "bubble_type": "down",
                     "position": {
-                        "x": 0.6500002360026041,
-                        "y": 0.39285731050037215
+                        "x": 0.665000236002603,
+                        "y": 0.420238262881324
                     }
                 }
             ]
         },
         {
-            "name": "mads",
+            "name": "coolpanel",
             "size": 1,
             "image": "game/img/panel_09.jpg",
             "editor": {
                 "position": {
-                    "x": 660,
-                    "y": 340
+                    "x": 550,
+                    "y": 180
                 }
             },
             "elements": [
@@ -126,8 +126,8 @@
                     "text": "I am\na steak",
                     "bubble_type": "down",
                     "position": {
-                        "x": 0.6500002568577918,
-                        "y": 0.32857155728133264
+                        "x": 0.64,
+                        "y": 0.29642857142857104
                     }
                 }
             ]

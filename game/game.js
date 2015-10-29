@@ -105,8 +105,8 @@ function speechBubble(sb) {
 
   }
 
-  var transform = "transform: translate(" + sb.position.x.toString() + "%, " + sb.position.y.toString() + "%);";
-  var position = align_x + ":" + Math.round(sb.position.x).toString() + "%;" + align_y + ":" + Math.round(sb.position.y).toString() + "%;";
+  //var transform = "transform: translate(" + sb.position.x.toString() + "%, " + sb.position.y.toString() + "%);";
+  var position = align_x + ":" + Math.round(sb.position.x*100).toString() + "%;" + align_y + ":" + Math.round(sb.position.y*100).toString() + "%;";
 
   bubble_html = "<div class='bubble " + center + " " + box_class + " " + clickable + " noselect'" +
                 "style='background-image:url(\"game/img/bubbles/" + image + "\");" + 

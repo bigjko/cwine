@@ -50,8 +50,8 @@ function initNodes() {
 		var panel = new Panel(panels[p]);
 		nodeContainer.addChild(panel);
 	}
+	nodeContainer.makeConnections();
 	viewContainer.addChild(nodeContainer);
-
 	drawAllConnections();
 }
 
@@ -156,7 +156,9 @@ function initviewContainer() {
 
 	dragBox = new createjs.Shape(new createjs.Graphics().beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height));
 	dragBox.on("mousedown", function(evt) {
-		nodeContainer.showProperties();
+		currentlySelected = nodeContainer;
+		openTab("propertyTab");
+		//nodeContainer.showProperties();
 		dragoffset.x = evt.stageX - viewContainer.x + viewContainer.regX*viewScale;
 		dragoffset.y = evt.stageY - viewContainer.y + viewContainer.regY*viewScale;
 	});
@@ -213,7 +215,7 @@ var currentTab = "properties";
 
 function openTab(tab) {
 
-	if (tab == currentTab) return;
+	//if (tab == currentTab) return;
 	currentTab = tab;
 
 	switch(tab) {

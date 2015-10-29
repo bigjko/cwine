@@ -13,7 +13,8 @@
 	Node.prototype.handleMouseDown = function(evt) {
 		dragoffset.x = evt.stageX/viewScale - evt.target.parent.x;
 		dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
-		evt.target.parent.showProperties(evt);
+		currentlySelected = evt.target.parent;
+		openTab("propertyTab");
 	};
 
 	Node.prototype.handleMouseMove = function(evt) {
@@ -32,15 +33,16 @@
 	Node.prototype.drawConnections = function() {
 		for (s=0; s < this.sockets.length; s++) {
 			var socket = this.sockets[s];
+			socket.line.graphics.clear();
 			if (socket.owner instanceof PanelElement) {
 				var socketpos = socket.owner.localToLocal(socket.owner.width, socket.owner.height/2, socket.parent);
 				socket.x = socketpos.x;
 				socket.y = socketpos.y;
 			}
-			if (socket.goto !== undefined) {
-				var goto = nodeContainer.children[socket.goto];
+			if (socket.owner.goto !== undefined && nodeContainer.contains(socket.owner.goto)) {
+				var goto = socket.owner.goto;
 				var local = nodeContainer.localToLocal(goto.x, goto.y+goto.height/2, socket);
-				socket.line.graphics.clear();
+				
 				if (socket.owner instanceof PanelElement) socket.line.graphics.s(socket.color).ss(socket.strokewidth).sd([10,5]).mt(0+socket.radius, 0).lt(local.x, local.y );
 				else socket.line.graphics.s(socket.color).ss(socket.strokewidth).mt(0+socket.radius, 0).lt(local.x, local.y );
 				socket.alpha = 1;
@@ -63,83 +65,10 @@
 		evt.target.parent.line.graphics.clear();
 		var targ = stage.getObjectUnderPoint(evt.stageX, evt.stageY);
 		if (targ.parent instanceof Node) {
-			evt.target.parent.goto = nodeContainer.getChildIndex(targ.parent);
-			evt.target.parent.owner.goto = nodeContainer.getChildIndex(targ.parent);
+			evt.target.parent.goto = targ.parent;
+			evt.target.parent.owner.goto = targ.parent;
 		}
 		evt.target.parent.parent.drawConnections();
-	};
-
-	Node.prototype.showProperties = function(evt) {
-		var node = evt.target.parent;
-		//if (currentlySelected == node) return;
-		currentlySelected = node;
-
-		//console.log("Showing properties for node " + node.name );
-
-		var property_panel = document.querySelector("#properties");
-
-		var property_header = 	'<div id="object-name">' +
-									'<p>' + node.name + '<span class="element-id">#' + nodeContainer.getChildIndex(node) + '</span></p>' +
-								'</div>';
-		property_panel.innerHTML = property_header;
-
-		var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
-		property_panel.innerHTML += node_name;
-
-		if (node instanceof Panel) {
-
-			var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
-			property_panel.innerHTML += panel_image;
-
-			var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="buttons noselect">';
-			
-			//panel_size += '</ul></div>';
-			
-
-			//var propsize = document.querySelector("#property-size");
-			for (s=1; s <= 4; s++) {
-				//var li = document.createElement("li");
-				//if (node.size == s) li.className = "selected";
-				//li.innerHTML = s.toString();
-				/*li.onclick = function() {
-					console.log("set to size " + s);
-					node.size = s;
-					this.className = "selected";
-				};*/
-				//propsize.appendChild(li);
-				var selected = (s == node.size) ? 'class="selected"' : '';
-				panel_size += '<li ' + selected + ' onclick="currentlySelected.changeSize(' + s.toString() + ')">' + s.toString() + '</li>';
-			}
-			panel_size += '</ul></div>';
-			property_panel.innerHTML += panel_size;
-			var propname = document.querySelector("#property-name");
-			propname.onchange = function() {
-				node.name = propname.value;
-			}
-
-			var propimage = document.querySelector("#property-imagepath");
-			propimage.onchange = function() {
-				//node.image = propimage.value;
-				var img = new Image();
-				img.src = "game/img/" + propimage.value;
-				img.onload = function() {
-					node.image = propimage.value;
-					node.panelbitmap.image = img;
-				}
-				img.onerror = function() {
-					var dialog = document.querySelector("#dialog");
-					dialog.innerHTML = "<p>'game/img/" + propimage.value + "' could not be loaded<p>";
-					//dialog.style.top = "50%";
-					//dialog.style.left = "50%";
-					dialog.style.opacity = "0.8";
-					dialog.style.backgroundColor = "#522";
-					setTimeout(function() {
-						dialog.style.opacity = "0";
-					}, 2000);
-				}
-			};
-		}
-		
 	};
 
 	Node.prototype.addSocket = function(x, y, goto, addTo, radius, color) {
@@ -221,7 +150,7 @@
 			this.addChild(this.panelbitmap);
 			this.panelbitmap.on("mousedown", this.handleMouseDown);
 			this.panelbitmap.on("pressmove", this.handleMouseMove);
-			this.panelbitmap.on("click", this.showProperties);
+			//this.panelbitmap.on("click", this.showProperties);
 		}
         
 		var socketpos = {
@@ -232,7 +161,7 @@
 		var sock = this.addSocket(socketpos.x,socketpos.y,obj.goto, this, 6);
 		sock.owner = this;
         
-        this.goto = obj.goto;
+        if (obj.goto != -1) this.goto = obj.goto;
 
 		this.elements = [];
 
@@ -252,6 +181,100 @@
 				sock.dashes = [10,5];
 			}
 		}
+	};
+
+	Panel.prototype.showProperties = function() {
+		var node = this;
+		//if (currentlySelected == this) return;
+		//currentlySelected = this;
+
+		//console.log("Showing properties for node " + node.name );
+
+		var property_panel = document.querySelector("#properties");
+
+		var property_header = 	'<div id="object-name">' +
+									'<p>' + node.name + '<span class="element-id">#' + nodeContainer.getChildIndex(node) + '</span></p>' +
+								'</div>';
+		property_panel.innerHTML = property_header;
+
+		var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
+		property_panel.innerHTML += node_name;
+
+		if (node instanceof Panel) {
+
+			var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
+			property_panel.innerHTML += panel_image;
+
+			var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="buttons noselect">';
+			
+			//panel_size += '</ul></div>';
+			
+
+			//var propsize = document.querySelector("#property-size");
+			for (s=1; s <= 4; s++) {
+				//var li = document.createElement("li");
+				//if (node.size == s) li.className = "selected";
+				//li.innerHTML = s.toString();
+				/*li.onclick = function() {
+					console.log("set to size " + s);
+					node.size = s;
+					this.className = "selected";
+				};*/
+				//propsize.appendChild(li);
+				var selected = (s == node.size) ? 'class="selected"' : '';
+				panel_size += '<li ' + selected + ' onclick="currentlySelected.changeSize(' + s.toString() + ')">' + s.toString() + '</li>';
+			}
+			panel_size += '</ul></div>';
+			property_panel.innerHTML += panel_size;
+
+			var delete_button = '<div class="field"><input id="delete" class="button delete-button" type="submit" value="Delete Panel"></div>';
+			property_panel.innerHTML += delete_button;
+			document.querySelector("#delete").onclick = function() {
+				console.log("lol");
+				nodeContainer.removeChild(currentlySelected);
+			};
+
+			var propname = document.querySelector("#property-name");
+			propname.onchange = function() {
+				node.name = propname.value;
+				var prophead = document.querySelector("#object-name");
+				prophead.innerHTML = '<div id="object-name">' +
+									'<p>' + node.name + '<span class="element-id">#' + nodeContainer.getChildIndex(node) + '</span></p>' +
+								'</div>';
+			}
+
+			propname.onkeyup = function() {
+				//console.log(proptext.value);
+				node.name = propname.value;
+				var prophead = document.querySelector("#object-name");
+				prophead.innerHTML = '<div id="object-name">' +
+									'<p>' + node.name + '<span class="element-id">#' + nodeContainer.getChildIndex(node) + '</span></p>' +
+								'</div>';
+			};
+
+			var propimage = document.querySelector("#property-imagepath");
+			propimage.onchange = function() {
+				//node.image = propimage.value;
+				var img = new Image();
+				img.src = "game/img/" + propimage.value;
+				img.onload = function() {
+					node.image = propimage.value;
+					node.panelbitmap.image = img;
+				}
+				img.onerror = function() {
+					var dialog = document.querySelector("#dialog");
+					dialog.innerHTML = "<p>'game/img/" + propimage.value + "' could not be loaded<p>";
+					//dialog.style.top = "50%";
+					//dialog.style.left = "50%";
+					dialog.style.opacity = "0.8";
+					dialog.style.backgroundColor = "#522";
+					setTimeout(function() {
+						dialog.style.opacity = "0";
+					}, 2000);
+				}
+			};
+		}
+		
 	};
 
 	Panel.prototype.changeSize = function(size) {
@@ -279,7 +302,7 @@
 	} createjs.extend(PanelElement, createjs.Container);
 
 	PanelElement.prototype.setup = function(obj) {
-		this.goto = obj.goto;
+		if (obj.goto != -1) this.goto = obj.goto;
 		this.align = obj.align;
 		this.bubble_type = obj.bubble_type;
 		this.text = obj.text;
@@ -307,7 +330,7 @@
 		div.className = "bubble";
 		if (bubble_orient == "box") div.className += " box";
 		div.className += " noselect";
-
+		div.style.opacity = '0';
 		div.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";
 		div.style.position = "absolute";
 		div.style.top = 0;
@@ -316,6 +339,7 @@
 		//document.querySelector("#view").appendChild(div);
 
 		var elm = new createjs.DOMElement(div);
+
 
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
@@ -352,10 +376,13 @@
 		this.hitArea = hitshape;
 
 		this.addChild(elm);
+		div.opacity = '1';
+		elm.x = 0;
+		elm.y = 0;
 		//this.addChild(hitshape);
 		this.on("mousedown", this.setDragOffset);
 		this.on("pressmove", this.dragElement);
-		this.on("click", this.showProperties);
+		//this.on("click", this.showProperties);
 		//elm.regY = elm.getBounds().height;
 		//elements.addChild(elm);
 	};
@@ -386,12 +413,12 @@
 		}
 	};
 
-	PanelElement.prototype.showProperties = function(evt) {
-		var node = evt.target;
-		//if (currentlySelected == node) return;
-		currentlySelected = node;
+	PanelElement.prototype.showProperties = function() {
+		var node = this;
+		//if (currentlySelected == this) return;
+		//currentlySelected = this;
 
-		console.log("Showing properties for node " + node.name );
+		//console.log("Showing properties for node " + node.name );
 
 		var property_panel = document.querySelector("#properties");
 
@@ -439,7 +466,9 @@
 			y: evt.stageY - global.y
 		};
 		//currentlySelected = evt.target.parent;
-		evt.target.parent.showProperties(evt);
+		currentlySelected = evt.target;
+		openTab("propertyTab");
+		//evt.target.showProperties();
 	};
 
 	PanelElement.prototype.dragElement = function(evt) {
@@ -480,7 +509,7 @@
 		//console.log(this);
 
 		//f (currentlySelected == this) return;
-		currentlySelected = this;
+		//currentlySelected = this;
 
 		var property_panel = document.querySelector("#properties");
 
@@ -501,6 +530,24 @@
 		};
 		
 	};
+
+	NodeContainer.prototype.makeConnections = function() {
+
+		for (i=0; i < this.children.length; i++) {
+			var node = this.children[i];
+			if (node.goto !== undefined) node.goto = this.getChildAt(node.goto);
+			for (e=0; e < node.elements.length; e++) {
+				var elem = node.elements[e];
+				if (elem.goto !== undefined) elem.goto = this.getChildAt(elem.goto);
+			}
+		}
+
+	};
+
+	NodeContainer.prototype.removeChild = function(child) {
+		this.Container_removeChild(child);
+		drawAllConnections();
+	}
 
 	// toObject - For outputting editor parameters to a JSON object
 
@@ -523,7 +570,8 @@
 				node.name = ref.name;
 				node.size = ref.size;
 				node.image = ref.image;
-				node.goto = ref.goto;
+				node.goto = this.getChildIndex(ref.goto);
+				if (node.goto == -1) node.goto = undefined;
 				node.editor = {
 					position: { x: ref.x, y: ref.y }
 				};
@@ -550,7 +598,8 @@
 							if (elem.align.x == "right") elem.position.x = 1 - elem.position.x;
 							if (elem.align.y == "bottom") elem.position.y = 1 - elem.position.y;
 						}
-						elem.goto = r_elem.goto;
+						elem.goto = this.getChildIndex(r_elem.goto);
+						if (elem.goto == -1) elem.goto = undefined;
 
 						node.elements.push(elem);
 					}

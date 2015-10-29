@@ -34,6 +34,7 @@ header {
 	padding: 5px 10px;
 	background-color:rgba(10,10,10,0.25);
 	color:#ccc;
+	pointer-events:none;
 }
 
 header h6 {
@@ -106,8 +107,9 @@ canvas {
 	width:280px;
 	height:100%;
 	padding:0;
-	background-color:#222;
-	background-color:rgba(20,20,20,0.8);
+	background-color:#444;
+	opacity:0.9;
+	/*background-color:rgba(20,20,20,0.8);*/
 	color:#ccc;
 	-webkit-transition: width 0.3s;
     transition: width 0.3s;
@@ -238,7 +240,7 @@ textarea {
 #tabs li {
 	float:left;
 	display:block;
-	background:#555;
+	background-color:#333;
 	color:#aaa;
 	font-size:80%;
 	font-weight:bolder;
@@ -249,9 +251,17 @@ textarea {
 	cursor:pointer;
 }
 
+#tabs li:hover {
+	background-color:#222;
+}
+
 #tabs .selected {
 	background-color:#222;
 	color:#ccc;
+}
+
+#tabs .selected:hover {
+	background-color:#222;
 }
 
 #sidebar .button {
@@ -279,6 +289,17 @@ textarea {
 #sidebar .button-primary:hover {
 	background-color:#466;
 	border-color:#577;
+}
+
+#sidebar .delete-button {
+	background-color:#922;
+	border-color:#a44;
+	color:#ccc;
+}
+
+#sidebar .delete-button:hover {
+	background-color:#932;
+	border-color:#b44;
 }
 
 .close {
