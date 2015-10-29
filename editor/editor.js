@@ -156,6 +156,7 @@ function initviewContainer() {
 
 	dragBox = new createjs.Shape(new createjs.Graphics().beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height));
 	dragBox.on("mousedown", function(evt) {
+		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = nodeContainer;
 		openTab("propertyTab");
 		//nodeContainer.showProperties();
@@ -222,7 +223,9 @@ function openTab(tab) {
 
 		case "propertyTab":
 		console.log("cool");
-		if (currentlySelected !== undefined) currentlySelected.showProperties();
+		if (currentlySelected !== undefined) {
+		 	currentlySelected.showProperties();
+		}
 		else nodeContainer.showProperties();
 		break;
 

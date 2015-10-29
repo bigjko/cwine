@@ -13,6 +13,7 @@
 	Node.prototype.handleMouseDown = function(evt) {
 		dragoffset.x = evt.stageX/viewScale - evt.target.parent.x;
 		dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
+		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target.parent;
 		openTab("propertyTab");
 	};
@@ -130,6 +131,8 @@
 			this.x = obj.editor.position.x;
 			this.y = obj.editor.position.y;
 		}
+		this.selected = new createjs.Shape();
+		this.addChild(this.selected);
 
 		if (obj.image !== undefined) {
 			this.panelbitmap = new createjs.Bitmap(obj.image);
@@ -150,6 +153,7 @@
 			this.addChild(this.panelbitmap);
 			this.panelbitmap.on("mousedown", this.handleMouseDown);
 			this.panelbitmap.on("pressmove", this.handleMouseMove);
+			this.panelbitmap.shadow = new createjs.Shadow("rgba(0,0,0,0.2)", 3, 3, 4);
 			//this.panelbitmap.on("click", this.showProperties);
 		}
         
@@ -181,6 +185,8 @@
 				sock.dashes = [10,5];
 			}
 		}
+
+		
 	};
 
 	Panel.prototype.showProperties = function() {
@@ -189,7 +195,8 @@
 		//currentlySelected = this;
 
 		//console.log("Showing properties for node " + node.name );
-
+		var thickness = 3;
+		this.selected.graphics.f("#0099ee").dr(-thickness,-thickness,this.panelbitmap.image.width*this.panelbitmap.scaleX+thickness*2, this.panelbitmap.image.height*this.panelbitmap.scaleY+thickness*2);
 		var property_panel = document.querySelector("#properties");
 
 		var property_header = 	'<div id="object-name">' +
@@ -287,6 +294,9 @@
 		for (s=0; s < ps.children.length; s++) {
 			ps.children[s].className = (s+1 == this.size) ? "selected" : "";
 		}
+		this.selected.graphics.clear();
+		var thickness = 3;
+		this.selected.graphics.f("#0099ee").dr(-thickness,-thickness,this.panelbitmap.image.width*this.panelbitmap.scaleX+thickness*2, this.panelbitmap.image.height*this.panelbitmap.scaleY+thickness*2);
 	};
 
 	window.Panel = createjs.promote(Panel, "Node");
@@ -370,12 +380,12 @@
 			this.regY = div.clientHeight;
 			this.y = this.panelbitmap.image.height*this.panelbitmap.scaleY-this.y;
 		}
-
+		var selected = new createjs.Shape();
 		var hitshape = new createjs.Shape();
 		hitshape.graphics.f("#000").dr(0,0,this.width,this.height);
 		this.hitArea = hitshape;
 
-		this.addChild(elm);
+		this.addChild(selected, elm);
 		div.opacity = '1';
 		elm.x = 0;
 		elm.y = 0;
@@ -466,6 +476,7 @@
 			y: evt.stageY - global.y
 		};
 		//currentlySelected = evt.target.parent;
+		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target;
 		openTab("propertyTab");
 		//evt.target.showProperties();
@@ -544,6 +555,7 @@
 
 	};
 
+	// Overwrite Container.removeChild()
 	NodeContainer.prototype.removeChild = function(child) {
 		this.Container_removeChild(child);
 		drawAllConnections();

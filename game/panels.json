@@ -10,8 +10,8 @@
             "goto": 2,
             "editor": {
                 "position": {
-                    "x": -280,
-                    "y": 340
+                    "x": -200,
+                    "y": 410
                 }
             },
             "elements": [
@@ -19,8 +19,8 @@
                     "text": "Cool Town, Rad Island <b>21xx</b>",
                     "bubble_type": "box",
                     "position": {
-                        "x": 0.006666666666666599,
-                        "y": 0.009610091743119331
+                        "x": 0.008333333333333859,
+                        "y": 0.009610091743120663
                     },
                     "align": {
                         "x": "right",
@@ -35,7 +35,7 @@
             "image": "game/img/panel_06.jpg",
             "editor": {
                 "position": {
-                    "x": 340,
+                    "x": 350,
                     "y": 400
                 }
             },
@@ -67,7 +67,7 @@
             "goto": 1,
             "editor": {
                 "position": {
-                    "x": 150,
+                    "x": 180,
                     "y": 400
                 }
             },
