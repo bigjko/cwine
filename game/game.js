@@ -153,6 +153,7 @@ function addPanel(id) {
   var bubbles = document.querySelectorAll(".clickable");
   for (b=0; b<bubbles.length; b++) {
     removeClass(bubbles[b], "clickable");
+    bubbles[b].removeAttribute('onclick');
   }
 
 	//var output = "";
