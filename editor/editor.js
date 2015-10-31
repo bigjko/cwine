@@ -191,6 +191,35 @@ function newPanel(x, y, image) {
 	nodeContainer.addChild(new Panel(obj));
 }
 
+function newPanelElement(x, y, panel, image) {
+	var elm = new Object();
+	elm.position = {
+		x: x/(panel.panelbitmap.image.width*panel.panelbitmap.scaleX),
+		y: y/(panel.panelbitmap.image.height*panel.panelbitmap.scaleY)
+	};
+	console.log(elm.position);
+	elm.image = image;
+	//default alignment option! for now
+	elm.bubble_type = "down";
+	elm.text = "";
+
+	var panelelement = new PanelElement(elm, panel.panelbitmap);
+
+	if (panel.elements == undefined) panel.elements = [];
+	panel.elements.push(panelelement);
+	panel.addChild(panelelement);
+
+	var socketpos = {
+		x: panelelement.x + panelelement.width*panelelement.scaleX,
+		y: panelelement.y + panelelement.height/2*panelelement.scaleY
+	};
+	var sock = panel.addSocket(socketpos.x, socketpos.y, panelelement.goto, panel, 3, "#fff");
+	sock.owner = panelelement;
+	socketpos = sock.owner.localToLocal(sock.owner.width, sock.owner.height/2, sock.parent);
+	sock.x = socketpos.x;
+	sock.y = socketpos.y;
+}
+
 function zoom(zoomModifier) {
 
 	if (zoomNumber + zoomModifier < 0 || zoomNumber + zoomModifier >= zoomStep.length) return;
@@ -284,10 +313,18 @@ function drag(ev, path) {
 function drop(ev) {
     ev.preventDefault();
     if (ev.target == stage.canvas) {
-    	console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
+    	//console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
     	var local = nodeContainer.globalToLocal(ev.clientX, ev.clientY);
-    	console.log(ev.dataTransfer.getData("text/plain"));
-    	newPanel(local.x, local.y, ev.dataTransfer.getData("text/plain"));
+    	//console.log(ev.dataTransfer.getData("text/plain"));
+    	var pnl = nodeContainer.getObjectUnderPoint(local.x, local.y);
+    	if (pnl !== null && pnl instanceof createjs.Bitmap) pnl = pnl.parent;
+    	//console.log(pnl);
+    	if (pnl instanceof Panel) {
+    		var pos = pnl.globalToLocal(ev.clientX, ev.clientY);
+    		console.log(pos);
+    		newPanelElement(pos.x, pos.y, pnl, ev.dataTransfer.getData("text/plain"));
+    	}
+    	else newPanel(local.x, local.y, ev.dataTransfer.getData("text/plain"));
     }
     //var data = ev.dataTransfer.getData("text");
     //ev.target.appendChild(document.getElementById(data));
