@@ -263,14 +263,17 @@
 			propimage.onchange = function() {
 				//node.image = propimage.value;
 				var img = new Image();
-				img.src = "game/img/" + propimage.value;
+				img.src = propimage.value;
 				img.onload = function() {
 					node.image = propimage.value;
 					node.panelbitmap.image = img;
+					node.selected.graphics.clear();
+					var thickness = 3;
+					node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
 				}
 				img.onerror = function() {
 					var dialog = document.querySelector("#dialog");
-					dialog.innerHTML = "<p>'game/img/" + propimage.value + "' could not be loaded<p>";
+					dialog.innerHTML = "<p>'" + propimage.value + "' could not be loaded<p>";
 					//dialog.style.top = "50%";
 					//dialog.style.left = "50%";
 					dialog.style.opacity = "0.8";
