@@ -1,0 +1,257 @@
+{
+    "config": {
+        "startnode": "0"
+    },
+    "nodes": [
+        {
+            "name": "intro",
+            "size": 4,
+            "image": "images/panel_01.jpg",
+            "goto": 2,
+            "editor": {
+                "position": {
+                    "x": -280,
+                    "y": 300
+                }
+            },
+            "elements": [
+                {
+                    "text": "Cool Town, Rad Island <b>21xx</b>",
+                    "bubble_type": "box",
+                    "image": "images/bubbles/medium_box.png",
+                    "position": {
+                        "x": 0.015000000000000902,
+                        "y": 0.014369266055047403
+                    },
+                    "align": {
+                        "x": "right",
+                        "y": "bottom"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "du",
+            "size": 1,
+            "image": "images/panel_06.jpg",
+            "editor": {
+                "position": {
+                    "x": 350,
+                    "y": 400
+                }
+            },
+            "elements": [
+                {
+                    "text": "You smell\nnice!",
+                    "bubble_type": "down",
+                    "image": "images/bubbles/medium_bubble_down.png",
+                    "position": {
+                        "x": 0.7800003020833333,
+                        "y": 0.37023822498139874
+                    },
+                    "goto": 3
+                },
+                {
+                    "text": "Hey",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.2666667649739577,
+                        "y": 0.2190476799665177
+                    },
+                    "goto": 4
+                }
+            ]
+        },
+        {
+            "name": "cool",
+            "size": 1,
+            "image": "images/panel_04.jpg",
+            "goto": 1,
+            "editor": {
+                "position": {
+                    "x": 190,
+                    "y": 370
+                }
+            },
+            "elements": [
+                {
+                    "text": "lol!",
+                    "bubble_type": "left",
+                    "image": "images/bubbles/medium_bubble_left.png",
+                    "position": {
+                        "x": 0.30000013085937494,
+                        "y": 0.4142858789062499
+                    }
+                },
+                {
+                    "text": "Huh?",
+                    "bubble_type": "down",
+                    "image": "images/bubbles/medium_bubble_down.png",
+                    "position": {
+                        "x": 0.8800003398437503,
+                        "y": 0.30714294782366075
+                    }
+                }
+            ]
+        },
+        {
+            "name": "er",
+            "size": 1,
+            "image": "images/panel_04.jpg",
+            "editor": {
+                "position": {
+                    "x": 540,
+                    "y": 480
+                }
+            },
+            "elements": [
+                {
+                    "text": "<b>THANKS!</b>",
+                    "bubble_type": "down",
+                    "image": "images/bubbles/medium_bubble_down.png",
+                    "position": {
+                        "x": 0.7116669026692699,
+                        "y": 0.4011906438337048
+                    }
+                }
+            ]
+        },
+        {
+            "name": "coolpanel",
+            "size": 1,
+            "image": "images/panel_09.jpg",
+            "goto": 5,
+            "editor": {
+                "position": {
+                    "x": 550,
+                    "y": 180
+                }
+            },
+            "elements": [
+                {
+                    "text": "I am\na steak",
+                    "bubble_type": "down",
+                    "image": "images/bubbles/medium_bubble_down.png",
+                    "position": {
+                        "x": 0.64,
+                        "y": 0.29642857142857104
+                    }
+                }
+            ]
+        },
+        {
+            "size": 1,
+            "image": "images/panel_04.jpg",
+            "editor": {
+                "position": {
+                    "x": 780,
+                    "y": 230
+                }
+            },
+            "elements": [
+                {
+                    "text": "lol",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.2640625,
+                        "y": 0.38504464285714285
+                    }
+                },
+                {
+                    "text": "lol",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.6446875,
+                        "y": 0.2938244047619047
+                    },
+                    "goto": 7
+                },
+                {
+                    "text": "wut?",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.886875,
+                        "y": 0.45074404761904746
+                    },
+                    "goto": 6
+                }
+            ]
+        },
+        {
+            "size": 1,
+            "image": "images/panel_06.jpg",
+            "editor": {
+                "position": {
+                    "x": 980,
+                    "y": 260
+                }
+            },
+            "elements": [
+                {
+                    "text": "you are\na delight",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.2539583333333331,
+                        "y": 0.27752976190476186
+                    }
+                }
+            ]
+        },
+        {
+            "size": 1,
+            "image": "images/panel_09.jpg",
+            "editor": {
+                "position": {
+                    "x": 940,
+                    "y": 60
+                }
+            },
+            "elements": [
+                {
+                    "text": "Hello steak",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.4472916666666663,
+                        "y": 0.19419642857142858
+                    }
+                }
+            ]
+        },
+        {
+            "size": 1,
+            "image": "images/panel_09.jpg",
+            "editor": {
+                "position": {
+                    "x": 760,
+                    "y": 450
+                }
+            },
+            "elements": [
+                {
+                    "text": "Hi Steak",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.43,
+                        "y": 0.22380952380952346
+                    }
+                },
+                {
+                    "text": "YO",
+                    "bubble_type": "down",
+                    "image": "images/small_bubble_down.png",
+                    "position": {
+                        "x": 0.6233333333333332,
+                        "y": 0.34285714285714286
+                    }
+                }
+            ]
+        }
+    ]
+}
