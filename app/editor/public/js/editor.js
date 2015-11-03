@@ -66,6 +66,17 @@ exports.init = function(obj) {
 	document.querySelector("#zoomout").onclick = function() { zoom(-1) };
 	document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab') };
 	document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab') };
+	
+	document.querySelector("#save").onclick = function() {
+		loader.save(nodeContainer.toObject());
+	};
+	document.addEventListener("keydown", function(e) {
+	  if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+	    e.preventDefault();
+	    // Process event...
+	      loader.saveJSON(editor.nodesToObject(), document.querySelector("#filepath").value);
+	  }
+	}, false);
 
 	function stageMouseMove(evt) {
 		if (dragging_element !== undefined && dragging_element !== null) {

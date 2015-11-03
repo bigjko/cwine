@@ -1,4 +1,4 @@
-var fs = require('fs');
+var localforage = require('localforage');
 /*exports.checkPath = function(path)
 {
 	if (typeof path == "undefined" || path === "" ) {
@@ -41,10 +41,10 @@ exports.loadAllImages = function(path, callback) {
 	request.send();
 }
 
-exports.saveJSON = function(obj, path) {
+exports.save = function(obj, path) {
 	//if (!checkPath(path)) return;
 
-	var filename = path.split("/").pop();
+	/*var filename = path.split("/").pop();
 
 	//doesFileExist(path);
 	writeToFile();
@@ -90,7 +90,24 @@ exports.saveJSON = function(obj, path) {
 		//sendrequest.responseType = 'json';
 		console.log(path);
 		sendrequest.send("json=" + JSON.stringify(obj, null, 4) + "&path=" + path);
-	}
+	}*/
+
+	localforage.setItem('cwine', obj, function(err, result) { 	
+		var dialog = document.querySelector("#dialog");
+		dialog.innerHTML = "<p>Cwine saved successfully<p>";
+		dialog.style.opacity = "0.8";
+		dialog.style.backgroundColor = "#333";
+		setTimeout(function() {
+			dialog.style.opacity = "0";
+		}, 2000);
+	});
+}
+
+exports.load = function(callback) {
+
+	localforage.getItem('cwine', function(err, value) { 	
+		callback(value);
+	});
 }
 
 exports.loadJSON = function(path, callback) {
