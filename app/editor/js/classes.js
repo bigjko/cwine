@@ -92,8 +92,8 @@
 		socket.shape.regX = 0;
 
 		socket.shape.graphics.f(this.bg_color).dc(r,r,r).f(socket.color).dc(r,r,r-r/3);
-		socket.shape.scaleX = 1 / viewScale;
-		socket.shape.scaleY = 1 / viewScale;
+		//socket.shape.scaleX = 1;
+		//socket.shape.scaleY = 1;
 
 		socket.strokewidth = socket.radius/2;
 		socket.cursor = "pointer";
@@ -167,15 +167,15 @@
         
         if (obj.goto != -1) this.goto = obj.goto;
 
-		this.elements = [];
+		//this.elements = [];
 
 		if (obj.elements !== undefined) {
 			for (e=0; e < obj.elements.length; e++) {
 				var element = new PanelElement(obj.elements[e], this.panelbitmap);
 
-				this.elements.push(element);
+				//this.elements.push(element);
 				this.addChild(element);
-				console.log(element.children.length);
+				//console.log(element.children.length);
 				socketpos = {
 					x: element.x + element.width*element.scaleX,
 					y: element.y + element.height/2*element.scaleY
@@ -263,14 +263,17 @@
 			propimage.onchange = function() {
 				//node.image = propimage.value;
 				var img = new Image();
-				img.src = "img/" + propimage.value;
+				img.src = propimage.value;
 				img.onload = function() {
 					node.image = propimage.value;
 					node.panelbitmap.image = img;
+					node.selected.graphics.clear();
+					var thickness = 3;
+					node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
 				}
 				img.onerror = function() {
 					var dialog = document.querySelector("#dialog");
-					dialog.innerHTML = "<p>'img/" + propimage.value + "' could not be loaded<p>";
+					dialog.innerHTML = "<p>'" + propimage.value + "' could not be loaded<p>";
 					//dialog.style.top = "50%";
 					//dialog.style.left = "50%";
 					dialog.style.opacity = "0.8";
@@ -283,6 +286,15 @@
 		}
 		
 	};
+
+	Panel.prototype.removeChild = function(child) {
+		var view = document.querySelector("#view");
+		var elm = child.children[1].htmlElement;
+		console.log(elm);
+		view.removeChild(elm);
+		this.Node_removeChild(child);
+		drawAllConnections();
+	}
 
 	Panel.prototype.changeSize = function(size) {
 		this.size = size;
@@ -313,6 +325,7 @@
 
 	PanelElement.prototype.setup = function(obj) {
 		if (obj.goto != -1) this.goto = obj.goto;
+		//this.type = obj.type;
 		this.align = obj.align;
 		this.bubble_type = obj.bubble_type;
 		this.text = obj.text;
@@ -322,18 +335,25 @@
 		var sb = obj;
 
 		var div = document.querySelector("#view").appendChild(document.createElement("DIV"));
-
-		var image = "";
-		var bubble_size = "medium";
-		if (sb.text.length < 4) {
-			bubble_size = "small";
-		}
 		var bubble_orient = sb.bubble_type;
-		image += bubble_size;
-		if (bubble_orient == "box") {
-			image += "_box.png";
+
+		if (obj.image !== undefined) {
+			this.image = obj.image;
 		}
-		else image += "_bubble_" + bubble_orient + ".png";
+		else {
+			var image = "";
+			var bubble_size = "medium";
+			if (sb.text.length < 4) {
+				bubble_size = "small";
+			}
+			
+			image += bubble_size;
+			if (bubble_orient == "box") {
+				image += "_box.png";
+			}
+			else image += "_bubble_" + bubble_orient + ".png";
+			this.image = 'game/img/bubbles/' + image;
+		}
 
 		div.innerHTML = "<p>" + sb.text.replace(/\n/g, "<br>") + "</p>";
 
@@ -341,14 +361,14 @@
 		if (bubble_orient == "box") div.className += " box";
 		div.className += " noselect";
 		div.style.opacity = '0';
-		div.style.backgroundImage = "url(\"img/bubbles/"+image+"\")";
+		div.style.backgroundImage = 'url("' + this.image +'")';
 		div.style.position = "absolute";
 		div.style.top = 0;
 		div.style.left = 0;
 
 		//document.querySelector("#view").appendChild(div);
 
-		var elm = new createjs.DOMElement(div);
+		
 
 
 		this.scaleX = 0.6;
@@ -384,7 +404,7 @@
 		var hitshape = new createjs.Shape();
 		hitshape.graphics.f("#000").dr(0,0,this.width,this.height);
 		this.hitArea = hitshape;
-
+		var elm = new createjs.DOMElement(div);
 		this.addChild(selected, elm);
 		div.opacity = '1';
 		elm.x = 0;
@@ -398,14 +418,14 @@
 	};
 
 	PanelElement.prototype.updateElement = function() {
-		var element = this.children[0].htmlElement; 
+		var element = this.children[1].htmlElement; 
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
 		this.width = element.clientWidth;
 		this.height = element.clientHeight;
 		this.regX = element.clientWidth/2;
 		this.regY = element.clientHeight;
 
-		var image = "";
+		/*var image = "";
 		var bubble_size = "medium";
 		if (this.text.length < 4) {
 			bubble_size = "small";
@@ -416,7 +436,8 @@
 			image += "_box.png";
 		}
 		else image += "_bubble_" + bubble_orient + ".png";
-		element.style.backgroundImage = "url(\"img/bubbles/"+image+"\")";
+		element.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";*/
+		element.style.backgroundImage = this.image;
 
 		if (this.align !== undefined && this.align.x == "right") {
 			this.regX = element.clientWidth;
@@ -440,32 +461,39 @@
 		//var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
 		//property_panel.innerHTML += node_name;
 
-		if (node instanceof PanelElement) {
-			var prop_text = '<div class="field labeltop"><p>Text:</p><textarea id="property-text">' +
-			node.text +
-			'</textarea></div>';
+		var prop_text = '<div class="field labeltop"><p>Text:</p><textarea id="property-text">' +
+		node.text +
+		'</textarea></div>';
 
-			//var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
-			property_panel.innerHTML += prop_text;
+		//var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
+		property_panel.innerHTML += prop_text;
 
-			//var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="numberbuttons noselect">';
-			
-			//panel_size += '</ul></div>';
-			
-			/*panel_size += '</ul></div>';
-			property_panel.innerHTML += panel_size;*/
-			/*var propname = document.querySelector("#property-name");
-			propname.onchange = function() {
-				node.name = propname.value;
-			}*/
+		//var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="numberbuttons noselect">';
+		
+		//panel_size += '</ul></div>';
+		
+		/*panel_size += '</ul></div>';
+		property_panel.innerHTML += panel_size;*/
+		/*var propname = document.querySelector("#property-name");
+		propname.onchange = function() {
+			node.name = propname.value;
+		}*/
 
-			var proptext = document.querySelector("#property-text");
-			proptext.onkeyup = function() {
-				//console.log(proptext.value);
-				node.text = proptext.value;
-				node.updateElement();
-			};
-		}
+		var delete_button = '<div class="field"><input id="delete" class="button delete-button" type="submit" value="Delete Panel"></div>';
+		property_panel.innerHTML += delete_button;
+		document.querySelector("#delete").onclick = function() {
+			console.log(node.parent);
+			node.parent.removeChild(currentlySelected);
+		};
+
+		var proptext = document.querySelector("#property-text");
+		proptext.onkeyup = function() {
+			//console.log(proptext.value);
+			node.text = proptext.value;
+			node.updateElement();
+		};
+
+		
 		
 	};
 
@@ -547,9 +575,9 @@
 		for (i=0; i < this.children.length; i++) {
 			var node = this.children[i];
 			if (node.goto !== undefined) node.goto = this.getChildAt(node.goto);
-			for (e=0; e < node.elements.length; e++) {
-				var elem = node.elements[e];
-				if (elem.goto !== undefined) elem.goto = this.getChildAt(elem.goto);
+			for (e=0; e < node.children.length; e++) {
+				var elem = node.children[e];
+				if (elem instanceof PanelElement && elem.goto !== undefined) elem.goto = this.getChildAt(elem.goto);
 			}
 		}
 
@@ -557,6 +585,16 @@
 
 	// Overwrite Container.removeChild()
 	NodeContainer.prototype.removeChild = function(child) {
+		var view = document.querySelector("#view");
+		for (e=0; e<child.children.length; e++) {
+			var elm = child.children[e];
+			console.log(elm);
+			if (elm instanceof PanelElement) {
+				elm = elm.children[1].htmlElement;
+				console.log(elm);
+				view.removeChild(elm);
+			}
+		}
 		this.Container_removeChild(child);
 		drawAllConnections();
 	}
@@ -588,11 +626,11 @@
 					position: { x: ref.x, y: ref.y }
 				};
 
-				if (ref.elements !== undefined) {
-					node.elements = [];
+				node.elements = [];
 
-					for (e=0; e < ref.elements.length; e++) {
-						var r_elem = ref.elements[e];
+				for (e=0; e < ref.children.length; e++) {
+					var r_elem = ref.children[e];
+					if (r_elem instanceof PanelElement) {
 						var elem = new Object();
 
 						elem.type = r_elem.type;
@@ -600,6 +638,7 @@
 							elem.text = r_elem.text;
 						}
 						elem.bubble_type = r_elem.bubble_type;
+						elem.image = r_elem.image;
 						
 						elem.position = {
 							x:r_elem.x/(r_elem.panelbitmap.image.width*r_elem.panelbitmap.scaleX),
