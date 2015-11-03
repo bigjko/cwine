@@ -20,7 +20,7 @@ var localforage = require('localforage');
 exports.loadAllImages = function(path, callback) {
 	
     var request = new XMLHttpRequest();
-	request.open('GET', "./img-folder.php", true);
+	request.open('GET', "./js/img-folder.php", true);
 
 	request.onload = function() {
 		if (request.status >= 200 && request.status < 400) {
@@ -105,8 +105,9 @@ exports.save = function(obj, path) {
 
 exports.load = function(callback) {
 
-	localforage.getItem('cwine', function(err, value) { 	
-		callback(value);
+	localforage.getItem('cwine', function(err, value) {
+		preloadImages(value,callback); 	
+		//callback(value);
 	});
 }
 

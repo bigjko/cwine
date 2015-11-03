@@ -16,6 +16,7 @@ var dragging_element;
 
 var defaultGamePath = "";
 var con_r = 6;
+var currentLocalImages;
 
 
 
@@ -66,6 +67,8 @@ exports.init = function(obj) {
 	document.querySelector("#zoomout").onclick = function() { zoom(-1) };
 	document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab') };
 	document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab') };
+	document.querySelector("#edit_canvas").ondrop = function() { drop(event) };
+	document.querySelector("#edit_canvas").ondragover = function() { allowDrop(event) };
 	
 	document.querySelector("#save").onclick = function() {
 		loader.save(nodeContainer.toObject());
@@ -269,6 +272,45 @@ function openTab(tab) {
 		break;
 
 		case "imagesTab":
+		function handleFileSelect(evt) {
+		    var files = evt.target.files; // FileList object
+		    currentLocalImages = files;
+		    // files is a FileList of File objects. List some properties.
+		    listFiles(files);
+		    //document.querySelector('#imagelist').innerHTML = output.join('');
+  		}
+  		function listFiles(filearray) {
+  			for (var i = 0, f; f = filearray[i]; i++) {
+		    	if (!f.type.match('image.*')) {
+			    	continue;
+			    }
+
+			    var reader = new FileReader();
+
+			    reader.onload = (function(theFile) {
+			        return function(e) {
+			          // Render thumbnail.
+			          //var span = document.createElement('span');
+			          var img = document.createElement('IMG');
+			          img.src = e.target.result;
+			          img.width = 100;
+			          img.draggable = true;
+			          img.ondragstart = function() { drag(event, e.target.result) };
+
+			          /*span.innerHTML = ['<img width="100" src="', e.target.result,
+			                            '" title="', escape(theFile.name), '" draggable="true" ondragstart="drag(event,\'', e.target.result ,'\')"/>'].join('');*/
+			          document.getElementById('imagelist').insertBefore(img, null);
+			        };
+			    })(f);
+
+			    reader.readAsDataURL(f);
+		    }
+  		}
+
+  		document.querySelector('#properties').innerHTML = '<input type="file" id="imagefiles" name="files[]" multiple /><output id="imagelist"></output>';
+  		if (currentLocalImages !== undefined) { listFiles(currentLocalImages) };
+  		document.querySelector('#imagefiles').addEventListener('change', handleFileSelect, false);
+  		/*
 		loader.loadAllImages(function(obj) {
 			var properties = document.querySelector("#properties");
 			properties.innerHTML = "";
@@ -276,7 +318,7 @@ function openTab(tab) {
 				console.log(obj[i]);
 				properties.innerHTML += '<img width="100" style="margin-left:10px;" src="' + obj[i].replace("../", "") + '" draggable="true" ondragstart="drag(event, \'' + obj[i].replace("../", "") + '\')" />';
 			}
-		});
+		});*/
 		break;
 	}
 

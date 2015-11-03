@@ -113,6 +113,9 @@ canvas {
 	color:#ccc;
 	-webkit-transition: width 0.3s;
     transition: width 0.3s;
+
+	overflow-y:scroll;
+	overflow-x:hidden;
 }
 
 #sidebar label {
@@ -142,6 +145,10 @@ input[type="number"] {
 	width:100px;
 	margin:0;
 	top:0;
+}
+
+input[type="file"] {
+	font-size:1.2rem;
 }
 
 textarea {
@@ -301,6 +308,7 @@ textarea {
 	background-color:#932;
 	border-color:#b44;
 }
+
 
 .close {
 	background-color: #555;
