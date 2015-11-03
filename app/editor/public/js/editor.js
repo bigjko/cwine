@@ -76,11 +76,9 @@ exports.init = function(obj) {
 	}
 }
 
-exports.getNodes = function() {
-	return nodeContainer;
+exports.nodesToObject = function() {
+	return nodeContainer.toObject();
 }
-
-exports.openTab = openTab;
 
 
 
