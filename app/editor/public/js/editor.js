@@ -1,8 +1,10 @@
+var classes = require('classes');
+
 var panels;
 var config;
 var stage;
 var viewContainer;
-var nodeContainer;
+nodeContainer;
 //var firstLoad = true;
 var viewScale = 1;
 var dragoffset = {x:0, y:0};
@@ -11,76 +13,18 @@ var zoomNumber = 3;
 var zoomStep = [0.2, 0.3, 0.5, 0.75, 1, 1.5, 2];
 var dragging_element;
 
-var defaultGamePath = "game/";
+defaultGamePath = "";
 var con_r = 6;
-/*window.onload = function() {
-  setTimeout(function() {
-    // preload image
-    new Image().src = "game/img/panel_01.png";
-  }, 1000);
-}; */
-
-document.addEventListener("keydown", function(e) {
-  if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
-    e.preventDefault();
-    // Process event...
-      saveJSON(nodeContainer.toObject(), defaultGamePath + document.querySelector("#filepath").value);
-  }
-}, false);
 
 
-window.onload = function() {
 
-	document.querySelector("#load").onclick = function() {
-		loadJSON(defaultGamePath + document.querySelector("#filepath").value, init);
-	};
-	document.querySelector("#save").onclick = function() {
-		saveJSON(nodeContainer.toObject(), defaultGamePath + document.querySelector("#filepath").value);
-	};
-	//document.querySelector("#save");
-	loadJSON(defaultGamePath + "panels.json", init);
-};
+// --------------------------- //
+//							   //
+//			EXPORTS            //
+//							   //
+// --------------------------- //
 
-//request.send();
-
-function initNodes() {
-	nodeContainer = new NodeContainer();
-	nodeContainer.startnode = config.startnode;
-	for (var p=0; p<panels.length;p++) {
-		var panel = new Panel(panels[p]);
-		nodeContainer.addChild(panel);
-	}
-	nodeContainer.makeConnections();
-	viewContainer.addChild(nodeContainer);
-	drawAllConnections();
-}
-
-window.onresize = function(event) {
-    var view = document.querySelector("#view");
-    var sidebar = document.querySelector("#sidebar");
-
-    stage.canvas.width = view.offsetWidth;
-    stage.canvas.height = view.offsetHeight;
-
-	stage.getChildByName("dragBox").graphics.beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height);
-    //stage.update();
-};
-
-function clearAll() {
-
-	function clearEvents(disObj) {
-		console.log(disObj);
-		disObj.removeAllEventListeners();
-		for (var i=0; i < disObj.children.length; i++) {
-			if (disObj.children[i].children !== undefined) {
-				clearEvents(disObj.children[i]);
-			}
-		}
-	}
-	if (stage !== undefined) clearEvents(stage);
-}
-
-function init(obj) {
+exports.init = function(obj) {
     
     panels = obj.nodes;
     config = obj.config;
@@ -124,6 +68,55 @@ function init(obj) {
 			dragging_element.y = local.y;
 		}
 	}
+}
+
+exports.getNodes = function() {
+	return nodeContainer;
+}
+
+
+
+
+//////////////////
+////  EDITOR  ////
+//////////////////
+
+
+function initNodes() {
+	nodeContainer = new NodeContainer();
+	nodeContainer.startnode = config.startnode;
+	for (var p=0; p<panels.length;p++) {
+		var panel = new Panel(panels[p]);
+		nodeContainer.addChild(panel);
+	}
+	nodeContainer.makeConnections();
+	viewContainer.addChild(nodeContainer);
+	drawAllConnections();
+}
+
+window.onresize = function(event) {
+    var view = document.querySelector("#view");
+    var sidebar = document.querySelector("#sidebar");
+
+    stage.canvas.width = view.offsetWidth;
+    stage.canvas.height = view.offsetHeight;
+
+	stage.getChildByName("dragBox").graphics.beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height);
+    //stage.update();
+};
+
+function clearAll() {
+
+	function clearEvents(disObj) {
+		console.log(disObj);
+		disObj.removeAllEventListeners();
+		for (var i=0; i < disObj.children.length; i++) {
+			if (disObj.children[i].children !== undefined) {
+				clearEvents(disObj.children[i]);
+			}
+		}
+	}
+	if (stage !== undefined) clearEvents(stage);
 }
 
 function initviewContainer() {

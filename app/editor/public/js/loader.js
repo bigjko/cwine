@@ -1,4 +1,6 @@
-function checkPath(path)
+var filesystem = require("fs");
+
+exports.checkPath = function(path)
 {
 	if (typeof path == "undefined" || path === "" ) {
 		window.alert("You forgot to enter a path!");
@@ -16,8 +18,8 @@ function checkPath(path)
 	return true;
 }
 
-function loadAllImages(path, callback) {
-	var filesystem = require("fs");
+exports.loadAllImages = function(path, callback) {
+	
     var results = [];
 
     filesystem.readdirSync(path).forEach(function(file) {
@@ -32,7 +34,7 @@ function loadAllImages(path, callback) {
     return results;
 }
 
-function saveJSON (obj, path) {
+exports.saveJSON = function(obj, path) {
 	if (!checkPath(path)) return;
 
 	var filename = path.split("/").pop();
@@ -84,7 +86,7 @@ function saveJSON (obj, path) {
 	}
 }
 
-function loadJSON (path, callback) {
+exports.loadJSON = function(path, callback) {
 
 	if (!checkPath(path)) return;
 	//clearAll();
@@ -115,7 +117,7 @@ function loadJSON (path, callback) {
 	request.send();
 }
 
-function preloadImages(obj, callback) {
+exports.preloadImages = function(obj, callback) {
 	var loaded = 0;
 	var images = [];
 	images.push("img/bubbles/medium_bubble_left.png");

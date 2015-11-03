@@ -1,7 +1,7 @@
 var express = require("express");
 var app = express();
 var path = __dirname + '/';
-var editor = require(path + "app/editor/js/editor.js");
+//var editor = require(path + "app/editor/js/editor.js");
 // respond with "Hello World!" on the homepage
 app.get('/', function (req, res) {
   res.sendFile(path + 'app/game/views/index.html');
