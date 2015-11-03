@@ -1,5 +1,5 @@
-var loader = require('loader');
-var editor = require('editor');
+var loader = require('./loader.js');
+var editor = require('./editor.js');
 
 var gamepath = __dirname + '/app/game/';
 

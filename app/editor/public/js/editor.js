@@ -1,4 +1,4 @@
-var classes = require('classes');
+var classes = require('./classes.js');
 
 var panels;
 var config;
