@@ -16,33 +16,23 @@ function checkPath(path)
 	return true;
 }
 
-function loadAllImages(callback) {
-	var request = new XMLHttpRequest();
-	request.open('GET', "editor/img-folder.php", true);
+function loadAllImages(path, callback) {
+	var filesystem = require("fs");
+    var results = [];
 
-	var mobile_small_panels = 0;
+    filesystem.readdirSync(path).forEach(function(file) {
+        file = path +'/'+file;
+        var stat = filesystem.statSync(file);
 
-	request.onload = function() {
-		if (request.status >= 200 && request.status < 400) {
-			//document.querySelector("#properties").innerHTML = request.responseText;
-			//console.log(request.responseText);
-			callback(JSON.parse(request.responseText));
-		} else {
-		// We reached our target server, but it returned an error
-		alert(request.responseText);
-		return null;
-		}
-	};
+        if (stat && stat.isDirectory()) {
+            results = results.concat(_getAllFilesFromFolder(file))
+        } else results.push(file);
+    });
 
-	request.onerror = function() {
-		alert(request.responseText);
-	};
-
-	request.send();
+    return results;
 }
 
 function saveJSON (obj, path) {
-
 	if (!checkPath(path)) return;
 
 	var filename = path.split("/").pop();
@@ -128,12 +118,12 @@ function loadJSON (path, callback) {
 function preloadImages(obj, callback) {
 	var loaded = 0;
 	var images = [];
-	images.push("game/img/bubbles/medium_bubble_left.png");
-	images.push("game/img/bubbles/medium_bubble_down.png");
-	images.push("game/img/bubbles/medium_box.png");
-	images.push("game/img/bubbles/small_box.png");
-	images.push("game/img/bubbles/small_bubble_down.png");
-	images.push("game/img/bubbles/x_small_bubble_left.png");
+	images.push("img/bubbles/medium_bubble_left.png");
+	images.push("img/bubbles/medium_bubble_down.png");
+	images.push("img/bubbles/medium_box.png");
+	images.push("img/bubbles/small_box.png");
+	images.push("img/bubbles/small_bubble_down.png");
+	images.push("img/bubbles/x_small_bubble_left.png");
 	for (var i=0; i<obj.nodes.length; i++) {
 		images.push(obj.nodes[i].image);
 	}

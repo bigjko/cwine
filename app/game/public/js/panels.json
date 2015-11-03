@@ -6,11 +6,11 @@
         {
             "name": "intro",
             "size": 4,
-            "image": "game/img/panel_01.jpg",
+            "image": "images/panel_01.jpg",
             "goto": 2,
             "editor": {
                 "position": {
-                    "x": -200,
+                    "x": 20,
                     "y": 410
                 }
             },
@@ -32,11 +32,11 @@
         {
             "name": "du",
             "size": 1,
-            "image": "game/img/panel_06.jpg",
+            "image": "images/panel_06.jpg",
             "editor": {
                 "position": {
-                    "x": 350,
-                    "y": 400
+                    "x": 600,
+                    "y": 410
                 }
             },
             "elements": [
@@ -63,12 +63,12 @@
         {
             "name": "cool",
             "size": 1,
-            "image": "game/img/panel_04.jpg",
+            "image": "images/panel_04.jpg",
             "goto": 1,
             "editor": {
                 "position": {
-                    "x": 180,
-                    "y": 400
+                    "x": 460,
+                    "y": 410
                 }
             },
             "elements": [
@@ -93,11 +93,11 @@
         {
             "name": "er",
             "size": 1,
-            "image": "game/img/panel_04.jpg",
+            "image": "images/panel_04.jpg",
             "editor": {
                 "position": {
-                    "x": 540,
-                    "y": 480
+                    "x": 740,
+                    "y": 570
                 }
             },
             "elements": [
@@ -114,11 +114,11 @@
         {
             "name": "coolpanel",
             "size": 1,
-            "image": "game/img/panel_09.jpg",
+            "image": "images/panel_09.jpg",
             "editor": {
                 "position": {
-                    "x": 550,
-                    "y": 180
+                    "x": 740,
+                    "y": 410
                 }
             },
             "elements": [
@@ -128,6 +128,84 @@
                     "position": {
                         "x": 0.64,
                         "y": 0.29642857142857104
+                    }
+                }
+            ]
+        },
+        {
+            "name": "intro",
+            "size": 4,
+            "image": "images/panel_01.jpg",
+            "goto": 2,
+            "editor": {
+                "position": {
+                    "x": 800,
+                    "y": 410
+                }
+            },
+            "elements": [
+                {
+                    "text": "Cool Town, Rad Island <b>21xx</b>",
+                    "bubble_type": "box",
+                    "position": {
+                        "x": 0.008333333333333859,
+                        "y": 0.009610091743120663
+                    },
+                    "align": {
+                        "x": "right",
+                        "y": "bottom"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "intro",
+            "size": 4,
+            "image": "images/panel_01.jpg",
+            "goto": 2,
+            "editor": {
+                "position": {
+                    "x": 1000,
+                    "y": 410
+                }
+            },
+            "elements": [
+                {
+                    "text": "Cool Town, Rad Island <b>21xx</b>",
+                    "bubble_type": "box",
+                    "position": {
+                        "x": 0.008333333333333859,
+                        "y": 0.009610091743120663
+                    },
+                    "align": {
+                        "x": "right",
+                        "y": "bottom"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "intro",
+            "size": 4,
+            "image": "images/panel_01.jpg",
+            "goto": 2,
+            "editor": {
+                "position": {
+                    "x": 1200,
+                    "y": 410
+                }
+            },
+            "elements": [
+                {
+                    "text": "Cool Town, Rad Island <b>21xx</b>",
+                    "bubble_type": "box",
+                    "position": {
+                        "x": 0.008333333333333859,
+                        "y": 0.009610091743120663
+                    },
+                    "align": {
+                        "x": "right",
+                        "y": "bottom"
                     }
                 }
             ]

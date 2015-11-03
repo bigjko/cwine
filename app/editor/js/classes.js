@@ -263,14 +263,14 @@
 			propimage.onchange = function() {
 				//node.image = propimage.value;
 				var img = new Image();
-				img.src = "game/img/" + propimage.value;
+				img.src = "img/" + propimage.value;
 				img.onload = function() {
 					node.image = propimage.value;
 					node.panelbitmap.image = img;
 				}
 				img.onerror = function() {
 					var dialog = document.querySelector("#dialog");
-					dialog.innerHTML = "<p>'game/img/" + propimage.value + "' could not be loaded<p>";
+					dialog.innerHTML = "<p>'img/" + propimage.value + "' could not be loaded<p>";
 					//dialog.style.top = "50%";
 					//dialog.style.left = "50%";
 					dialog.style.opacity = "0.8";
@@ -341,7 +341,7 @@
 		if (bubble_orient == "box") div.className += " box";
 		div.className += " noselect";
 		div.style.opacity = '0';
-		div.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";
+		div.style.backgroundImage = "url(\"img/bubbles/"+image+"\")";
 		div.style.position = "absolute";
 		div.style.top = 0;
 		div.style.left = 0;
@@ -416,7 +416,7 @@
 			image += "_box.png";
 		}
 		else image += "_bubble_" + bubble_orient + ".png";
-		element.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";
+		element.style.backgroundImage = "url(\"img/bubbles/"+image+"\")";
 
 		if (this.align !== undefined && this.align.x == "right") {
 			this.regX = element.clientWidth;

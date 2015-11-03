@@ -2,7 +2,7 @@ var panels;
 var config;
 
 var request = new XMLHttpRequest();
-request.open('GET', 'game/panels.json', true);
+request.open('GET', 'js/panels.json', true);
 
 var mobile_small_panels = 0;
 
@@ -27,12 +27,12 @@ request.onerror = function() {
 function preloadImages(array, callback) {
   var loaded = 0;
   var images = [];
-  images.push("game/img/bubbles/medium_bubble_left.png");
-  images.push("game/img/bubbles/medium_bubble_down.png");
-  images.push("game/img/bubbles/medium_box.png");
-  images.push("game/img/bubbles/small_box.png");
-  images.push("game/img/bubbles/small_bubble_down.png");
-  images.push("game/img/bubbles/x_small_bubble_left.png");
+  images.push("images/bubbles/medium_bubble_left.png");
+  images.push("images/bubbles/medium_bubble_down.png");
+  images.push("images/bubbles/medium_box.png");
+  images.push("images/bubbles/small_box.png");
+  images.push("images/bubbles/small_bubble_down.png");
+  images.push("images/bubbles/x_small_bubble_left.png");
   for (var i=0; i<array.length; i++) {
     images.push(array[i].image);
   }
@@ -109,7 +109,7 @@ function speechBubble(sb) {
   var position = align_x + ":" + Math.round(sb.position.x*100).toString() + "%;" + align_y + ":" + Math.round(sb.position.y*100).toString() + "%;";
 
   bubble_html = "<div class='bubble " + center + " " + box_class + " " + clickable + " noselect'" +
-                "style='background-image:url(\"game/img/bubbles/" + image + "\");" + 
+                "style='background-image:url(\"images/bubbles/" + image + "\");" + 
                 position + "'" + onclick + ">" +
                 "<p>" + sb.text.replace(/\n/g, "<br>") + "</p></div>";
 
@@ -238,7 +238,7 @@ function newPanelElement(id) {
     var height = 280;
     if (panels[i].height !== undefined) height = panels[i].height;
 
-		//panel_html += "<img class='u-max-full-width' src='game/img/" + panels[i].image + "' />";
+		//panel_html += "<img class='u-max-full-width' src='img/" + panels[i].image + "' />";
     panel_html += "<img class='u-max-full-width' src='" + panels[i].image + "' />";
     
     for (var e=0; e < panels[i].elements.length; e++) {

@@ -57,7 +57,6 @@
   "app_name": "cwine",
   "name": "cwine",
   "dependencies": {
-    "connect": "^3.4.0",
-    "serve-static": "^1.10.0"
+    "express": "^4.13.3"
   }
 }
