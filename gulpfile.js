@@ -7,14 +7,14 @@ var browserify = require('browserify'),
     destFile = 'cwine-editor.js';
 
 gulp.task('browserify', function() {
-  return browserify(sourceFile)
+  return browserify(sourceFile, {debug:true})
   .bundle()
   .pipe(source(destFile))
   .pipe(gulp.dest(destFolder));
 });
 
 gulp.task('watch', function() {
-  var bundler = watchify(browserify(sourceFile));
+  var bundler = watchify(browserify(sourceFile, {debug:true}));
   bundler.on('update', rebundle);
 
   function rebundle() {

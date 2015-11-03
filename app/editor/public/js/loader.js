@@ -1,6 +1,5 @@
-var filesystem = require("fs");
-
-exports.checkPath = function(path)
+var fs = require('fs');
+/*exports.checkPath = function(path)
 {
 	if (typeof path == "undefined" || path === "" ) {
 		window.alert("You forgot to enter a path!");
@@ -16,13 +15,13 @@ exports.checkPath = function(path)
 	}
 
 	return true;
-}
+}*/
 
 exports.loadAllImages = function(path, callback) {
 	
     var results = [];
 
-    filesystem.readdirSync(path).forEach(function(file) {
+    fs.readdirSync(path).forEach(function(file) {
         file = path +'/'+file;
         var stat = filesystem.statSync(file);
 
@@ -35,7 +34,7 @@ exports.loadAllImages = function(path, callback) {
 }
 
 exports.saveJSON = function(obj, path) {
-	if (!checkPath(path)) return;
+	//if (!checkPath(path)) return;
 
 	var filename = path.split("/").pop();
 
@@ -88,7 +87,7 @@ exports.saveJSON = function(obj, path) {
 
 exports.loadJSON = function(path, callback) {
 
-	if (!checkPath(path)) return;
+	//if (!checkPath(path)) return;
 	//clearAll();
 
 	var request = new XMLHttpRequest();
@@ -101,7 +100,9 @@ exports.loadJSON = function(path, callback) {
 			// Success!
 			//panels = JSON.parse(request.responseText);
             var obj = JSON.parse(request.responseText);
+            console.log(obj);
 			preloadImages(obj, callback);
+			//callback(obj);
 		} else {
 		// We reached our target server, but it returned an error
 			if (request.status == 404) window.alert("File not found!");
@@ -117,27 +118,30 @@ exports.loadJSON = function(path, callback) {
 	request.send();
 }
 
-exports.preloadImages = function(obj, callback) {
+function preloadImages(obj, callback) {
 	var loaded = 0;
 	var images = [];
-	images.push("img/bubbles/medium_bubble_left.png");
+	/*images.push("img/bubbles/medium_bubble_left.png");
 	images.push("img/bubbles/medium_bubble_down.png");
 	images.push("img/bubbles/medium_box.png");
 	images.push("img/bubbles/small_box.png");
 	images.push("img/bubbles/small_bubble_down.png");
-	images.push("img/bubbles/x_small_bubble_left.png");
+	images.push("img/bubbles/x_small_bubble_left.png");*/
 	for (var i=0; i<obj.nodes.length; i++) {
 		images.push(obj.nodes[i].image);
 	}
 
 	function imageLoaded() {
 		loaded++;
+		console.log("Image loaded.." + loaded + "/" + images.length);
 		updateProgress();
 	}
 
 	function updateProgress() {
 		document.getElementById("progress_bar").style.width = (loaded/images.length * 100).toString() + "%";
+		console.log("update progress..");
 		if (loaded == images.length) {
+			console.log("Finished preloading images..");
 			setTimeout(function() {
 				document.getElementById("progress").style.opacity = "0";
 			}, 100);
