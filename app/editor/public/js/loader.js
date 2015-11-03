@@ -19,18 +19,26 @@ var fs = require('fs');
 
 exports.loadAllImages = function(path, callback) {
 	
-    var results = [];
+    var request = new XMLHttpRequest();
+	request.open('GET', "./img-folder.php", true);
 
-    fs.readdirSync(path).forEach(function(file) {
-        file = path +'/'+file;
-        var stat = filesystem.statSync(file);
+	request.onload = function() {
+		if (request.status >= 200 && request.status < 400) {
+			//document.querySelector("#properties").innerHTML = request.responseText;
+			//console.log(request.responseText);
+			callback(JSON.parse(request.responseText));
+		} else {
+		// We reached our target server, but it returned an error
+		alert(request.responseText);
+		return null;
+		}
+	};
 
-        if (stat && stat.isDirectory()) {
-            results = results.concat(_getAllFilesFromFolder(file))
-        } else results.push(file);
-    });
+	request.onerror = function() {
+		alert(request.responseText);
+	};
 
-    return results;
+	request.send();
 }
 
 exports.saveJSON = function(obj, path) {
@@ -77,7 +85,7 @@ exports.saveJSON = function(obj, path) {
 			}
 			//window.alert(sendrequest.status + " - " + sendrequest.responseText);
 		};
-		sendrequest.open("POST","json.php",true);
+		sendrequest.open("POST","./json.php",true);
 		sendrequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		//sendrequest.responseType = 'json';
 		console.log(path);
@@ -100,7 +108,7 @@ exports.loadJSON = function(path, callback) {
 			// Success!
 			//panels = JSON.parse(request.responseText);
             var obj = JSON.parse(request.responseText);
-            console.log(obj);
+            //console.log(obj);
 			preloadImages(obj, callback);
 			//callback(obj);
 		} else {
@@ -133,13 +141,13 @@ function preloadImages(obj, callback) {
 
 	function imageLoaded() {
 		loaded++;
-		console.log("Image loaded.." + loaded + "/" + images.length);
+		//console.log("Image loaded.." + loaded + "/" + images.length);
 		updateProgress();
 	}
 
 	function updateProgress() {
 		document.getElementById("progress_bar").style.width = (loaded/images.length * 100).toString() + "%";
-		console.log("update progress..");
+		//console.log("update progress..");
 		if (loaded == images.length) {
 			console.log("Finished preloading images..");
 			setTimeout(function() {

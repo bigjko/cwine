@@ -1,4 +1,5 @@
 //var classes = require('./classes.js');
+var loader = require("./loader.js");
 
 var panels;
 var config;
@@ -63,6 +64,8 @@ exports.init = function(obj) {
 
 	document.querySelector("#zoomin").onclick = function() { zoom(1) };
 	document.querySelector("#zoomout").onclick = function() { zoom(-1) };
+	document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab') };
+	document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab') };
 
 	function stageMouseMove(evt) {
 		if (dragging_element !== undefined && dragging_element !== null) {
@@ -257,7 +260,7 @@ function openTab(tab) {
 		break;
 
 		case "imagesTab":
-		loadAllImages(function(obj) {
+		loader.loadAllImages(function(obj) {
 			var properties = document.querySelector("#properties");
 			properties.innerHTML = "";
 			for (i=0; i<obj.length; i++) {
@@ -805,6 +808,37 @@ function drop(ev) {
 
 		//var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
 		//property_panel.innerHTML += node_name;
+
+		var prop_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
+		property_panel.innerHTML += prop_image;
+
+		console.log("Yo!");
+
+		document.querySelector("#property-imagepath").onchange = function() {
+			console.log("Whut!");
+			//node.image = propimage.value;
+			var img = new Image();
+			img.src = propimage.value;
+			img.onload = function() {
+				node.image = propimage.value;
+				node.updateElement();
+				//node.panelbitmap.image = img;
+				//node.selected.graphics.clear();
+				//var thickness = 3;
+				//node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
+			}
+			img.onerror = function() {
+				var dialog = document.querySelector("#dialog");
+				dialog.innerHTML = "<p>'" + propimage.value + "' could not be loaded<p>";
+				//dialog.style.top = "50%";
+				//dialog.style.left = "50%";
+				dialog.style.opacity = "0.8";
+				dialog.style.backgroundColor = "#522";
+				setTimeout(function() {
+					dialog.style.opacity = "0";
+				}, 2000);
+			}
+		};
 
 		var prop_text = '<div class="field labeltop"><p>Text:</p><textarea id="property-text">' +
 		node.text +
