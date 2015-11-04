@@ -57,10 +57,12 @@
   "app_name": "cwine",
   "name": "cwine",
   "dependencies": {
-    "browserify": "latest",
     "express": "^4.13.3",
+    "localforage": "^1.3.0"
+  },
+  "devDependencies": {
+    "browserify": "latest",
     "gulp": "3.9.0",
-    "localforage": "^1.3.0",
     "vinyl-source-stream": "latest",
     "watchify": "latest"
   }
