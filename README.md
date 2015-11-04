@@ -34,5 +34,5 @@
 
 - make sure you have node.js installed
 - in the main folder, in a terminal or cmd, run 'npm install'
-- run node server.js
-- now you can go to localhost:8080 to view the comic, and localhost:8080/edit.html for the edit! :D
+- run 'gulp'
+- now you can go to localhost:8080 to view the comic, and localhost:8080/edit for the edit. Any changes you do to the code will load automatically. :D
