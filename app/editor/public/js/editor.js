@@ -295,6 +295,7 @@ function openTab(tab) {
 			          img.src = e.target.result;
 			          img.width = 100;
 			          img.draggable = true;
+			          img.title = escape(theFile.name);
 			          img.ondragstart = function() { drag(event, e.target.result) };
 
 			          /*span.innerHTML = ['<img width="100" src="', e.target.result,

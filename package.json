@@ -63,6 +63,7 @@
   "devDependencies": {
     "browserify": "latest",
     "vinyl-source-stream": "latest",
-    "watchify": "latest"
+    "watchify": "latest",
+    "gulp": "3.9.0"
   }
 }
