@@ -1,4 +1,4 @@
-exports.server = function() {
+exports.serve = function() {
 	var express = require("express");
 	var app = express();
 	var path = __dirname + '/';

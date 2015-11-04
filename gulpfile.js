@@ -29,7 +29,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('express', function () {
-  server.server();
+  server.serve();
 });
 
 gulp.task('default', ['browserify', 'watch', 'express']);
