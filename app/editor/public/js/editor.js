@@ -1,5 +1,6 @@
 //var classes = require('./classes.js');
 var loader = require("./loader.js");
+var $ = require('jquery');
 
 var panels;
 var config;
@@ -612,7 +613,13 @@ function drop(ev) {
 			var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
 			property_panel.innerHTML += panel_image;
 
-			var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="buttons noselect">';
+			var panel_size = $('<div>').addClass('field labelside');
+			var size_ul = $('<ul>').attr('id','property-size').addClass('buttons noselect');
+
+			size_ul.appendTo(panel_size);
+			
+			//panel_size.appendChild(size_ul);
+			//var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="buttons noselect"></div>';
 			
 			//panel_size += '</ul></div>';
 			
@@ -628,13 +635,27 @@ function drop(ev) {
 					this.className = "selected";
 				};*/
 				//propsize.appendChild(li);
-				var selected = (s == node.size) ? 'class="selected"' : '';
-				panel_size += '<li ' + selected + ' onclick="currentlySelected.changeSize(' + s.toString() + ')">' + s.toString() + '</li>';
-			}
-			panel_size += '</ul></div>';
-			property_panel.innerHTML += panel_size;
+				var li = $('<li>');
 
-			var delete_button = '<div class="field"><input id="delete" class="button delete-button" type="submit" value="Delete Panel"></div>';
+				/*var selected = (s == node.size) ? 'class="selected"' : '';
+				panel_size += '<li ' + selected + ' onclick="currentlySelected.changeSize(' + s.toString() + ')">' + s.toString() + '</li>';*/
+				if (s == node.size) li.addClass('selected');
+				li.html(s.toString());
+				li.data('size', s);
+				li.data('node', this);
+				//li.onclick = function() { console.log("click!"); currentlySelected.changeSize(s); };
+				li.appendTo(size_ul);
+			}
+			//panel_size += '</ul></div>';
+			//property_panel.appendChild(panel_size);
+			panel_size.appendTo(property_panel);
+			$('#property-size').on('click', 'li', function(e) {
+				e.preventDefault();
+				console.log("click size");
+				$(this).data('node').changeSize($(this).data('size'));
+			});
+
+			/*var delete_button = '<div class="field"><input id="delete" class="button delete-button" type="submit" value="Delete Panel"></div>';
 			property_panel.innerHTML += delete_button;
 			document.querySelector("#delete").onclick = function() {
 				console.log("lol");
@@ -682,7 +703,7 @@ function drop(ev) {
 						dialog.style.opacity = "0";
 					}, 2000);
 				}
-			};
+			};*/
 		}
 		
 	};
@@ -694,9 +715,10 @@ function drop(ev) {
 		view.removeChild(elm);
 		this.Node_removeChild(child);
 		drawAllConnections();
-	}
+	};
 
 	Panel.prototype.changeSize = function(size) {
+		console.log('changing size!');
 		this.size = size;
 		var scale = 0.25;
 		scale = this.size*400*scale / this.panelbitmap.image.width;
