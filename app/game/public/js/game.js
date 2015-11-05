@@ -144,11 +144,9 @@ function start() {
 function addPanel(id) {
   var panels = getPanel(id);
 
-  $container
-    .append(panels)
-    .packery('appended', panels);
+  $container.append(panels);
 
-  $container.packery();
+  $container.packery('appended', panels);
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
@@ -169,14 +167,14 @@ function getPanel(id) {
   
   var p = newPanelElement(id);
  
-  elems.push(p);
+  elems.push(p.get(0));
 
   
   while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null) {
     id = panels[id].goto;
     count++;
     p = newPanelElement(id);
-    elems.push(p);
+    elems.push(p.get(0));
 
     // In case of infinite looping comic: Abort
     if (count > 50) break;
