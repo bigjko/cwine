@@ -40,25 +40,11 @@ header img {
 	}
 }
 
-@media (max-width: 550px) {
-	.one.column, .two.columns, .three.columns { width: 48%; float:left; }
-	.mobile-margin { margin-right: 4%; }	
-}
-
-.first {
-	margin-left:0;
-}
-
-.noselect {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    user-drag: none; 
-	-moz-user-select: none;
-	-webkit-user-drag: none;
+#panels {
+	position:relative;
+	width:60%;
+	max-width:800px;
+	margin:0 auto;
 }
 
 #progress {
@@ -130,7 +116,7 @@ header img {
 	padding: 15px 15px 22px 15px;
 	margin:0;
 	font-size: 90%;
-	line-height: 1.2rem;
+	line-height: 1rem;
 	display:block;
 }
 
@@ -152,91 +138,43 @@ header img {
 }
 
 .panel img {
-	
+	max-width: 100%;
+  	box-sizing: border-box;
 	float:left;
 }
 
-.panel-img {
-
-	background-repeat: no-repeat;
-	background-size: 100%;
-	background-position: top center;
-}
-
-@media (max-width: 550px) {
-	.panel-img {
-		height:125px;
-		background-position: center 30%;
-	}
-
-	.twelve.columns .panel-img {
-		background-size: 160%;
-	}
+.gutter-size {
+	width:2%;
 }
 
 .panel {
-	font-family:UnmaskedBB;
-	margin-top: 4%;
+	width:18.4%;
+	float:left;
 	position:relative;
+	font-family:UnmaskedBB;
 	-webkit-transition: opacity 1s;
     transition: opacity 1s;
 	/*background-color:#500;*/
 }
 
-/* Larger than phablet (also point when grid becomes active) */
-@media (min-width: 550px) {
-	.bubble p {
-		padding: 8px 12px 14px 12px;
-		margin:0;
-		font-size: 75%;
-		line-height: 0.8rem;
-	}
-
-	.box p {
-		padding: 10px 15px 10px;
-	}
-
-	.panel {
-		margin-top: 3%;
-		-webkit-transition: opacity 1s;
-    	transition: opacity 1s;
-	}
+.w2 {
+	width:36.8%;
 }
 
-/* Larger than tablet */
-@media (min-width: 750px) {
-	.bubble p {
-		padding: 12px 18px 20px;
-		margin:0;
-		font-size: 100%;
-		line-height: 1rem;
-	}
-
-	.box p {
-		padding: 15px 15px 15px;
-	}
+.w3 {
+	width:55.2%;
 }
 
-/* Larger than desktop */
-@media (min-width: 1000px) {
-	.bubble p {
-		padding: 15px 20px 25px;
-		margin:0;
-		font-size: 120%;
-		line-height: 1.2rem;
-	}
-
-	.box p {
-		padding: 15px 15px 15px;
-	}
+.w4 {
+	width:77.2%;
 }
 
-/* Larger than Desktop HD */
-@media (min-width: 1200px) {}
-
-
+.w5 {
+	width:100%;
+}
 
 footer {
+	clear:both;
 	margin-top:10%;
 	text-align:center;
 	font-style:italic;
@@ -244,4 +182,17 @@ footer {
 	font-size:1rem;
 	letter-spacing:0.2rem;
 	color:#ccc;
+}
+
+/* UTILITIES */
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    user-drag: none; 
+	-moz-user-select: none;
+	-webkit-user-drag: none;
 }

@@ -1,8 +1,11 @@
 var panels;
 var config;
-var mobile_small_panels = 0;
 
 var $ = require('jquery');
+var jQBridget = require('jquery-bridget');
+var Packery = require('packery');
+var imagesLoaded = require('imagesloaded');
+$.bridget('packery', Packery);
 
 function loadJSON(path) {
   var request = new XMLHttpRequest();
@@ -12,18 +15,18 @@ function loadJSON(path) {
     if (request.status >= 200 && request.status < 400) {
       // Success!
     //alert(request.responseText);
-      var json = JSON.parse(request.responseText)
+      var json = JSON.parse(request.responseText);
       panels = json.nodes;
       config = json.config;
       preloadImages(panels, start);
     } else {
       // We reached our target server, but it returned an error
-      document.getElementById("panels").innerHTML = "What?" + request.responseText;
+
     }
   };
 
   request.onerror = function() {
-    document.getElementById("panels").innerHTML = "Huh?!";
+
   };
 
   request.send();
@@ -36,30 +39,22 @@ function loadLocal() {
     panels = value.nodes;
     config = value.config;
     preloadImages(panels,start);
-    //callback(value);
   });
 }
 
 function preloadImages(array, callback) {
   var loaded = 0;
   var images = [];
-  /*images.push("game/img/bubbles/medium_bubble_left.png");
-  images.push("game/img/bubbles/medium_bubble_down.png");
-  images.push("game/img/bubbles/medium_box.png");
-  images.push("game/img/bubbles/small_box.png");
-  images.push("game/img/bubbles/small_bubble_down.png");
-  images.push("game/img/bubbles/x_small_bubble_left.png");*/
   for (var i=0; i<array.length; i++) {
     images.push(array[i].image);
   }
 
   function updateProgress() {
-    document.getElementById("progress_bar").style.width = (loaded/images.length * 100).toString() + "%";
+    document.getElementById('progress_bar').style.width = (loaded/images.length * 100).toString() + "%";
     if (loaded == images.length) {
       setTimeout(function() {
-        document.getElementById("progress").style.opacity = 0;
+        document.getElementById('progress').style.opacity = 0;
       }, 100);
-      console.log("Preloading done!");
       callback();
     }
   }
@@ -70,7 +65,7 @@ function preloadImages(array, callback) {
    }
 
   setTimeout(function() {
-    document.getElementById("progress").style.opacity = 1;
+    document.getElementById('progress').style.opacity = 1;
   }, 100);
 
   setTimeout(function() {
@@ -86,47 +81,6 @@ function preloadImages(array, callback) {
 
 
 function speechBubble(sb) {
-/*
-  var bubble_html = "";
-  var image = "";
-  var center = "";
-  var box_class = "";
-  var bubble_orient = sb.bubble_type;
-  
-  image = sb.image;
-
-  if (bubble_orient == "down") center = "center-origin";
-
-  if (bubble_orient == "box") {
-    //image += "_box.png";
-    box_class = "box";
-  }
-  var align_x = "left";
-  var align_y = "top";
-  if (sb.align !== undefined) {
-    align_x = sb.align.x;
-    align_y = sb.align.y;
-  }
-
-  var clickable = "";
-  var onclick = "";
-  if (sb.goto !== undefined) {
-
-    clickable = "clickable";
-    onclick = ' onclick="addPanel(' + sb.goto + ')" '
-
-  }
-
-  //var transform = "transform: translate(" + sb.position.x.toString() + "%, " + sb.position.y.toString() + "%);";
-  var position = align_x + ":" + Math.round(sb.position.x*100).toString() + "%;" + align_y + ":" + Math.round(sb.position.y*100).toString() + "%;";
-
-  bubble_html = "<div class='bubble " + center + " " + box_class + " " + clickable + " noselect'" +
-                "style='background-image:url(\"" + image + "\");" + 
-                position + "'" + onclick + ">" +
-                "<p>" + sb.text.replace(/\n/g, "<br>") + "</p></div>";
-
-
-  return bubble_html;*/
 
   var speechbubble = document.createElement('DIV');
 
@@ -143,10 +97,9 @@ function speechBubble(sb) {
     x: Math.round(sb.position.x*100).toString() + "%",
     y: Math.round(sb.position.y*100).toString() + "%"
   };
-  console.log(position);
-  if (align_x == "left") speechbubble.style.left = position.x;
+  if (align_x == 'left') speechbubble.style.left = position.x;
   else speechbubble.style.right = position.x;
-  if (align_y == "top") speechbubble.style.top = position.y;
+  if (align_y == 'top') speechbubble.style.top = position.y;
   else speechbubble.style.bottom = position.y;
   speechbubble.classList.add('bubble');
   if (sb.bubble_type == 'down') speechbubble.classList.add('center-origin');
@@ -157,7 +110,7 @@ function speechBubble(sb) {
     speechbubble.classList.add('clickable');
     speechbubble.onclick = function() {
       addPanel(sb.goto);
-    }
+    };
   }
 
   speechbubble.innerHTML = '<p>' + sb.text.replace(/\n/g, '<br>') + '</p>';
@@ -165,160 +118,84 @@ function speechBubble(sb) {
   return speechbubble;
 }
 
-
-var row_size = 0;
-var row_count = 0;
-
+var $container;
 
 function start() {
   var start_id = config.startnode;
   
-  //var id = start_id;
-  //var count = 0;
-  
-  document.getElementById("panels").innerHTML = "<div class='row'></div>";
-  addPanel(start_id);
-}
+  var panels = getPanel(start_id);
 
-/*function movePanels(row, size) {
-  console.log("row: " + row + ", row size: " + size);
-  switch (size) {
-    case 3:
-    document.querySelector("#panels").children[row].children[0].className += " offset-by-one-half";
-    break;
-    
-    case 2:
-    document.querySelector("#panels").children[row].children[0].className += " offset-by-three";
-    break;
-    
-    case 1:
-    document.querySelector("#panels").children[row].children[0].className += " offset-by-five";
-    break;
-  }
-}*/
+  $container = $('#panels');
 
-function addPanel(id) {
-  var bubbles = document.querySelectorAll(".clickable");
-  for (b=0; b<bubbles.length; b++) {
-    removeClass(bubbles[b], "clickable");
-    bubbles[b].removeAttribute('onclick');
-  }
+  $container
+    .append(panels)
+    .packery({
+      itemSelector: '.panel',
+      gutter: '.gutter-size',
+      percentPosition: true
+    });
 
-  //var output = "";
-  var count = 0;
-  //output += newPanelElement(id);
-  
-  var p = newPanelElement(id);
-  if (panels[id].size + row_size > 4) {
-    p.addClass('first');
-    row_size = 0;
-  }
-  $('#panels').append(p);
-  //document.getElementById("panels").appendChild(p);
-  //document.getElementById("panels").children[row_count].appendChild(newPanelElement(id));
-  row_size += panels[id].size;
-  
-  while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null) {
-    id = panels[id].goto;
-    console.log(id);
-    count++;
-    p = newPanelElement(id);
-    if (panels[id].size + row_size > 4) {
-      p.addClass('first');
-      row_size = 0;
-    }
-    $('#panels').append(p);
-    row_size += panels[id].size;
-
-    // In case of infinite looping comic: Abort
-    if (count > 50) break;
-  }
-
-  setTimeout(function() {
-    var panel_divs = document.querySelectorAll(".panel");
-    for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
-  },100);
-  /*
-  setTimeout(function() {
+  /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
     for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
   },100);*/
 }
 
-function newPanelElement(id) {
+function addPanel(id) {
+  var panels = getPanel(id);
+
+  $container
+    .append(panels)
+    .packery('appended', panels);
+
+  $container.packery();
+
+  /*setTimeout(function() {
+    var panel_divs = document.querySelectorAll(".panel");
+    for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
+  },100);*/
+}
+
+function getPanel(id) {
+  var elems = [];
+
+  var bubbles = document.querySelectorAll(".clickable");
+  for (var b=0; b<bubbles.length; b++) {
+    removeClass(bubbles[b], "clickable");
+    bubbles[b].removeAttribute('onclick');
+  }
+
+  var count = 0;
   
-  var i = id;
-  //var output = "";
+  var p = newPanelElement(id);
+ 
+  elems.push(p);
 
-  //var panel_html = "";
+  
+  while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null) {
+    id = panels[id].goto;
+    count++;
+    p = newPanelElement(id);
+    elems.push(p);
 
-  var mobile_small = "";
-
-  if (panels[id].size == 1) {
-  if (mobile_small_panels === 0) {
-    mobile_small = "mobile-margin";
-    mobile_small_panels++;
+    // In case of infinite looping comic: Abort
+    if (count > 50) break;
   }
-  else mobile_small_panels = 0;
-  }
-  else mobile_small_panels = 0;
 
-  var column_size;
-  switch (panels[id].size) {
-    case 1:
-    column_size = "three";
-    break;
-    case 2:
-    column_size = "six";
-    break;
-    case 3:
-    column_size = "nine";
-    break;
-    case 4:
-    column_size = "twelve";
-    break;
-  }
-  /*var paneldiv = document.createElement('DIV');
-  paneldiv.classList.add('panel');
-  paneldiv.classList.add('noselect');*/
-  var paneldiv = $('<div>').addClass('panel noselect');
-  if (column_size != "" && column_size !== undefined) {
-    paneldiv.addClass(column_size + ' columns');
-  }
-  if (mobile_small != "" && mobile_small !== undefined) paneldiv.addClass(mobile_small);
-  paneldiv.css('opacity', 0);
-    //panel_html += "<div class='panel noselect " + column_size + " " + mobile_small + "' style='opacity:0;'>";   
+  return elems;
+}
 
-  var height = 280;
-  if (panels[id].height !== undefined) height = panels[id].height;
+function newPanelElement(id) {
 
-  //panel_html += "<img class='u-max-full-width' src='game/img/" + panels[i].image + "' />";
-  var panelimg = $('<img>');
-  panelimg.addClass('u-max-full-width');
-  panelimg.attr('src', panels[id].image);
-  //panel_html += "<img class='u-max-full-width' src='" + panels[i].image + "' />";
+  var paneldiv = $('<div>').addClass('panel noselect ' + 'w' + panels[id].size).css('opacity', 1);
+  var panelimg = $('<img>').attr('src', panels[id].image);
 
-  panelimg.appendTo(paneldiv);
+  paneldiv.append(panelimg);
 
   for (var e=0; e < panels[id].elements.length; e++) {
     var el = panels[id].elements[e];
-    
     paneldiv.append(speechBubble(el));
-    /*"<div class='bubble center-bubble' " + 
-    "style='"+ speechBubble(el.bubble_type) +
-    align_x + ":"+ el.position.x +"%; " + 
-    align_y + ":"+ el.position.y +"%;'>" +
-    "<p>" + el.text + "</p>" +
-    "</div>";*/
   }
-
-  //panel_html += "</div>";
-
-  //output += panel_html;
-
-  //output = "IS THIS WORKING?!";
-
-
   return paneldiv;
 }
 
