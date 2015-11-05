@@ -2,27 +2,50 @@ var browserify = require('browserify'),
     watchify = require('watchify'),
     gulp = require('gulp'),
     source = require('vinyl-source-stream'),
-    sourceFile = 'app/editor/public/js/main.js',
-    destFolder = 'app/editor/public/js/',
-    destFile = 'cwine-editor.js',
+    editorSource = 'app/editor/public/js/main.js',
+    editorDestFolder = 'app/editor/public/js/',
+    editorDestFile = 'cwine-editor.js',
+    gameSource = 'app/game/public/js/game.js',
+    gameDestFolder = 'app/game/public/js/',
+    gameDestFile = 'cwine-runtime.js',
     server = require('./server.js');
 
 
-gulp.task('browserify', function() {
-  return browserify(sourceFile, {debug:true})
+gulp.task('browserify-editor', function() {
+  return browserify(editorSource, {debug:true})
   .bundle()
-  .pipe(source(destFile))
-  .pipe(gulp.dest(destFolder));
+  .pipe(source(editorDestFile))
+  .pipe(gulp.dest(editorDestFolder));
 });
 
-gulp.task('watch', function() {
-  var bundler = watchify(browserify(sourceFile, {debug:true}));
+gulp.task('browserify-game', function() {
+  return browserify(gameSource, {debug:true})
+  .bundle()
+  .pipe(source(gameDestFile))
+  .pipe(gulp.dest(gameDestFolder));
+});
+
+gulp.task('watch-editor', function() {
+  var bundler = watchify(browserify(editorSource, {debug:true}));
   bundler.on('update', rebundle);
 
   function rebundle() {
     return bundler.bundle()
-      .pipe(source(destFile))
-      .pipe(gulp.dest(destFolder));
+      .pipe(source(editorDestFile))
+      .pipe(gulp.dest(editorDestFolder));
+  }
+
+  return rebundle();
+});
+
+gulp.task('watch-game', function() {
+  var bundler = watchify(browserify(gameSource, {debug:true}));
+  bundler.on('update', rebundle);
+
+  function rebundle() {
+    return bundler.bundle()
+      .pipe(source(gameDestFile))
+      .pipe(gulp.dest(gameDestFolder));
   }
 
   return rebundle();
@@ -32,4 +55,4 @@ gulp.task('express', function () {
   server.serve();
 });
 
-gulp.task('default', ['browserify', 'watch', 'express']);
+gulp.task('default', ['browserify-editor', 'browserify-game', 'watch-editor', 'watch-game', 'express']);
