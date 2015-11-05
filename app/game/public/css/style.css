@@ -139,6 +139,7 @@ header img {
 
 .panel img {
 	max-width: 100%;
+	max-height:100%;
   	box-sizing: border-box;
 	float:left;
 }
@@ -158,15 +159,15 @@ header img {
 }
 
 .w2 {
-	width:36.8%;
+	width:38.8%;
 }
 
 .w3 {
-	width:55.2%;
+	width:59.2%;
 }
 
 .w4 {
-	width:77.2%;
+	width:79.6%;
 }
 
 .w5 {

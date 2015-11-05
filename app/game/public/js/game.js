@@ -82,10 +82,11 @@ function preloadImages(array, callback) {
 
 function speechBubble(sb) {
 
-  var speechbubble = document.createElement('DIV');
+  //ar bubble = document.createElement('DIV');
+  var bubble = $('<div>');
 
   if (sb.image !== undefined) {
-    speechbubble.style.backgroundImage = 'url("' + sb.image + '")';
+    bubble.css('background-image', 'url("' + sb.image + '")');
   }
   var align_x = "left";
   var align_y = "top";
@@ -97,25 +98,25 @@ function speechBubble(sb) {
     x: Math.round(sb.position.x*100).toString() + "%",
     y: Math.round(sb.position.y*100).toString() + "%"
   };
-  if (align_x == 'left') speechbubble.style.left = position.x;
-  else speechbubble.style.right = position.x;
-  if (align_y == 'top') speechbubble.style.top = position.y;
-  else speechbubble.style.bottom = position.y;
-  speechbubble.classList.add('bubble');
-  if (sb.bubble_type == 'down') speechbubble.classList.add('center-origin');
-  if (sb.bubble_type == 'box') speechbubble.classList.add('box');
+  if (align_x == 'left') bubble.css('left', position.x);
+  else bubble.css('right', position.x);
+  if (align_y == 'top') bubble.css('top', position.y);
+  else bubble.css('bottom', position.y);
+  bubble.addClass('bubble');
+  if (sb.bubble_type == 'down') bubble.addClass('center-origin');
+  if (sb.bubble_type == 'box') bubble.addClass('box');
 
   // INTERACTIVE BUBBLE!
   if (sb.goto !== undefined) {
-    speechbubble.classList.add('clickable');
-    speechbubble.onclick = function() {
+    bubble.addClass('clickable');
+    bubble.on('click', function() {
       addPanel(sb.goto);
-    };
+    });
   }
 
-  speechbubble.innerHTML = '<p>' + sb.text.replace(/\n/g, '<br>') + '</p>';
+  bubble.html('<p>' + sb.text.replace(/\n/g, '<br>') + '</p>');
 
-  return speechbubble;
+  return bubble;
 }
 
 var $container;
@@ -130,9 +131,9 @@ function start() {
   $container
     .append(panels)
     .packery({
-      itemSelector: '.panel',
-      gutter: '.gutter-size',
-      percentPosition: true
+      'itemSelector': '.panel',
+      'gutter': '.gutter-size',
+      'percentPosition': true
     });
 
   /*setTimeout(function() {
@@ -142,6 +143,9 @@ function start() {
 }
 
 function addPanel(id) {
+
+  $('.bubble').removeClass('clickable').off('click');
+
   var panels = getPanel(id);
 
   $container.append(panels);
@@ -156,12 +160,6 @@ function addPanel(id) {
 
 function getPanel(id) {
   var elems = [];
-
-  var bubbles = document.querySelectorAll(".clickable");
-  for (var b=0; b<bubbles.length; b++) {
-    removeClass(bubbles[b], "clickable");
-    bubbles[b].removeAttribute('onclick');
-  }
 
   var count = 0;
   
@@ -196,19 +194,6 @@ function newPanelElement(id) {
   }
   return paneldiv;
 }
-
-function hasClass(ele,cls) {
-    return ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
-}
-
-function removeClass(ele,cls) {
-    if (hasClass(ele,cls)) {
-        var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
-        ele.className=ele.className.replace(reg,' ');
-    }
-}
-
-
 
 //// LOAD COMIC
 
