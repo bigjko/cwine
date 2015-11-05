@@ -2,6 +2,8 @@ var panels;
 var config;
 var mobile_small_panels = 0;
 
+var $ = require('jquery');
+
 function loadJSON(path) {
   var request = new XMLHttpRequest();
   request.open('GET', path, true);
@@ -206,30 +208,26 @@ function addPanel(id) {
   var count = 0;
   //output += newPanelElement(id);
   
+  var p = newPanelElement(id);
   if (panels[id].size + row_size > 4) {
-    // NEW ROW
-    //output += "</div><div class='row'>";
-    //if (row_size < 4) movePanels(row_count,row_size);
-    document.getElementById("panels").innerHTML += "<div class='row'></div>";
+    p.addClass('first');
     row_size = 0;
-    row_count++;
   }
-  document.getElementById("panels").children[row_count].appendChild(newPanelElement(id));
-  
+  $('#panels').append(p);
+  //document.getElementById("panels").appendChild(p);
+  //document.getElementById("panels").children[row_count].appendChild(newPanelElement(id));
   row_size += panels[id].size;
   
   while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null) {
     id = panels[id].goto;
     console.log(id);
     count++;
+    p = newPanelElement(id);
     if (panels[id].size + row_size > 4) {
-      // NEW ROW
-      //if (row_size < 4) movePanels(row_count,row_size);
-      document.getElementById("panels").innerHTML += "<div class='row'></div>";
+      p.addClass('first');
       row_size = 0;
-      row_count++;
     }
-    document.getElementById("panels").children[row_count].appendChild(newPanelElement(id));
+    $('#panels').append(p);
     row_size += panels[id].size;
 
     // In case of infinite looping comic: Abort
@@ -280,32 +278,32 @@ function newPanelElement(id) {
     column_size = "twelve";
     break;
   }
-  var paneldiv = document.createElement('DIV');
+  /*var paneldiv = document.createElement('DIV');
   paneldiv.classList.add('panel');
-  paneldiv.classList.add('noselect');
+  paneldiv.classList.add('noselect');*/
+  var paneldiv = $('<div>').addClass('panel noselect');
   if (column_size != "" && column_size !== undefined) {
-    paneldiv.classList.add(column_size);
-    paneldiv.classList.add('columns');
+    paneldiv.addClass(column_size + ' columns');
   }
-  if (mobile_small != "" && mobile_small !== undefined) paneldiv.classList.add(mobile_small);
-  paneldiv.style.opacity = 0;
-  //panel_html += "<div class='panel noselect " + column_size + " " + mobile_small + "' style='opacity:0;'>";   
+  if (mobile_small != "" && mobile_small !== undefined) paneldiv.addClass(mobile_small);
+  paneldiv.css('opacity', 0);
+    //panel_html += "<div class='panel noselect " + column_size + " " + mobile_small + "' style='opacity:0;'>";   
 
   var height = 280;
   if (panels[id].height !== undefined) height = panels[id].height;
 
   //panel_html += "<img class='u-max-full-width' src='game/img/" + panels[i].image + "' />";
-  var panelimg = document.createElement('IMG');
-  panelimg.classList.add('u-max-full-width');
-  panelimg.src = panels[id].image;
+  var panelimg = $('<img>');
+  panelimg.addClass('u-max-full-width');
+  panelimg.attr('src', panels[id].image);
   //panel_html += "<img class='u-max-full-width' src='" + panels[i].image + "' />";
 
-  paneldiv.appendChild(panelimg);
+  panelimg.appendTo(paneldiv);
 
   for (var e=0; e < panels[id].elements.length; e++) {
     var el = panels[id].elements[e];
     
-    paneldiv.appendChild(speechBubble(el));
+    paneldiv.append(speechBubble(el));
     /*"<div class='bubble center-bubble' " + 
     "style='"+ speechBubble(el.bubble_type) +
     align_x + ":"+ el.position.x +"%; " + 

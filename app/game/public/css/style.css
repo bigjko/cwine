@@ -42,7 +42,11 @@ header img {
 
 @media (max-width: 550px) {
 	.one.column, .two.columns, .three.columns { width: 48%; float:left; }
-	.mobile-margin { margin-right: 4%; }
+	.mobile-margin { margin-right: 4%; }	
+}
+
+.first {
+	margin-left:0;
 }
 
 .noselect {
