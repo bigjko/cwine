@@ -4,7 +4,6 @@ var config;
 var $ = require('jquery');
 var jQBridget = require('jquery-bridget');
 var Packery = require('packery');
-var imagesLoaded = require('imagesloaded');
 $.bridget('packery', Packery);
 
 function loadJSON(path) {
@@ -122,6 +121,7 @@ function speechBubble(sb) {
 var $container;
 
 function start() {
+
   var start_id = config.startnode;
   
   var panels = getPanel(start_id);
@@ -131,9 +131,10 @@ function start() {
   $container
     .append(panels)
     .packery({
-      'itemSelector': '.panel',
-      'gutter': '.gutter-size',
-      'percentPosition': true
+      itemSelector: '.panel',
+      gutter: '.gutter-size',
+      percentPosition: true,
+      isFitWidth : true
     });
 
   /*setTimeout(function() {

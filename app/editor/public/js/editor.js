@@ -64,12 +64,12 @@ exports.init = function(obj) {
 	initviewContainer();
 	initNodes();
 
-	document.querySelector("#zoomin").onclick = function() { zoom(1) };
-	document.querySelector("#zoomout").onclick = function() { zoom(-1) };
-	document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab') };
-	document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab') };
-	document.querySelector("#edit_canvas").ondrop = function() { drop(event) };
-	document.querySelector("#edit_canvas").ondragover = function() { allowDrop(event) };
+	document.querySelector("#zoomin").onclick = function() { zoom(1); };
+	document.querySelector("#zoomout").onclick = function() { zoom(-1); };
+	document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab'); };
+	document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab'); };
+	document.querySelector("#edit_canvas").ondrop = function() { drop(event); };
+	document.querySelector("#edit_canvas").ondragover = function() { allowDrop(event); };
 	
 	document.querySelector("#save").onclick = function() {
 		loader.save(nodeContainer.toObject());
@@ -89,11 +89,11 @@ exports.init = function(obj) {
 			dragging_element.y = local.y;
 		}
 	}
-}
+};
 
 exports.nodesToObject = function() {
 	return nodeContainer.toObject();
-}
+};
 
 
 
@@ -195,18 +195,18 @@ function drawAllConnections() {
 }
 
 function newPanel(x, y, image) {
-	var obj = new Object();
+	var obj = {};
 	obj.image = image;
-	obj.editor = new Object();
+	obj.editor = {};
 	obj.editor.position = {
 		x: x,
 		y: y
-	}
+	};
 	nodeContainer.addChild(new Panel(obj));
 }
 
 function newPanelElement(x, y, panel, image) {
-	var elm = new Object();
+	var elm = {};
 	elm.position = {
 		x: x/(panel.panelbitmap.image.width*panel.panelbitmap.scaleX),
 		y: y/(panel.panelbitmap.image.height*panel.panelbitmap.scaleY)
@@ -219,7 +219,7 @@ function newPanelElement(x, y, panel, image) {
 
 	var panelelement = new PanelElement(elm, panel.panelbitmap);
 
-	if (panel.elements == undefined) panel.elements = [];
+	if (panel.elements === undefined) panel.elements = [];
 	panel.elements.push(panelelement);
 	panel.addChild(panelelement);
 
@@ -297,7 +297,7 @@ function openTab(tab) {
 			          img.width = 100;
 			          img.draggable = true;
 			          img.title = escape(theFile.name);
-			          img.ondragstart = function() { drag(event, e.target.result) };
+			          img.ondragstart = function() { drag(event, e.target.result); };
 
 			          /*span.innerHTML = ['<img width="100" src="', e.target.result,
 			                            '" title="', escape(theFile.name), '" draggable="true" ondragstart="drag(event,\'', e.target.result ,'\')"/>'].join('');*/
@@ -310,7 +310,7 @@ function openTab(tab) {
   		}
 
   		document.querySelector('#properties').innerHTML = '<input type="file" id="imagefiles" name="files[]" multiple /><output id="imagelist"></output>';
-  		if (currentLocalImages !== undefined) { listFiles(currentLocalImages) };
+  		if (currentLocalImages !== undefined) { listFiles(currentLocalImages); }
   		document.querySelector('#imagefiles').addEventListener('change', handleFileSelect, false);
   		/*
 		loader.loadAllImages(function(obj) {
@@ -900,7 +900,7 @@ function drop(ev) {
 				//node.selected.graphics.clear();
 				//var thickness = 3;
 				//node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
-			}
+			};
 			img.onerror = function() {
 				var dialog = document.querySelector("#dialog");
 				dialog.innerHTML = "<p>'" + propimage.value + "' could not be loaded<p>";
@@ -911,7 +911,7 @@ function drop(ev) {
 				setTimeout(function() {
 					dialog.style.opacity = "0";
 				}, 2000);
-			}
+			};
 		};
 
 		var prop_text = '<div class="field labeltop"><p>Text:</p><textarea id="property-text">' +
@@ -1050,13 +1050,13 @@ function drop(ev) {
 		}
 		this.Container_removeChild(child);
 		drawAllConnections();
-	}
+	};
 
 	// toObject - For outputting editor parameters to a JSON object
 
 	NodeContainer.prototype.toObject = function() {
 
-		var output = new Object();
+		var output = {};
 
 		output.config = {
 			startnode: this.startnode
@@ -1066,7 +1066,7 @@ function drop(ev) {
 		for (i=0; i < this.children.length; i++) {
 			var ref = this.children[i];
 			// cycle through all nodes, saving their data to an object
-			var node = new Object();
+			var node = {};
 
 			if (ref instanceof Panel) {
 				//console.log(node.name);
@@ -1084,7 +1084,7 @@ function drop(ev) {
 				for (e=0; e < ref.children.length; e++) {
 					var r_elem = ref.children[e];
 					if (r_elem instanceof PanelElement) {
-						var elem = new Object();
+						var elem = {};
 
 						elem.type = r_elem.type;
 						if (r_elem.text !== undefined) {
@@ -1096,7 +1096,7 @@ function drop(ev) {
 						elem.position = {
 							x:r_elem.x/(r_elem.panelbitmap.image.width*r_elem.panelbitmap.scaleX),
 							y:r_elem.y/(r_elem.panelbitmap.image.height*r_elem.panelbitmap.scaleY)
-						}
+						};
 						if (r_elem.align !== undefined) {
 							elem.align = r_elem.align;
 							if (elem.align.x == "right") elem.position.x = 1 - elem.position.x;
