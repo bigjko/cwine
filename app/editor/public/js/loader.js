@@ -42,56 +42,6 @@ exports.loadAllImages = function(path, callback) {
 }
 
 exports.save = function(obj, path) {
-	//if (!checkPath(path)) return;
-
-	/*var filename = path.split("/").pop();
-
-	//doesFileExist(path);
-	writeToFile();
-
-	function doesFileExist(urlToFile)
-	{
-		var xhr = new XMLHttpRequest();
-		xhr.open('HEAD', urlToFile, true);
-		xhr.send();
-
-		xhr.onload = function() {
-			if (xhr.status == 404) {
-				// File not found
-				writeToFile();
-			} else {
-				// File exists
-				if (window.confirm("'"+path+"' already exists.\nDo you want to overwrite it?")) writeToFile();
-				else return null;
-			}
-		};
-	}
-
-	function writeToFile() {
-		//window.alert("Writing to file! ..not really lol");
-		var sendrequest = new XMLHttpRequest();
-		sendrequest.onload = function() {
-			if (sendrequest.status >= 200 && sendrequest.status < 400) {
-                //window.alert(sendrequest.responseText);
-				var dialog = document.querySelector("#dialog");
-				dialog.innerHTML = "<p>'" + path + "' saved successfully<p>";
-				//dialog.style.top = "50%";
-				//dialog.style.left = "50%";
-				dialog.style.opacity = "0.8";
-				dialog.style.backgroundColor = "#333";
-				setTimeout(function() {
-					dialog.style.opacity = "0";
-				}, 2000);
-			}
-			//window.alert(sendrequest.status + " - " + sendrequest.responseText);
-		};
-		sendrequest.open("POST","./json.php",true);
-		sendrequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		//sendrequest.responseType = 'json';
-		console.log(path);
-		sendrequest.send("json=" + JSON.stringify(obj, null, 4) + "&path=" + path);
-	}*/
-
 	localforage.setItem('cwine', obj, function(err, result) { 	
 		var dialog = document.querySelector("#dialog");
 		dialog.innerHTML = "<p>Cwine saved successfully<p>";
