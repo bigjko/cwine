@@ -2,6 +2,8 @@
 var loader = require("./loader.js");
 var $ = require('jquery');
 
+$.event.props.push('dataTransfer');
+
 var panels;
 var config;
 var stage;
@@ -39,11 +41,12 @@ exports.init = function(obj) {
 	}
 	else {
 		stage.removeAllChildren();
-		var bubbles = document.querySelectorAll(".bubble");
-		var view = document.querySelector("#view");
+		/*var bubbles = $(".bubble");
+		var view = $("#view");
 		for (var b=0; b < bubbles.length; b++) {
 			view.removeChild(bubbles[b]);
-		}
+		}*/
+		$('.bubble').remove();
 	}
 
 	//var cool_mads_node = new Node("panel");
@@ -53,8 +56,8 @@ exports.init = function(obj) {
 	//stage.canvas.width = document.documentElement.clientWidth;
 	//stage.canvas.height = document.documentElement.clientHeight;
 
-	stage.canvas.width = document.querySelector("#view").offsetWidth;
-	stage.canvas.height = document.querySelector("#view").offsetHeight;
+	stage.canvas.width = $("#view").outerWidth();
+	stage.canvas.height = $("#view").outerHeight();
 	stage.enableMouseOver(15);
 	stage.on("mousedown", function() { document.activeElement.blur(); });
 
@@ -64,23 +67,26 @@ exports.init = function(obj) {
 	initviewContainer();
 	initNodes();
 
-	document.querySelector("#zoomin").onclick = function() { zoom(1); };
-	document.querySelector("#zoomout").onclick = function() { zoom(-1); };
-	document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab'); };
-	document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab'); };
-	document.querySelector("#edit_canvas").ondrop = function() { drop(event); };
-	document.querySelector("#edit_canvas").ondragover = function() { allowDrop(event); };
+	$("#zoomin").on('click', function() { zoom(1); });
+	$("#zoomout").on('click', function() { zoom(-1); });
+	$('#tabs').on('click', 'li', function() { openTab($(this).prop('id')); });
+	//document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab'); };
+	//document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab'); };
+	$("#edit_canvas").on('drop', function(event) { drop(event); });
+	$("#edit_canvas").on('dragover', function(event) { allowDrop(event); });
 	
-	document.querySelector("#save").onclick = function() {
+	$("#save").on('click', function() {
 		loader.save(nodeContainer.toObject());
-	};
-	document.addEventListener("keydown", function(e) {
+	});
+	$(document).keydown(function(e) {
+	  console.log("keydown:");
 	  if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
 	    e.preventDefault();
+	    console.log("CTRL+S");
 	    // Process event...
-	      loader.saveJSON(editor.nodesToObject(), document.querySelector("#filepath").value);
+	    loader.save(nodeContainer.toObject(), $("#filepath").value);
 	  }
-	}, false);
+	});
 
 	function stageMouseMove(evt) {
 		if (dragging_element !== undefined && dragging_element !== null) {
@@ -292,16 +298,17 @@ function openTab(tab) {
 			        return function(e) {
 			          // Render thumbnail.
 			          //var span = document.createElement('span');
-			          var img = document.createElement('IMG');
-			          img.src = e.target.result;
-			          img.width = 100;
-			          img.draggable = true;
-			          img.title = escape(theFile.name);
-			          img.ondragstart = function() { drag(event, e.target.result); };
+			          var img = $('<img>');
+			          img.attr({
+			          	'src': e.target.result, 
+			          	'width': 100, 
+			          	'draggable': true, 
+			          	'title': escape(theFile.name)});
+			          img.on('dragstart', function(event) { drag(event, e.target.result); });
 
 			          /*span.innerHTML = ['<img width="100" src="', e.target.result,
 			                            '" title="', escape(theFile.name), '" draggable="true" ondragstart="drag(event,\'', e.target.result ,'\')"/>'].join('');*/
-			          document.getElementById('imagelist').insertBefore(img, null);
+			          $('#imagelist').prepend(img);
 			        };
 			    })(f);
 
@@ -309,9 +316,9 @@ function openTab(tab) {
 		    }
   		}
 
-  		document.querySelector('#properties').innerHTML = '<input type="file" id="imagefiles" name="files[]" multiple /><output id="imagelist"></output>';
+  		$('#properties').html('<input type="file" id="imagefiles" name="files[]" multiple /><output id="imagelist"></output>');
   		if (currentLocalImages !== undefined) { listFiles(currentLocalImages); }
-  		document.querySelector('#imagefiles').addEventListener('change', handleFileSelect, false);
+  		$('#imagefiles').on('change', handleFileSelect);
   		/*
 		loader.loadAllImages(function(obj) {
 			var properties = document.querySelector("#properties");
