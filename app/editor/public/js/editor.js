@@ -122,11 +122,11 @@ function initNodes() {
 }
 
 window.onresize = function(event) {
-    var view = document.querySelector("#view");
-    var sidebar = document.querySelector("#sidebar");
+    var view = $("#view");
+    var sidebar = $("#sidebar");
 
-    stage.canvas.width = view.offsetWidth;
-    stage.canvas.height = view.offsetHeight;
+    stage.canvas.width = view.outerWidth();
+    stage.canvas.height = view.outerHeight();
 
 	stage.getChildByName("dragBox").graphics.beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height);
     //stage.update();
@@ -166,8 +166,8 @@ function initviewContainer() {
 	}
 
 	function centerViewOrigin(x,y) {
-		viewContainer.regX = ((document.querySelector("#view").offsetWidth - 280)/2 - viewContainer.x)/viewScale;
-		viewContainer.regY = ((document.querySelector("#view").offsetHeight/2) - viewContainer.y)/viewScale;
+		viewContainer.regX = (($("#view").outerWidth() - 280)/2 - viewContainer.x)/viewScale;
+		viewContainer.regY = (($("#view").outerHeight()/2) - viewContainer.y)/viewScale;
 		//corners.graphics.clear();
 		//corners.graphics.f("red").dc(viewContainer.x,viewContainer.y,15).f("blue").dc(viewContainer.x+viewContainer.regX*viewScale, viewContainer.y+viewContainer.regY*viewScale, 15);
 		viewContainer.x = x + viewContainer.regX * viewScale;
@@ -331,26 +331,10 @@ function openTab(tab) {
 		break;
 	}
 
-	var tabs = document.querySelector("#tabs");
-	for (t=0; t<tabs.children.length; t++) {
-		tabs.children[t].className = (tabs.children[t].id == currentTab) ? "selected" : "";
-	}
-}
-
-
-var sidebarClosed = false;
-
-function hideSidebar() {
-	var min = "30px";
-	var max = "280px";
-	if ( sidebarClosed ) {
-		document.querySelector("#sidebar").style.width = max;
-		sidebarClosed = false;
-	}
-	else {
-		document.querySelector("#sidebar").style.width = min;
-		sidebarClosed = true;
-	}
+	$('#tabs').children().each( function() {
+		if ($(this).attr('id') == currentTab) $(this).addClass('selected');
+		else $(this).removeClass('selected');
+	});
 }
 
 function mouseUp() {
@@ -605,113 +589,86 @@ function drop(ev) {
 		//console.log("Showing properties for node " + node.name );
 		var thickness = 3;
 		this.selected.graphics.f("#0099ee").dr(-thickness,-thickness,this.panelbitmap.image.width*this.panelbitmap.scaleX+thickness*2, this.panelbitmap.image.height*this.panelbitmap.scaleY+thickness*2);
-		var property_panel = document.querySelector("#properties");
+		
+		var p_header = $('<div>').attr('id', 'object-name')
+								 .append($('<p>' + node.name + '</p>').append($('<span>#'+nodeContainer.getChildIndex(node)+'</span>')
+								 									  .addClass('element-id')));
+		
+		var node_name = $('<div>').addClass('field labelside')
+			.append($('<p>Name:</p>'))
+			.append($('<input>').attr({'type':'text', 'value':node.name, 'id':'property-name'})
+								.data('node', node)
+								.on('change keyup', function() {
+									console.log("node name changed..");
+									$(this).data('node').name = $(this).val();
+									$('#object-name').html(node.name + '<span>#' + nodeContainer.getChildIndex(node) + '</span>');
+								});
+								
+		var panel_image = $('<div>').addClass('field labeltop')
+			.append('<p>Image URL:</p>')
+			.append($('<input>').attr({'type':'text', 'value':node.image, 'id':'property-imagepath'})
+								.data('node', node);
+								
 
-		var property_header = 	'<div id="object-name">' +
-									'<p>' + node.name + '<span class="element-id">#' + nodeContainer.getChildIndex(node) + '</span></p>' +
-								'</div>';
-		property_panel.innerHTML = property_header;
+		function loadNodeImage(val, node) {
+			var img = $('<img>');
+			img.attr('src', val);
+			img.on('load', function() {
+				node.image = val;
+				node.panelbitmap.image = img;
+				node.selected.graphics.clear();
+				var thickness = 3;
+				node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
+			});
+			img.on('error', function() {
+				var dialog = $("#dialog")
+					.html("<p>'" + val + "' could not be loaded<p>")
+					.css({ 'opacity':'0.8', 'background-color':'#522'});
+				setTimeout(function() {
+					dialog.css('opacity','0');
+				}, 2000);
+			});
+		}
 
-		var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
-		property_panel.innerHTML += node_name;
+		var panel_size = $('<div>').addClass('field labelside');
+		
+		var size_ul = $('<ul>').attr('id','property-size')
+			.addClass('buttons noselect')
+			.appendTo(panel_size);
 
-		if (node instanceof Panel) {
-
-			var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
-			property_panel.innerHTML += panel_image;
-
-			var panel_size = $('<div>').addClass('field labelside');
-			var size_ul = $('<ul>').attr('id','property-size').addClass('buttons noselect');
-
-			size_ul.appendTo(panel_size);
-			
-			//panel_size.appendChild(size_ul);
-			//var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="buttons noselect"></div>';
-			
-			//panel_size += '</ul></div>';
-			
-
-			//var propsize = document.querySelector("#property-size");
-			for (s=1; s <= 4; s++) {
-				//var li = document.createElement("li");
-				//if (node.size == s) li.className = "selected";
-				//li.innerHTML = s.toString();
-				/*li.onclick = function() {
-					console.log("set to size " + s);
-					node.size = s;
-					this.className = "selected";
-				};*/
-				//propsize.appendChild(li);
-				var li = $('<li>');
-
-				/*var selected = (s == node.size) ? 'class="selected"' : '';
-				panel_size += '<li ' + selected + ' onclick="currentlySelected.changeSize(' + s.toString() + ')">' + s.toString() + '</li>';*/
-				if (s == node.size) li.addClass('selected');
-				li.html(s.toString());
-				li.data('size', s);
-				li.data('node', this);
-				//li.onclick = function() { console.log("click!"); currentlySelected.changeSize(s); };
-				li.appendTo(size_ul);
-			}
-			//panel_size += '</ul></div>';
-			//property_panel.appendChild(panel_size);
-			panel_size.appendTo(property_panel);
-			$('#property-size').on('click', 'li', function(e) {
+		for (s=1; s <= 4; s++) {
+			var li = $('<li>')
+				.html(s.toString())
+				.data('size', s)
+				.data('node', this)
+				.appendTo(size_ul);
+			if (s == node.size) li.addClass('selected');
+		}
+		size_ul.on('click', 'li', function(e) {
 				e.preventDefault();
 				console.log("click size");
 				$(this).data('node').changeSize($(this).data('size'));
-			});
+		});
+		
+		var delete_button = $('<div>')
+			.addClass('field')
+			.append($('<input>')
+				.addClass('button delete-button')
+				.attr({'id':'delete', 'type':'submit', 'value':'Delete Panel'})
+				.on('click', function() {
+					console.log("lol");
+					$(this).data('node').parent.removeChild(currentlySelected);
+				}));
 
-			/*var delete_button = '<div class="field"><input id="delete" class="button delete-button" type="submit" value="Delete Panel"></div>';
-			property_panel.innerHTML += delete_button;
-			document.querySelector("#delete").onclick = function() {
-				console.log("lol");
-				nodeContainer.removeChild(currentlySelected);
-			};
+		$("#properties").empty().append(p_header, node_name, panel_image, panel_size, delete_button);
 
-			var propname = document.querySelector("#property-name");
-			propname.onchange = function() {
-				node.name = propname.value;
-				var prophead = document.querySelector("#object-name");
-				prophead.innerHTML = '<div id="object-name">' +
-									'<p>' + node.name + '<span class="element-id">#' + nodeContainer.getChildIndex(node) + '</span></p>' +
-								'</div>';
-			}
-
-			propname.onkeyup = function() {
-				//console.log(proptext.value);
-				node.name = propname.value;
-				var prophead = document.querySelector("#object-name");
-				prophead.innerHTML = '<div id="object-name">' +
-									'<p>' + node.name + '<span class="element-id">#' + nodeContainer.getChildIndex(node) + '</span></p>' +
-								'</div>';
-			};
-
-			var propimage = document.querySelector("#property-imagepath");
-			propimage.onchange = function() {
-				//node.image = propimage.value;
-				var img = new Image();
-				img.src = propimage.value;
-				img.onload = function() {
-					node.image = propimage.value;
-					node.panelbitmap.image = img;
-					node.selected.graphics.clear();
-					var thickness = 3;
-					node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
-				}
-				img.onerror = function() {
-					var dialog = document.querySelector("#dialog");
-					dialog.innerHTML = "<p>'" + propimage.value + "' could not be loaded<p>";
-					//dialog.style.top = "50%";
-					//dialog.style.left = "50%";
-					dialog.style.opacity = "0.8";
-					dialog.style.backgroundColor = "#522";
-					setTimeout(function() {
-						dialog.style.opacity = "0";
-					}, 2000);
-				}
-			};*/
-		}
+		$("#property-name")
+		
+		
+		$("#property-imagepath").on('change', function() {
+			console.log("image changed..");
+			loadNodeImage($(this).value, $(this).data('node'));
+		});
 		
 	};
 

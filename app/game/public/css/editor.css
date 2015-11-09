@@ -108,8 +108,7 @@ canvas {
 	height:100%;
 	padding:0;
 	background-color:#444;
-	opacity:0.9;
-	/*background-color:rgba(20,20,20,0.8);*/
+	background-color:rgba(40,40,40,0.8);
 	color:#ccc;
 	-webkit-transition: width 0.3s;
     transition: width 0.3s;
