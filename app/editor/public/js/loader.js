@@ -39,7 +39,7 @@ exports.loadAllImages = function(path, callback) {
 	};
 
 	request.send();
-}
+};
 
 exports.save = function(obj, path) {
 	localforage.setItem('cwine', obj, function(err, result) { 	
@@ -51,7 +51,7 @@ exports.save = function(obj, path) {
 			dialog.style.opacity = "0";
 		}, 2000);
 	});
-}
+};
 
 exports.load = function(callback) {
 
@@ -59,7 +59,7 @@ exports.load = function(callback) {
 		preloadImages(value,callback); 	
 		//callback(value);
 	});
-}
+};
 
 exports.loadJSON = function(path, callback) {
 
@@ -92,7 +92,7 @@ exports.loadJSON = function(path, callback) {
 	};
 
 	request.send();
-}
+};
 
 function preloadImages(obj, callback) {
 	var loaded = 0;

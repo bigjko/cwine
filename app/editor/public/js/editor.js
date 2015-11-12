@@ -122,8 +122,8 @@ function initNodes() {
 }
 
 window.onresize = function(event) {
-    var view = $("#view");
-    var sidebar = $("#sidebar");
+    let view = $("#view");
+    let sidebar = $("#sidebar");
 
     stage.canvas.width = view.outerWidth();
     stage.canvas.height = view.outerHeight();
@@ -602,12 +602,12 @@ function drop(ev) {
 									console.log("node name changed..");
 									$(this).data('node').name = $(this).val();
 									$('#object-name').html(node.name + '<span>#' + nodeContainer.getChildIndex(node) + '</span>');
-								});
+								}));
 								
 		var panel_image = $('<div>').addClass('field labeltop')
 			.append('<p>Image URL:</p>')
 			.append($('<input>').attr({'type':'text', 'value':node.image, 'id':'property-imagepath'})
-								.data('node', node);
+								.data('node', node));
 								
 
 		function loadNodeImage(val, node) {
@@ -662,7 +662,7 @@ function drop(ev) {
 
 		$("#properties").empty().append(p_header, node_name, panel_image, panel_size, delete_button);
 
-		$("#property-name")
+		//$("#property-name")
 		
 		
 		$("#property-imagepath").on('change', function() {
