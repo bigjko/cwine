@@ -1,9 +1,9 @@
-var loader = require('./loader.js');
-var editor = require('./editor.js');
+/* @jsx React.DOM */
 
-//var gamepath = __dirname + '/app/game/';
+//var loader = require('./loader.js');
+//var editor = require('./editor.js');
 
-window.onload = function() {
+/*window.onload = function() {
 
 		// Check for the various File API support.
 	if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -19,4 +19,13 @@ window.onload = function() {
 		loader.load(editor.init);
 	};
 	loader.load(editor.init);
-};
+};*/
+
+// main.js
+var React = require('react');
+var ReactDOM = require('react-dom');
+
+ReactDOM.render(
+  <h1>Hello, world!</h1>,
+  document.getElementById('view')
+);

@@ -27,7 +27,7 @@ gulp.task('browserify-game', function() {
 });
 
 gulp.task('watch-editor', function() {
-  var bundler = watchify(browserify(editorSource, {debug:true})).transform(babelify, { 'presets': ['react','es2015']});
+  var bundler = watchify(browserify(editorSource, {debug:true})).transform(babelify, { presets: ['react','es2015']});
   bundler.on('update', rebundle);
 
   function rebundle() {
