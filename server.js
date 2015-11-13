@@ -9,7 +9,7 @@ exports.serve = function() {
 	});
 
 	app.get('/edit', function (req, res) {
-	  res.sendFile(path + 'app/editor/views/index.html');
+	  res.sendFile(path + 'app/editor/views/cwine.html');
 	});
 
 	app.use(express.static('app/shared/public'));
@@ -24,4 +24,4 @@ exports.serve = function() {
 	app.listen(8080,function(){
 	  console.log("Live at Port 8080");
 	});	
-}
+};
