@@ -2,8 +2,6 @@
 var loader = require("./loader.js");
 var $ = require('jquery');
 
-$.event.props.push('dataTransfer');
-
 var panels;
 var config;
 var stage;
@@ -19,15 +17,8 @@ var dragging_element;
 
 var defaultGamePath = "";
 var con_r = 6;
+var currentlySelected;
 var currentLocalImages;
-
-
-
-// --------------------------- //
-//							   //
-//			EXPORTS            //
-//							   //
-// --------------------------- //
 
 exports.init = function(obj) {
 
@@ -69,15 +60,15 @@ exports.init = function(obj) {
 
 	$("#zoomin").on('click', function() { zoom(1); });
 	$("#zoomout").on('click', function() { zoom(-1); });
-	$('#tabs').on('click', 'li', function() { openTab($(this).prop('id')); });
+	//$('#tabs').on('click', 'li', function() { openTab($(this).prop('id')); });
 	//document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab'); };
 	//document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab'); };
 	$("#edit_canvas").on('drop', function(event) { drop(event); });
 	$("#edit_canvas").on('dragover', function(event) { allowDrop(event); });
 	
-	$("#save").on('click', function() {
+	/*$("#save").on('click', function() {
 		loader.save(nodeContainer.toObject());
-	});
+	});*/
 	$(document).keydown(function(e) {
 	  console.log("keydown:");
 	  if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
@@ -96,18 +87,6 @@ exports.init = function(obj) {
 		}
 	}
 };
-
-exports.nodesToObject = function() {
-	return nodeContainer.toObject();
-};
-
-
-
-
-//////////////////
-////  EDITOR  ////
-//////////////////
-
 
 function initNodes() {
 	nodeContainer = new NodeContainer();
@@ -178,7 +157,7 @@ function initviewContainer() {
 	dragBox.on("mousedown", function(evt) {
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = nodeContainer;
-		openTab("propertyTab");
+		//openTab("propertyTab");
 		//nodeContainer.showProperties();
 		dragoffset.x = evt.stageX - viewContainer.x + viewContainer.regX*viewScale;
 		dragoffset.y = evt.stageY - viewContainer.y + viewContainer.regY*viewScale;
@@ -192,6 +171,12 @@ function initviewContainer() {
 	stage.addChild(viewContainer);
 
 	centerViewOrigin(0,0);
+
+	
+	let zoomIn = $('<div>+</div>').attr('id', 'zoomin').addClass('zoom-button noselect plus').click(zoom(1));
+	let zoomOut = $('<div>-</div>').attr('id', 'zoomout').addClass('zoom-button noselect').click(zoom(-1));
+	let zoomButtons = $('<div>').attr('id', 'zoom').append(zoomIn, zoomOut);
+	$('body').append(zoomButtons);
 }
 
 function drawAllConnections() {
@@ -260,93 +245,6 @@ function zoom(zoomModifier) {
 	}*/
 }
 
-var currentlySelected;
-var currentTab = "properties";
-
-function openTab(tab) {
-
-	//if (tab == currentTab) return;
-	currentTab = tab;
-
-	switch(tab) {
-
-		case "propertyTab":
-		console.log("cool");
-		if (currentlySelected !== undefined) {
-		 	currentlySelected.showProperties();
-		}
-		else nodeContainer.showProperties();
-		break;
-
-		case "imagesTab":
-		function handleFileSelect(evt) {
-		    var files = evt.target.files; // FileList object
-		    currentLocalImages = files;
-		    // files is a FileList of File objects. List some properties.
-		    listFiles(files);
-		    //document.querySelector('#imagelist').innerHTML = output.join('');
-  		}
-  		function listFiles(filearray) {
-  			for (var i = 0, f; f = filearray[i]; i++) {
-		    	if (!f.type.match('image.*')) {
-			    	continue;
-			    }
-
-			    var reader = new FileReader();
-
-			    reader.onload = (function(theFile) {
-			        return function(e) {
-			          // Render thumbnail.
-			          //var span = document.createElement('span');
-			          var img = $('<img>');
-			          img.attr({
-			          	'src': e.target.result, 
-			          	'width': 100, 
-			          	'draggable': true, 
-			          	'title': escape(theFile.name)});
-			          img.on('dragstart', function(event) { drag(event, e.target.result); });
-
-			          /*span.innerHTML = ['<img width="100" src="', e.target.result,
-			                            '" title="', escape(theFile.name), '" draggable="true" ondragstart="drag(event,\'', e.target.result ,'\')"/>'].join('');*/
-			          $('#imagelist').prepend(img);
-			        };
-			    })(f);
-
-			    reader.readAsDataURL(f);
-		    }
-  		}
-
-  		$('#properties').html('<input type="file" id="imagefiles" name="files[]" multiple /><output id="imagelist"></output>');
-  		if (currentLocalImages !== undefined) { listFiles(currentLocalImages); }
-  		$('#imagefiles').on('change', handleFileSelect);
-  		/*
-		loader.loadAllImages(function(obj) {
-			var properties = document.querySelector("#properties");
-			properties.innerHTML = "";
-			for (i=0; i<obj.length; i++) {
-				console.log(obj[i]);
-				properties.innerHTML += '<img width="100" style="margin-left:10px;" src="' + obj[i].replace("../", "") + '" draggable="true" ondragstart="drag(event, \'' + obj[i].replace("../", "") + '\')" />';
-			}
-		});*/
-		break;
-	}
-
-	$('#tabs').children().each( function() {
-		if ($(this).attr('id') == currentTab) $(this).addClass('selected');
-		else $(this).removeClass('selected');
-	});
-}
-
-function mouseUp() {
-	console.log("Mouse Up on HTML Element");
-	dragging_element = undefined;
-}
-
-function mouseDown(elm) {
-	console.log("Mouse Down on HTML Element");
-	dragging_element = elm;
-}
-
 function allowDrop(ev) {
     ev.preventDefault();
 }
@@ -376,14 +274,6 @@ function drop(ev) {
 }
 
 
-/**
-* 
-*
-*	Easeljs class definitions
-*
-*
-**/
-
 (function() {
 
 	// ------------ //
@@ -407,7 +297,7 @@ function drop(ev) {
 		//evt.target.dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target.parent;
-		openTab("propertyTab");
+		//openTab("propertyTab");
 	};
 
 	Node.prototype.handleMouseMove = function(evt) {
@@ -424,7 +314,7 @@ function drop(ev) {
 	};
 
 	Node.prototype.drawConnections = function() {
-		for (s=0; s < this.sockets.length; s++) {
+		for (let s=0; s < this.sockets.length; s++) {
 			var socket = this.sockets[s];
 			socket.line.graphics.clear();
 			if (socket.owner instanceof PanelElement) {
@@ -562,7 +452,7 @@ function drop(ev) {
 		//this.elements = [];
 
 		if (obj.elements !== undefined) {
-			for (e=0; e < obj.elements.length; e++) {
+			for (let e=0; e < obj.elements.length; e++) {
 				var element = new PanelElement(obj.elements[e], this.panelbitmap);
 
 				//this.elements.push(element);
@@ -576,100 +466,7 @@ function drop(ev) {
 				sock.owner = element;
 				sock.dashes = [10,5];
 			}
-		}
-
-		
-	};
-
-	Panel.prototype.showProperties = function() {
-		var node = this;
-		//if (currentlySelected == this) return;
-		//currentlySelected = this;
-
-		//console.log("Showing properties for node " + node.name );
-		var thickness = 3;
-		this.selected.graphics.f("#0099ee").dr(-thickness,-thickness,this.panelbitmap.image.width*this.panelbitmap.scaleX+thickness*2, this.panelbitmap.image.height*this.panelbitmap.scaleY+thickness*2);
-		
-		var p_header = $('<div>').attr('id', 'object-name')
-								 .append($('<p>' + node.name + '</p>').append($('<span>#'+nodeContainer.getChildIndex(node)+'</span>')
-								 									  .addClass('element-id')));
-		
-		var node_name = $('<div>').addClass('field labelside')
-			.append($('<p>Name:</p>'))
-			.append($('<input>').attr({'type':'text', 'value':node.name, 'id':'property-name'})
-								.data('node', node)
-								.on('change keyup', function() {
-									console.log("node name changed..");
-									$(this).data('node').name = $(this).val();
-									$('#object-name').html(node.name + '<span>#' + nodeContainer.getChildIndex(node) + '</span>');
-								}));
-								
-		var panel_image = $('<div>').addClass('field labeltop')
-			.append('<p>Image URL:</p>')
-			.append($('<input>').attr({'type':'text', 'value':node.image, 'id':'property-imagepath'})
-								.data('node', node));
-								
-
-		function loadNodeImage(val, node) {
-			var img = $('<img>');
-			img.attr('src', val);
-			img.on('load', function() {
-				node.image = val;
-				node.panelbitmap.image = img;
-				node.selected.graphics.clear();
-				var thickness = 3;
-				node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
-			});
-			img.on('error', function() {
-				var dialog = $("#dialog")
-					.html("<p>'" + val + "' could not be loaded<p>")
-					.css({ 'opacity':'0.8', 'background-color':'#522'});
-				setTimeout(function() {
-					dialog.css('opacity','0');
-				}, 2000);
-			});
-		}
-
-		var panel_size = $('<div>').addClass('field labelside');
-		
-		var size_ul = $('<ul>').attr('id','property-size')
-			.addClass('buttons noselect')
-			.appendTo(panel_size);
-
-		for (s=1; s <= 4; s++) {
-			var li = $('<li>')
-				.html(s.toString())
-				.data('size', s)
-				.data('node', this)
-				.appendTo(size_ul);
-			if (s == node.size) li.addClass('selected');
-		}
-		size_ul.on('click', 'li', function(e) {
-				e.preventDefault();
-				console.log("click size");
-				$(this).data('node').changeSize($(this).data('size'));
-		});
-		
-		var delete_button = $('<div>')
-			.addClass('field')
-			.append($('<input>')
-				.addClass('button delete-button')
-				.attr({'id':'delete', 'type':'submit', 'value':'Delete Panel'})
-				.on('click', function() {
-					console.log("lol");
-					$(this).data('node').parent.removeChild(currentlySelected);
-				}));
-
-		$("#properties").empty().append(p_header, node_name, panel_image, panel_size, delete_button);
-
-		//$("#property-name")
-		
-		
-		$("#property-imagepath").on('change', function() {
-			console.log("image changed..");
-			loadNodeImage($(this).value, $(this).data('node'));
-		});
-		
+		}	
 	};
 
 	Panel.prototype.removeChild = function(child) {
@@ -679,22 +476,6 @@ function drop(ev) {
 		view.removeChild(elm);
 		this.Node_removeChild(child);
 		drawAllConnections();
-	};
-
-	Panel.prototype.changeSize = function(size) {
-		console.log('changing size!');
-		this.size = size;
-		var scale = 0.25;
-		scale = this.size*400*scale / this.panelbitmap.image.width;
-		this.panelbitmap.scaleX = scale;
-		this.panelbitmap.scaleY = scale;
-		var ps = document.querySelector("#property-size");
-		for (s=0; s < ps.children.length; s++) {
-			ps.children[s].className = (s+1 == this.size) ? "selected" : "";
-		}
-		this.selected.graphics.clear();
-		var thickness = 3;
-		this.selected.graphics.f("#0099ee").dr(-thickness,-thickness,this.panelbitmap.image.width*this.panelbitmap.scaleX+thickness*2, this.panelbitmap.image.height*this.panelbitmap.scaleY+thickness*2);
 	};
 
 	window.Panel = createjs.promote(Panel, "Node");
@@ -830,90 +611,6 @@ function drop(ev) {
 		}
 	};
 
-	PanelElement.prototype.showProperties = function() {
-		var node = this;
-		//if (currentlySelected == this) return;
-		//currentlySelected = this;
-
-		//console.log("Showing properties for node " + node.name );
-
-		var property_panel = document.querySelector("#properties");
-
-		var property_header = 	'<div id="object-name">' +
-									'<p>' + node.parent.name + '<span class="element-id">' + node.parent.constructor.name + ' #' + nodeContainer.getChildIndex(node.parent) + ' - ' + node.constructor.name + '</span></p>' +
-								'</div>';
-		property_panel.innerHTML = property_header;
-
-		//var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
-		//property_panel.innerHTML += node_name;
-
-		var prop_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
-		property_panel.innerHTML += prop_image;
-
-		console.log("Yo!");
-
-		document.querySelector("#property-imagepath").onchange = function() {
-			console.log("Whut!");
-			//node.image = propimage.value;
-			var img = new Image();
-			img.src = propimage.value;
-			img.onload = function() {
-				node.image = propimage.value;
-				node.updateElement();
-				//node.panelbitmap.image = img;
-				//node.selected.graphics.clear();
-				//var thickness = 3;
-				//node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
-			};
-			img.onerror = function() {
-				var dialog = document.querySelector("#dialog");
-				dialog.innerHTML = "<p>'" + propimage.value + "' could not be loaded<p>";
-				//dialog.style.top = "50%";
-				//dialog.style.left = "50%";
-				dialog.style.opacity = "0.8";
-				dialog.style.backgroundColor = "#522";
-				setTimeout(function() {
-					dialog.style.opacity = "0";
-				}, 2000);
-			};
-		};
-
-		var prop_text = '<div class="field labeltop"><p>Text:</p><textarea id="property-text">' +
-		node.text +
-		'</textarea></div>';
-
-		//var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
-		property_panel.innerHTML += prop_text;
-
-		//var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="numberbuttons noselect">';
-		
-		//panel_size += '</ul></div>';
-		
-		/*panel_size += '</ul></div>';
-		property_panel.innerHTML += panel_size;*/
-		/*var propname = document.querySelector("#property-name");
-		propname.onchange = function() {
-			node.name = propname.value;
-		}*/
-
-		var delete_button = '<div class="field"><input id="delete" class="button delete-button" type="submit" value="Delete Panel"></div>';
-		property_panel.innerHTML += delete_button;
-		document.querySelector("#delete").onclick = function() {
-			console.log(node.parent);
-			node.parent.removeChild(currentlySelected);
-		};
-
-		var proptext = document.querySelector("#property-text");
-		proptext.onkeyup = function() {
-			//console.log(proptext.value);
-			node.text = proptext.value;
-			node.updateElement();
-		};
-
-		
-		
-	};
-
 	PanelElement.prototype.setDragOffset = function(evt) {
 		var global = evt.target.parent.localToGlobal(evt.target.x, evt.target.y);
 		dragoffset = {
@@ -923,7 +620,7 @@ function drop(ev) {
 		//currentlySelected = evt.target.parent;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target;
-		openTab("propertyTab");
+		//openTab("propertyTab");
 		//evt.target.showProperties();
 	};
 
@@ -959,40 +656,12 @@ function drop(ev) {
 		this.startnode = 0;
 	} createjs.extend(NodeContainer, createjs.Container);
 
-
-	NodeContainer.prototype.showProperties = function() {
-
-		//console.log(this);
-
-		//f (currentlySelected == this) return;
-		//currentlySelected = this;
-
-		var property_panel = document.querySelector("#properties");
-
-		var property_header = 	'<div id="object-name">' +
-									'<p>Project Properties</p>' +
-								'</div>';
-		property_panel.innerHTML = property_header;
-
-		var prop_startnode = '<div class="field labelside"><p>Start node:</p><input type="number" value="' + this.startnode + '" id="property-startnode"></div>';
-		property_panel.innerHTML += prop_startnode;
-
-		var propstart = document.querySelector("#property-startnode");
-		var container = this;
-		propstart.onchange = function() {
-			console.log("Start node changed", propstart.value);
-			container.startnode = propstart.value;
-			console.log(container.startnode);
-		};
-		
-	};
-
 	NodeContainer.prototype.makeConnections = function() {
 
-		for (i=0; i < this.children.length; i++) {
+		for (let i=0; i < this.children.length; i++) {
 			var node = this.children[i];
 			if (node.goto !== undefined) node.goto = this.getChildAt(node.goto);
-			for (e=0; e < node.children.length; e++) {
+			for (let e=0; e < node.children.length; e++) {
 				var elem = node.children[e];
 				if (elem instanceof PanelElement && elem.goto !== undefined) elem.goto = this.getChildAt(elem.goto);
 			}

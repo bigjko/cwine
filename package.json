@@ -73,7 +73,9 @@
     "masonry": "0.0.2",
     "packery": "^1.4.3",
     "react": "^0.14.2",
-    "react-dom": "^0.14.2"
+    "react-dom": "^0.14.2",
+    "react-simpletabs": "^0.7.0",
+    "react-tabs": "^0.5.1"
   },
   "devDependencies": {
     "browserify": "latest",

@@ -236,14 +236,43 @@ textarea {
 	font-size:75%;
 	margin-left:10px;
 }
-
-#tabs {
-	clear:left;
-	list-style:none;
-	padding:4px;
+/*
+.react-tabs [role=tablist] {
+	margin:0;
+	border:0;
 }
 
-#tabs li {
+.react-tabs [role=tab] [aria-selected=true] {
+	background-color: #666;
+}
+
+.tabs {
+	font-size: 70%;
+	font-weight: bolder;
+	margin:0;
+}
+
+.tab {
+	margin-left:10px;
+	margin-bottom: 0;
+	background-color: #666;
+	border-radius: 5px 5px 0 0;
+}
+
+.tab-panel {
+	min-height: 100px;
+	background-color: #333;
+}
+
+/*.tabs ul {
+	clear:both;
+	display:block;
+	list-style:none;
+	padding:4px;
+	width:100%;
+}
+
+.tabs li {
 	float:left;
 	display:block;
 	background-color:#333;
@@ -257,18 +286,18 @@ textarea {
 	cursor:pointer;
 }
 
-#tabs li:hover {
+.tabs li:hover {
 	background-color:#222;
 }
 
-#tabs .selected {
+.tabs .selected {
 	background-color:#222;
 	color:#ccc;
 }
 
-#tabs .selected:hover {
+.tabs .selected:hover {
 	background-color:#222;
-}
+}*/
 
 #sidebar .button {
 	color:#444;
@@ -400,4 +429,43 @@ textarea {
 	pointer-events:none;
 	padding: 15px;
 	font-size:100%;
+}
+
+/*!
+ * 
+ *  React Simpletabs - Just a simple tabs component built with React
+ *  @version v0.7.0
+ *  @link https://github.com/pedronauck/react-simpletabs
+ *  @license MIT
+ *  @author Pedro Nauck (https://github.com/pedronauck)
+ * 
+ */
+.tabs-menu {
+  display: table;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tabs-menu-item {
+  float: left;
+  margin-right: 20px;
+  background-color: #444;
+}
+
+.tabs-menu-item a {
+	padding:15px;
+  cursor: pointer;
+  display: block;
+  color: #A9A9A9;
+}
+
+.tabs-menu-item:not(.is-active) a:hover,
+.tabs-menu-item.is-active a {
+  color: #3498DB;
+  background-color:#555;
+}
+
+.tab-panel {
+  padding: 10px 50px;
 }

@@ -30,16 +30,24 @@
 
 	<script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
 	<script src="https://code.createjs.com/tweenjs-0.6.1.min.js"></script>
-
+	
 </head>
 <body>
 	<!-- Primary Page Layout
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
 	<header>
+		<h6 class="noselect">cwine v0.01</h6>
 	</header>
+	
+	<div id="progress">
+		<p>loading..</p>
+		<div id="progress_bg"><div id="progress_bar" style="height:100%; width:0%;"></div></div>
+	</div>
 
-	<div id="container"></div>
+	<div id="view"><canvas id="edit_canvas"></canvas></div>
+
+	<div id="sidebar"></div>
+
 	<script src="js/cwine-editor.js"></script>
-
 </body>
 </html>

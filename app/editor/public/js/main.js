@@ -1,7 +1,12 @@
-/* @jsx React.DOM */
+var React = require('react');
+var ReactDOM = require('react-dom');
+var loader = require('./loader.js');
+var editor = require('./editor-react.js');
 
-//var loader = require('./loader.js');
-//var editor = require('./editor.js');
+let project = {};
+let currentlySelected = undefined;
+
+import Sidebar from './sidebar.js';
 
 /*window.onload = function() {
 
@@ -11,22 +16,45 @@
 	} else {
 	  alert('The File APIs are not fully supported in this browser.');
 	}
-	//document.querySelector("#save");
-	document.querySelector("#loadjson").onclick = function() {
-		loader.loadJSON(document.querySelector("#filepath").value, editor.init);
-	};
-	document.querySelector("#load").onclick = function() {
-		loader.load(editor.init);
-	};
-	loader.load(editor.init);
+	loader.load(init);
 };*/
 
-// main.js
-var $ = require('jquery');
-var React = require('react');
-var ReactDOM = require('react-dom');
+function init() {
+	//project = loaded;
 
-ReactDOM.render(
-  <h1>Hello, world!</h1>,
-  document.querySelector('#container')
-);
+	//editor.init(loaded);
+
+	ReactDOM.render(
+		<Editor />,
+		document.querySelector('#sidebar')
+	);
+}
+
+const Editor = React.createClass({
+	getInitialState: function() {
+		return { nodes: [], currentlySelected: { node: 1, element: undefined } };
+	},
+	componentDidMount: function() {
+		loader.load(function(data) {
+			editor.init(data);
+			this.setState({
+				nodes: data.nodes,
+				currentlySelected: { node: 3, element: undefined }
+			});
+		}.bind(this));
+	},
+	render: function() {
+		//let currentnode = this.state.nodes[this.state.currentlySelected.node];
+		//if ( this.state.currentlySelected.element !== undefined ) currentnode = currentnode.elements[this.state.currentlySelected.element];
+		return (
+			<Sidebar nodes={this.state.nodes} current={this.state.currentlySelected} />
+		);
+	}
+
+});
+
+init();
+
+// main.js
+
+// Render THE EDITOR!
