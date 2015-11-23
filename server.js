@@ -25,7 +25,7 @@
 		  res.sendFile(path + 'app/shared/views/error/404.html');
 		});
 
-		app.listen(8080,function(){
+		app.listen((process.env.PORT || 8080),function(){
 		  console.log("Live at Port 8080");
 		});	
 	}
