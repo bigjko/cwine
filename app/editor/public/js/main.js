@@ -40,7 +40,7 @@ const Editor = React.createClass({
 		this.setState({ currentlySelected: selected });
 	},
 	handleSidebarSelection: function(event) {
-		let selection = event.target.getAttribute('data-selection');
+		let selection = JSON.parse(event.target.getAttribute('data-selection'));
 		this.setState({ currentlySelected: selection});
 	},
 	handleChange: function(event) {

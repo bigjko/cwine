@@ -77,7 +77,8 @@
     "react-addons-update": "^0.14.3",
     "react-dom": "^0.14.2",
     "react-simpletabs": "^0.7.0",
-    "react-tabs": "^0.5.1"
+    "react-tabs": "^0.5.1",
+    "react-textarea-autosize": "^3.1.0"
   },
   "devDependencies": {
     "browserify": "latest",

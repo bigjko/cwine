@@ -3,6 +3,7 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const Tabs = require('react-simpletabs');
+const Textarea = require('react-textarea-autosize');
 
 const Sidebar = React.createClass({
 	render: function() {
@@ -51,7 +52,7 @@ const PanelProperties = React.createClass({
 		if (this.props.node.elements !== undefined) {
 			elementList = this.props.node.elements.map(function(element, index) {
 				return (
-					<li className="element-list-item" onClick={this.props.onselect} data-selection={{node: this.props.selected.node, element:index}} key={index}>
+					<li className="element-list-item" onClick={this.props.onselect} data-selection={JSON.stringify({node: this.props.selected.node, element:index})} key={index}>
 						{element.text}
 					</li>
 				);
@@ -66,26 +67,16 @@ const PanelProperties = React.createClass({
 		return (
 			<div className="noselect">
 				<h6><span className="node-type">Panel #{this.props.selected.node}</span> {this.props.node.name}</h6>
-				<div className="field labelside">
-					<p>Name:</p>
-					<input type="text" name="name" value={ this.props.node.name } onChange={this.props.onchange} />
-				</div>
-				<div className="field labelside">
-					<p>Size:</p>
-					<input type="text" name="size" value={ this.props.node.size } onChange={this.props.onchange} />
-					<br /><span className="noselect"><em>work in progress: value from 1 - 5</em></span>
-				</div>
-				<div className="field labelside">
-					<p>Image:</p>
-					<span>{ this.props.node.image }</span>
-				</div>
+				<InputField name="Name" valueName="name" value={this.props.node.name} onchange={this.props.onchange} />
+				<InputField name="Size" valueName="size" value={this.props.node.size} onchange={this.props.onchange} description="work in progress: value from 1 - 5" />
+				<StaticField name="Image" value={this.props.node.image} />
 				<div className="field labeltop">
 					<p>Panel Elements:</p>
 					<ul className="element-list">{elementList}</ul>
 				</div>
-				<div className="field labelside">
-					<button className="button delete-button">Delete Panel</button>
-				</div>
+				
+				<button className="button delete-button">Delete Panel</button>
+
 			</div>
 		);
 	}
@@ -98,8 +89,9 @@ const ElementProperties = React.createClass({
 			<div>
 				<div className="field labelside">
 					<p>Text:</p>
-					<textarea name="text" value={ this.props.node.text } onChange={this.props.onchange} />
+					<Textarea minRow={1} name="text" value={ this.props.node.text } onChange={this.props.onchange} />
 				</div>
+				<StaticField name="Image" value={this.props.node.image} />
 			</div>
 		);
 	}
@@ -111,6 +103,33 @@ const ProjectProperties = React.createClass({
 			<h4>
 				Project
 			</h4>
+		);
+	}
+});
+
+const InputField = React.createClass({
+	render: function() {
+		let description;
+		if (this.props.description !== undefined) description = (
+				<span className="prop-description noselect">{this.props.description}</span>
+			);
+		return (
+			<div className="field labelside">
+				<p>{this.props.name}:</p>
+				<input type="text" name={this.props.valueName} value={ this.props.value } onChange={this.props.onchange} />
+				{description}
+			</div>
+		);
+	}
+});
+
+const StaticField = React.createClass({
+	render: function() {
+		return (
+			<div className="field labelside">
+					<p>{this.props.name}:</p>
+					<span>{this.props.value}</span>
+			</div>
 		);
 	}
 });
