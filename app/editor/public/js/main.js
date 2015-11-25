@@ -2,6 +2,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var loader = require('./loader.js');
 var editor = require('./editor-react.js');
+const update = require('react-addons-update');
+const $ = require('jquery');
 
 let project = {};
 let currentlySelected = undefined;
@@ -32,14 +34,38 @@ function init() {
 
 const Editor = React.createClass({
 	getInitialState: function() {
-		return { nodes: [], currentlySelected: { node: 1, element: undefined } };
+		return { nodes: [], currentlySelected: { node: 1 } };
+	},
+	handleCanvasSelection: function(selected) {
+		this.setState({ currentlySelected: selected });
+	},
+	handleSidebarSelection: function(event) {
+		let selection = event.target.getAttribute('data-selection');
+		this.setState({ currentlySelected: selection});
+	},
+	handleChange: function(event) {
+		let sel = this.state.currentlySelected;
+		if (sel.node !== undefined) {
+			if (sel.element !== undefined) {
+				this.setState({
+					nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[event.target.name]: {$set: event.target.value}}}}})
+				});
+			}
+			else {
+				this.setState({
+					nodes: update(this.state.nodes, {[sel.node]: {[event.target.name]: {$set: event.target.value}}})
+				});
+			}
+		}
+		console.log("Change!");
+		// maybe use $.extend(node, change) here
 	},
 	componentDidMount: function() {
 		loader.load(function(data) {
-			editor.init(data);
+			editor.init(data, this.handleCanvasSelection, this.handleChange);
 			this.setState({
 				nodes: data.nodes,
-				currentlySelected: { node: 3, element: undefined }
+				currentlySelected: { node: 3 }
 			});
 		}.bind(this));
 	},
@@ -47,7 +73,7 @@ const Editor = React.createClass({
 		//let currentnode = this.state.nodes[this.state.currentlySelected.node];
 		//if ( this.state.currentlySelected.element !== undefined ) currentnode = currentnode.elements[this.state.currentlySelected.element];
 		return (
-			<Sidebar nodes={this.state.nodes} current={this.state.currentlySelected} />
+			<Sidebar nodes={this.state.nodes} current={this.state.currentlySelected} onchange={this.handleChange} onselect={this.handleSidebarSelection} />
 		);
 	}
 

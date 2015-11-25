@@ -55,6 +55,10 @@ footer p {
 canvas {
 }
 
+#file-panel {
+	margin: 20px 0 10px 0;
+}
+
 #progress {
 	opacity: 0;
 	color:#999;
@@ -163,6 +167,33 @@ textarea {
 	background-color:#222;
 }
 
+.node-type {
+	font-size: 70%;
+	color:#999;
+	margin-right: 10px;
+	font-style:italic;
+}
+
+.element-list {
+	list-style-type: none;
+	font-size:80%;
+	width:70%;
+}
+
+.element-list-item {
+	background-color:#444;
+	padding: 3px 7px;
+	border: 1px solid #666;
+	border-radius: 5px;
+	margin:3px;
+}
+
+.element-list-item:hover {
+	background-color:#4f4f4f;
+	border-color: #aaa;
+	cursor:pointer;
+}
+
 .field {
 	margin-top:20px;
 	clear:both;
@@ -187,7 +218,6 @@ textarea {
 }
 
 .labelside input[type="text"] {
-	width:70%;
 }
 
 .labelside p {
@@ -195,6 +225,10 @@ textarea {
 	float:left;
 	clear:none;
 	margin-right:20px;
+}
+
+.field span {
+	font-size: 70%;
 }
 
 .buttons {
@@ -441,31 +475,51 @@ textarea {
  * 
  */
 .tabs-menu {
-  display: table;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+	display: table;
+	list-style: none;
+	padding: 0;
+	margin: 0;
 }
 
 .tabs-menu-item {
-  float: left;
-  margin-right: 20px;
-  background-color: #444;
+	float: left;
+	margin: 0 0 0 10px;
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border-top: 2px solid #434343;
+    /* border-radius:4px; */
+    font-size:80%;
 }
 
 .tabs-menu-item a {
-	padding:15px;
-  cursor: pointer;
-  display: block;
-  color: #A9A9A9;
+	padding:3px 10px;
+	cursor: pointer;
+	display: block;
+	color: #A9A9A9;
+	background-color:#434343;
 }
 
-.tabs-menu-item:not(.is-active) a:hover,
+.tabs-menu-item:not(.is-active) a:hover {
+	background-color:#4e4e4e;
+}
+
+.tabs-menu-item:not(.is-active):hover {
+	border-color: #4e4e4e;
+}
+
 .tabs-menu-item.is-active a {
-  color: #3498DB;
-  background-color:#555;
+	background-color:#555;
+}
+
+.tabs-menu-item.is-active {
+	border-color: #3498DB;
 }
 
 .tab-panel {
-  padding: 10px 50px;
+	padding: 10px 20px;
+	background-color:#555;
 }

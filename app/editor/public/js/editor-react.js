@@ -20,7 +20,13 @@ var con_r = 6;
 var currentlySelected;
 var currentLocalImages;
 
-exports.init = function(obj) {
+let handleSelection;
+let handleChange;
+
+exports.init = function(obj, onselect, onchange) {
+
+	handleSelection = onselect;
+	handleChange = onchange;
 
     panels = obj.nodes;
     config = obj.config;
@@ -297,6 +303,7 @@ function drop(ev) {
 		//evt.target.dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target.parent;
+		handleSelection({ node: nodeContainer.getChildIndex(evt.target.parent) });
 		//openTab("propertyTab");
 	};
 
@@ -450,13 +457,14 @@ function drop(ev) {
         if (obj.goto != -1) this.goto = obj.goto;
 
 		//this.elements = [];
-
+		this.elements = [];
 		if (obj.elements !== undefined) {
 			for (let e=0; e < obj.elements.length; e++) {
 				var element = new PanelElement(obj.elements[e], this.panelbitmap);
 
 				//this.elements.push(element);
 				this.addChild(element);
+				this.elements.push(element);
 				//console.log(element.children.length);
 				socketpos = {
 					x: element.x + element.width*element.scaleX,
@@ -620,6 +628,7 @@ function drop(ev) {
 		//currentlySelected = evt.target.parent;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target;
+		handleSelection({node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)});
 		//openTab("propertyTab");
 		//evt.target.showProperties();
 	};
