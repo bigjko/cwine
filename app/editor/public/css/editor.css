@@ -170,6 +170,7 @@ textarea {
 .prop-description {
 	clear:both;
 	display:block;
+	font-style:italic;
 }
 
 .node-type {
@@ -181,7 +182,6 @@ textarea {
 
 .element-list {
 	list-style-type: none;
-	font-size:80%;
 	width:70%;
 }
 
@@ -202,12 +202,19 @@ textarea {
 .field {
 	margin-top:20px;
 	clear:both;
+	font-size:80%;
 }
 
-.field p {
-	font-size:70%;
+.field p  {
 	margin:0;
 	padding:0;
+}
+
+.static-value {
+	line-height:30px;
+	font-style: italic;
+	color:#aaa;
+	margin:0;
 }
 
 .labelside {
@@ -229,11 +236,7 @@ textarea {
 	line-height:30px;
 	float:left;
 	clear:none;
-	margin-right:20px;
-}
-
-.field span {
-	font-size: 70%;
+	margin-right:10px;
 }
 
 .buttons {

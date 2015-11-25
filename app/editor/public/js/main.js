@@ -3,7 +3,7 @@ var ReactDOM = require('react-dom');
 var loader = require('./loader.js');
 var editor = require('./editor-react.js');
 const update = require('react-addons-update');
-const $ = require('jquery');
+//const $ = require('jquery');
 
 let project = {};
 let currentlySelected = undefined;

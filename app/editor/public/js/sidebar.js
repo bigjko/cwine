@@ -128,7 +128,7 @@ const StaticField = React.createClass({
 		return (
 			<div className="field labelside">
 					<p>{this.props.name}:</p>
-					<span>{this.props.value}</span>
+					<span className="static-value">{this.props.value}</span>
 			</div>
 		);
 	}
