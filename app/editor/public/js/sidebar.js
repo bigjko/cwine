@@ -12,7 +12,7 @@ const Sidebar = React.createClass({
 		console.log(sel);
 		if (this.props.nodes.length > 0 && sel !== undefined && sel.node !== undefined) {
 			if (sel.element !== undefined) {
-				panel = <ElementProperties node={this.props.nodes[sel.node].elements[sel.element]} onchange={this.props.onchange} />;
+				panel = <ElementProperties selected={sel} node={this.props.nodes[sel.node].elements[sel.element]} onchange={this.props.onchange} />;
 			}
 			else panel = <PanelProperties selected={sel} node={this.props.nodes[sel.node]} onchange={this.props.onchange} onselect={this.props.onselect} />;
 		}
@@ -25,9 +25,38 @@ const Sidebar = React.createClass({
 						{panel}
 					</Tabs.Panel>
 					<Tabs.Panel title="Images">
-						<h2>Images!</h2>
+						<ImagePanel onfiles={this.props.onfiles} images={this.props.images} />
 					</Tabs.Panel>
 				</Tabs>
+			</div>
+		);
+	}
+});
+
+const ImagePanel = React.createClass({
+	render: function() {
+		return (
+			<div>
+				<input type="file" id="imagefiles" name="files[]" onChange={this.props.onfiles} multiple />
+				<ImageList images={this.props.images}/>
+			</div>
+		);
+	}
+});
+
+const ImageList = React.createClass({
+	render: function() {
+		let imagelist;
+		if (this.props.images !== undefined) {
+			imagelist = this.props.images.map(function(file, index) {
+				return (
+					<img key={index} src={file.image} title={file.file.name} width='50' />
+				);
+			});
+		}
+		return (
+			<div>
+				{imagelist}
 			</div>
 		);
 	}
@@ -87,11 +116,13 @@ const ElementProperties = React.createClass({
 		//let text = this.props.node.text.replace('\\n', '\n');
 		return (
 			<div>
+				<h6><span className="node-type">Panel #{this.props.selected.node} - Panel Element #{this.props.selected.element}</span></h6>
 				<div className="field labelside">
 					<p>Text:</p>
 					<Textarea minRow={1} name="text" value={ this.props.node.text } onChange={this.props.onchange} />
 				</div>
 				<StaticField name="Image" value={this.props.node.image} />
+				<StaticField name="Position" value={[this.props.node.position.x.toFixed(2), this.props.node.position.y.toFixed(2)]} />
 			</div>
 		);
 	}

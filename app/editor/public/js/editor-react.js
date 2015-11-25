@@ -153,8 +153,6 @@ function initviewContainer() {
 	function centerViewOrigin(x,y) {
 		viewContainer.regX = (($("#view").outerWidth() - 280)/2 - viewContainer.x)/viewScale;
 		viewContainer.regY = (($("#view").outerHeight()/2) - viewContainer.y)/viewScale;
-		//corners.graphics.clear();
-		//corners.graphics.f("red").dc(viewContainer.x,viewContainer.y,15).f("blue").dc(viewContainer.x+viewContainer.regX*viewScale, viewContainer.y+viewContainer.regY*viewScale, 15);
 		viewContainer.x = x + viewContainer.regX * viewScale;
 		viewContainer.y = y + viewContainer.regY * viewScale;
 	}
@@ -251,15 +249,15 @@ function zoom(zoomModifier) {
 	}*/
 }
 
-function allowDrop(ev) {
+const allowDrop = function (ev) {
     ev.preventDefault();
-}
+};
 
-function drag(ev, path) {
+exports.drag = function (ev, path) {
     ev.dataTransfer.setData("text/plain", path);
-}
+};
 
-function drop(ev) {
+const drop = function (ev) {
     ev.preventDefault();
     if (ev.target == stage.canvas) {
     	//console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
@@ -277,7 +275,7 @@ function drop(ev) {
     }
     //var data = ev.dataTransfer.getData("text");
     //ev.target.appendChild(document.getElementById(data));
-}
+};
 
 
 (function() {

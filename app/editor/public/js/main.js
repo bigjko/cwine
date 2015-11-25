@@ -60,6 +60,30 @@ const Editor = React.createClass({
 		console.log("Change!");
 		// maybe use $.extend(node, change) here
 	},
+	handleFiles: function (evt) {
+		console.log("handling files");
+	    let files = [];
+	    for (let i=0, f; f = evt.target.files[i]; i++) {
+	    	if (!f.type.match('image.*')) {
+		    	continue;
+		    }
+
+		    console.log("Image!");
+
+		    var reader = new FileReader();
+
+		    reader.onload = (function(ed, array, theFile) {
+		    		//debugger;
+		    		return function(e) {
+			    		array.push({file:theFile, image:e.target.result});
+			        	ed.setState({localImages: files});
+			        	console.log(array);
+		        	};
+		    }(this, files, f));
+
+		    reader.readAsDataURL(f);
+	    }
+	},
 	componentDidMount: function() {
 		loader.load(function(data) {
 			editor.init(data, this.handleCanvasSelection, this.handleChange);
@@ -73,7 +97,14 @@ const Editor = React.createClass({
 		//let currentnode = this.state.nodes[this.state.currentlySelected.node];
 		//if ( this.state.currentlySelected.element !== undefined ) currentnode = currentnode.elements[this.state.currentlySelected.element];
 		return (
-			<Sidebar nodes={this.state.nodes} current={this.state.currentlySelected} onchange={this.handleChange} onselect={this.handleSidebarSelection} />
+			<Sidebar 
+				nodes={this.state.nodes}
+				images={this.state.localImages}
+				current={this.state.currentlySelected}
+				onchange={this.handleChange}
+				onselect={this.handleSidebarSelection}
+				ondrag={editor.drag}
+				onfiles={this.handleFiles} />
 		);
 	}
 
