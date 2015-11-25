@@ -259,9 +259,13 @@ exports.drag = function (ev, path) {
 
 const drop = function (ev) {
     ev.preventDefault();
+    ev.dataTransfer = ev.originalEvent.dataTransfer;
+    ev.clientX = ev.originalEvent.clientX;
+    ev.clientY = ev.originalEvent.clientY;
     if (ev.target == stage.canvas) {
     	//console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
     	var local = nodeContainer.globalToLocal(ev.clientX, ev.clientY);
+    	console.log(local);
     	//console.log(ev.dataTransfer.getData("text/plain"));
     	var pnl = nodeContainer.getObjectUnderPoint(local.x, local.y);
     	if (pnl !== null && pnl instanceof createjs.Bitmap) pnl = pnl.parent;

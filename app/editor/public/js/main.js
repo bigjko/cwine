@@ -103,7 +103,6 @@ const Editor = React.createClass({
 				current={this.state.currentlySelected}
 				onchange={this.handleChange}
 				onselect={this.handleSidebarSelection}
-				ondrag={editor.drag}
 				onfiles={this.handleFiles} />
 		);
 	}

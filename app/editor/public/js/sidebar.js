@@ -45,14 +45,18 @@ const ImagePanel = React.createClass({
 });
 
 const ImageList = React.createClass({
+	drag: function(ev) {
+		console.log(ev.target.src);
+		ev.dataTransfer.setData("text/plain", ev.target.src);
+	},
 	render: function() {
 		let imagelist;
 		if (this.props.images !== undefined) {
 			imagelist = this.props.images.map(function(file, index) {
 				return (
-					<img key={index} src={file.image} title={file.file.name} width='50' />
+					<img key={index} src={file.image} title={file.file.name} width='50' draggable='true' onDragStart={this.drag} />
 				);
-			});
+			}.bind(this));
 		}
 		return (
 			<div>
