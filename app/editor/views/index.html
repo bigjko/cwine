@@ -15,7 +15,7 @@
 
 	<!-- FONT
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
-	<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+	<link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600" rel="stylesheet" type="text/css">
 
 	<!-- CSS
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -30,7 +30,7 @@
 
 	<script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
 	<script src="https://code.createjs.com/tweenjs-0.6.1.min.js"></script>
-
+	
 </head>
 <body>
 	<!-- Primary Page Layout
@@ -43,61 +43,11 @@
 		<p>loading..</p>
 		<div id="progress_bg"><div id="progress_bar" style="height:100%; width:0%;"></div></div>
 	</div>
-	<div id="view"><!--<canvas id="edit_canvas" width="500" height="50"></canvas>--></div>
+
+	<div id="view"><canvas id="edit_canvas"></canvas></div>
+
+	<div id="sidebar"></div>
+
 	<script src="js/cwine-editor.js"></script>
-	<div id="sidebar">
-		<div id="file" class="u-full-width">
-			<label for="filepath">JSON file (in '/')</label>
-			<input class="" type="text" placeholder="path/to/json" value="js/panels.json" id="filepath">
-			<input id="loadjson" class="button" type="submit" value="Load JSON"><br>
-			<label for="filepath">Local Storage</label>
-			<input id="load" class="button" type="submit" value="Load"><input id="save" class="button button-primary" type="submit" value="Save">
-		</div>
-		
-		<ul id="tabs" class="noselect">
-			<li class="selected" id="propertyTab">Properties</li>
-			<li id="imagesTab">Images</li>
-		</ul>
-		<div id="properties" class="">
-			<div id="object-name">
-				<p>Panel 1 <span class="element-id">#000</span></p>
-			</div>
-			<div class="field labelside">
-				<p>Name:</p>
-				<input type="text" placeholder="Element name" id="property-name">
-			</div>
-			<div class="field labeltop">
-				<p>Image URL:</p>
-				<input type="text" placeholder="img/" id="property-imagepath">
-			</div>
-			<div class="field labelside">
-				<p>Size:</p>
-				<ul class="buttons noselect">
-					<li class="selected">1</li>
-					<li>2</li>
-					<li>3</li>
-					<li>4</li>
-				</ul>
-			</div>
-			<div class="field labeltop">
-				<p>Text:</p>
-				<textarea id="property-text">Speech Bubble Text!</textarea>
-			</div>
-			<input id="delete" class="button delete-button" type="submit" value="Delete Panel">
-		</div>
-			<!-- <div class="close noselect" onclick="hideSidebar()">></div> -->
-	</div>
-	<div id="zoom">
-		<div id="zoomin" class="zoom-button noselect plus">+</div><div id="zoomout" class="zoom-button noselect">-</div>
-	</div>
-	<div id="dialog">
-		<p>
-			File saved!
-		</p>
-	</div>
-
-<!-- End Document
-	–––––––––––––––––––––––––––––––––––––––?? -->
-
 </body>
 </html>

@@ -2,8 +2,6 @@
 var loader = require("./loader.js");
 var $ = require('jquery');
 
-$.event.props.push('dataTransfer');
-
 var panels;
 var config;
 var stage;
@@ -19,17 +17,18 @@ var dragging_element;
 
 var defaultGamePath = "";
 var con_r = 6;
+var currentlySelected;
 var currentLocalImages;
 
+let handleSelection;
+let handleChange;
+let changeData;
 
+exports.init = function(obj, onselect, onchange, changedata) {
 
-// --------------------------- //
-//							   //
-//			EXPORTS            //
-//							   //
-// --------------------------- //
-
-exports.init = function(obj) {
+	handleSelection = onselect;
+	handleChange = onchange;
+	changeData = changedata;
 
     panels = obj.nodes;
     config = obj.config;
@@ -69,15 +68,15 @@ exports.init = function(obj) {
 
 	$("#zoomin").on('click', function() { zoom(1); });
 	$("#zoomout").on('click', function() { zoom(-1); });
-	$('#tabs').on('click', 'li', function() { openTab($(this).prop('id')); });
+	//$('#tabs').on('click', 'li', function() { openTab($(this).prop('id')); });
 	//document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab'); };
 	//document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab'); };
 	$("#edit_canvas").on('drop', function(event) { drop(event); });
 	$("#edit_canvas").on('dragover', function(event) { allowDrop(event); });
 	
-	$("#save").on('click', function() {
+	/*$("#save").on('click', function() {
 		loader.save(nodeContainer.toObject());
-	});
+	});*/
 	$(document).keydown(function(e) {
 	  console.log("keydown:");
 	  if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
@@ -97,17 +96,19 @@ exports.init = function(obj) {
 	}
 };
 
-exports.nodesToObject = function() {
-	return nodeContainer.toObject();
+exports.updateData = function(data) {
+
 };
 
-
-
-
-//////////////////
-////  EDITOR  ////
-//////////////////
-
+exports.updateNode = function(sel, update) {
+	console.log("update node!");
+	if (sel.node !== undefined) {
+		if (sel.element !== undefined) {
+			nodeContainer.children[sel.node].elements[sel.element].update(update);
+		}
+		nodeContainer.children[sel.node].update(update);
+	}
+};
 
 function initNodes() {
 	nodeContainer = new NodeContainer();
@@ -168,8 +169,6 @@ function initviewContainer() {
 	function centerViewOrigin(x,y) {
 		viewContainer.regX = (($("#view").outerWidth() - 280)/2 - viewContainer.x)/viewScale;
 		viewContainer.regY = (($("#view").outerHeight()/2) - viewContainer.y)/viewScale;
-		//corners.graphics.clear();
-		//corners.graphics.f("red").dc(viewContainer.x,viewContainer.y,15).f("blue").dc(viewContainer.x+viewContainer.regX*viewScale, viewContainer.y+viewContainer.regY*viewScale, 15);
 		viewContainer.x = x + viewContainer.regX * viewScale;
 		viewContainer.y = y + viewContainer.regY * viewScale;
 	}
@@ -178,7 +177,8 @@ function initviewContainer() {
 	dragBox.on("mousedown", function(evt) {
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = nodeContainer;
-		openTab("propertyTab");
+		handleSelection({});
+		//openTab("propertyTab");
 		//nodeContainer.showProperties();
 		dragoffset.x = evt.stageX - viewContainer.x + viewContainer.regX*viewScale;
 		dragoffset.y = evt.stageY - viewContainer.y + viewContainer.regY*viewScale;
@@ -192,6 +192,12 @@ function initviewContainer() {
 	stage.addChild(viewContainer);
 
 	centerViewOrigin(0,0);
+
+	
+	let zoomIn = $('<div>+</div>').attr('id', 'zoomin').addClass('zoom-button noselect plus').click(zoom(1));
+	let zoomOut = $('<div>-</div>').attr('id', 'zoomout').addClass('zoom-button noselect').click(zoom(-1));
+	let zoomButtons = $('<div>').attr('id', 'zoom').append(zoomIn, zoomOut);
+	$('body').append(zoomButtons);
 }
 
 function drawAllConnections() {
@@ -209,7 +215,19 @@ function newPanel(x, y, image) {
 		y: y
 	};
 	nodeContainer.addChild(new Panel(obj));
+	changeData(nodeContainer.toObject());
 }
+
+exports.removeNode = function(sel) {
+	if (sel.node !== undefined) {
+		if (sel.element !== undefined) {
+			nodeContainer.children[sel.node].removeChild(elements[sel.element]);
+		} else {
+			nodeContainer.removeChild(nodeContainer.children[sel.node]);
+		}
+	}
+	return nodeContainer.toObject();
+};
 
 function newPanelElement(x, y, panel, image) {
 	var elm = {};
@@ -238,6 +256,8 @@ function newPanelElement(x, y, panel, image) {
 	socketpos = sock.owner.localToLocal(sock.owner.width, sock.owner.height/2, sock.parent);
 	sock.x = socketpos.x;
 	sock.y = socketpos.y;
+
+	changeData(nodeContainer.toObject());
 }
 
 function zoom(zoomModifier) {
@@ -260,106 +280,23 @@ function zoom(zoomModifier) {
 	}*/
 }
 
-var currentlySelected;
-var currentTab = "properties";
-
-function openTab(tab) {
-
-	//if (tab == currentTab) return;
-	currentTab = tab;
-
-	switch(tab) {
-
-		case "propertyTab":
-		console.log("cool");
-		if (currentlySelected !== undefined) {
-		 	currentlySelected.showProperties();
-		}
-		else nodeContainer.showProperties();
-		break;
-
-		case "imagesTab":
-		function handleFileSelect(evt) {
-		    var files = evt.target.files; // FileList object
-		    currentLocalImages = files;
-		    // files is a FileList of File objects. List some properties.
-		    listFiles(files);
-		    //document.querySelector('#imagelist').innerHTML = output.join('');
-  		}
-  		function listFiles(filearray) {
-  			for (var i = 0, f; f = filearray[i]; i++) {
-		    	if (!f.type.match('image.*')) {
-			    	continue;
-			    }
-
-			    var reader = new FileReader();
-
-			    reader.onload = (function(theFile) {
-			        return function(e) {
-			          // Render thumbnail.
-			          //var span = document.createElement('span');
-			          var img = $('<img>');
-			          img.attr({
-			          	'src': e.target.result, 
-			          	'width': 100, 
-			          	'draggable': true, 
-			          	'title': escape(theFile.name)});
-			          img.on('dragstart', function(event) { drag(event, e.target.result); });
-
-			          /*span.innerHTML = ['<img width="100" src="', e.target.result,
-			                            '" title="', escape(theFile.name), '" draggable="true" ondragstart="drag(event,\'', e.target.result ,'\')"/>'].join('');*/
-			          $('#imagelist').prepend(img);
-			        };
-			    })(f);
-
-			    reader.readAsDataURL(f);
-		    }
-  		}
-
-  		$('#properties').html('<input type="file" id="imagefiles" name="files[]" multiple /><output id="imagelist"></output>');
-  		if (currentLocalImages !== undefined) { listFiles(currentLocalImages); }
-  		$('#imagefiles').on('change', handleFileSelect);
-  		/*
-		loader.loadAllImages(function(obj) {
-			var properties = document.querySelector("#properties");
-			properties.innerHTML = "";
-			for (i=0; i<obj.length; i++) {
-				console.log(obj[i]);
-				properties.innerHTML += '<img width="100" style="margin-left:10px;" src="' + obj[i].replace("../", "") + '" draggable="true" ondragstart="drag(event, \'' + obj[i].replace("../", "") + '\')" />';
-			}
-		});*/
-		break;
-	}
-
-	$('#tabs').children().each( function() {
-		if ($(this).attr('id') == currentTab) $(this).addClass('selected');
-		else $(this).removeClass('selected');
-	});
-}
-
-function mouseUp() {
-	console.log("Mouse Up on HTML Element");
-	dragging_element = undefined;
-}
-
-function mouseDown(elm) {
-	console.log("Mouse Down on HTML Element");
-	dragging_element = elm;
-}
-
-function allowDrop(ev) {
+const allowDrop = function (ev) {
     ev.preventDefault();
-}
+};
 
-function drag(ev, path) {
+exports.drag = function (ev, path) {
     ev.dataTransfer.setData("text/plain", path);
-}
+};
 
-function drop(ev) {
+const drop = function (ev) {
     ev.preventDefault();
+    ev.dataTransfer = ev.originalEvent.dataTransfer;
+    ev.clientX = ev.originalEvent.clientX;
+    ev.clientY = ev.originalEvent.clientY;
     if (ev.target == stage.canvas) {
     	//console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
     	var local = nodeContainer.globalToLocal(ev.clientX, ev.clientY);
+    	console.log(local);
     	//console.log(ev.dataTransfer.getData("text/plain"));
     	var pnl = nodeContainer.getObjectUnderPoint(local.x, local.y);
     	if (pnl !== null && pnl instanceof createjs.Bitmap) pnl = pnl.parent;
@@ -373,16 +310,8 @@ function drop(ev) {
     }
     //var data = ev.dataTransfer.getData("text");
     //ev.target.appendChild(document.getElementById(data));
-}
+};
 
-
-/**
-* 
-*
-*	Easeljs class definitions
-*
-*
-**/
 
 (function() {
 
@@ -407,16 +336,22 @@ function drop(ev) {
 		//evt.target.dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target.parent;
-		openTab("propertyTab");
+		handleSelection({ node: nodeContainer.getChildIndex(evt.target.parent) });
+		//openTab("propertyTab");
 	};
 
 	Node.prototype.handleMouseMove = function(evt) {
 		//console.log(evt.target);
-		evt.target.parent.x = evt.stageX/viewScale - dragoffset.x;
-		evt.target.parent.y = evt.stageY/viewScale - dragoffset.y;
+		let panel = evt.target.parent;
 
-		evt.target.parent.x = Math.round(evt.target.parent.x*0.1)*10;
-		evt.target.parent.y = Math.round(evt.target.parent.y*0.1)*10;
+		panel.x = evt.stageX/viewScale - dragoffset.x;
+		panel.y = evt.stageY/viewScale - dragoffset.y;
+
+		panel.x = Math.round(panel.x*0.1)*10;
+		panel.y = Math.round(panel.y*0.1)*10;
+
+		let sel = {node: nodeContainer.getChildIndex(panel)};
+		handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
 
 		//console.log(evt.target.parent);
 		//drawConnections(evt.target.parent);
@@ -424,11 +359,16 @@ function drop(ev) {
 	};
 
 	Node.prototype.drawConnections = function() {
-		for (s=0; s < this.sockets.length; s++) {
+		for (let s=0; s < this.sockets.length; s++) {
 			var socket = this.sockets[s];
 			socket.line.graphics.clear();
 			if (socket.owner instanceof PanelElement) {
-				var socketpos = socket.owner.localToLocal(socket.owner.width, socket.owner.height/2, socket.parent);
+				let socketpos = socket.owner.localToLocal(socket.owner.width, socket.owner.height/2, socket.parent);
+				socket.x = socketpos.x;
+				socket.y = socketpos.y;
+			}
+			else {
+				let socketpos = { x: socket.owner.width, y: socket.owner.height/2 };
 				socket.x = socketpos.x;
 				socket.y = socketpos.y;
 			}
@@ -453,15 +393,29 @@ function drop(ev) {
 	};
 
 	Node.prototype.releaseLine = function(evt) {
-		evt.target.parent.goto = undefined;
-		evt.target.parent.owner.goto = undefined;
-		evt.target.parent.line.graphics.clear();
-		var targ = stage.getObjectUnderPoint(evt.stageX, evt.stageY);
-		if (targ.parent instanceof Node) {
-			evt.target.parent.goto = targ.parent;
-			evt.target.parent.owner.goto = targ.parent;
+		let socket = evt.target.parent;
+		let panel = evt.target.parent.parent;
+		let owner = evt.target.parent.owner;
+		socket.goto = undefined;
+		owner.goto = undefined;
+		socket.line.graphics.clear();
+		var target = stage.getObjectUnderPoint(evt.stageX, evt.stageY).parent;
+		if (target instanceof Node) {
+			socket.goto = target;
+			owner.goto = target;
+			let nodeindex;
+			let elmindex;
+			if (owner instanceof PanelElement) {
+				nodeindex = nodeContainer.getChildIndex(panel);
+				elmindex = panel.elements.indexOf(owner);
+			} else {
+				nodeindex = nodeContainer.getChildIndex(owner);
+			}
+			let gotoindex = nodeContainer.getChildIndex(socket.goto);
+			handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
 		}
-		evt.target.parent.parent.drawConnections();
+
+		panel.drawConnections();
 	};
 
 	Node.prototype.addSocket = function(x, y, goto, addTo, radius, color) {
@@ -560,13 +514,14 @@ function drop(ev) {
         if (obj.goto != -1) this.goto = obj.goto;
 
 		//this.elements = [];
-
+		this.elements = [];
 		if (obj.elements !== undefined) {
-			for (e=0; e < obj.elements.length; e++) {
+			for (let e=0; e < obj.elements.length; e++) {
 				var element = new PanelElement(obj.elements[e], this.panelbitmap);
 
 				//this.elements.push(element);
 				this.addChild(element);
+				this.elements.push(element);
 				//console.log(element.children.length);
 				socketpos = {
 					x: element.x + element.width*element.scaleX,
@@ -576,100 +531,31 @@ function drop(ev) {
 				sock.owner = element;
 				sock.dashes = [10,5];
 			}
-		}
-
-		
+		}	
 	};
 
-	Panel.prototype.showProperties = function() {
-		var node = this;
-		//if (currentlySelected == this) return;
-		//currentlySelected = this;
-
-		//console.log("Showing properties for node " + node.name );
-		var thickness = 3;
-		this.selected.graphics.f("#0099ee").dr(-thickness,-thickness,this.panelbitmap.image.width*this.panelbitmap.scaleX+thickness*2, this.panelbitmap.image.height*this.panelbitmap.scaleY+thickness*2);
-		
-		var p_header = $('<div>').attr('id', 'object-name')
-								 .append($('<p>' + node.name + '</p>').append($('<span>#'+nodeContainer.getChildIndex(node)+'</span>')
-								 									  .addClass('element-id')));
-		
-		var node_name = $('<div>').addClass('field labelside')
-			.append($('<p>Name:</p>'))
-			.append($('<input>').attr({'type':'text', 'value':node.name, 'id':'property-name'})
-								.data('node', node)
-								.on('change keyup', function() {
-									console.log("node name changed..");
-									$(this).data('node').name = $(this).val();
-									$('#object-name').html(node.name + '<span>#' + nodeContainer.getChildIndex(node) + '</span>');
-								}));
-								
-		var panel_image = $('<div>').addClass('field labeltop')
-			.append('<p>Image URL:</p>')
-			.append($('<input>').attr({'type':'text', 'value':node.image, 'id':'property-imagepath'})
-								.data('node', node));
-								
-
-		function loadNodeImage(val, node) {
-			var img = $('<img>');
-			img.attr('src', val);
-			img.on('load', function() {
-				node.image = val;
-				node.panelbitmap.image = img;
-				node.selected.graphics.clear();
-				var thickness = 3;
-				node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
-			});
-			img.on('error', function() {
-				var dialog = $("#dialog")
-					.html("<p>'" + val + "' could not be loaded<p>")
-					.css({ 'opacity':'0.8', 'background-color':'#522'});
-				setTimeout(function() {
-					dialog.css('opacity','0');
-				}, 2000);
-			});
+	Panel.prototype.update = function(update) {
+		//this.x = update.editor.position.x;
+		//this.y = update.editor.position.y;
+		for (let property in update) {
+			this[property] = update[property];
+			if (property == 'image') {
+				// FIX THIS IMAGE SHIT!
+				this.panelbitmap = new Bitmap(this.image);
+			}
+			console.log("Changed", property, update[property]);
 		}
-
-		var panel_size = $('<div>').addClass('field labelside');
-		
-		var size_ul = $('<ul>').attr('id','property-size')
-			.addClass('buttons noselect')
-			.appendTo(panel_size);
-
-		for (s=1; s <= 4; s++) {
-			var li = $('<li>')
-				.html(s.toString())
-				.data('size', s)
-				.data('node', this)
-				.appendTo(size_ul);
-			if (s == node.size) li.addClass('selected');
+		let scale = 0.25;
+		scale = this.size*400*scale / this.panelbitmap.image.width;
+		this.panelbitmap.scaleX = scale;
+		this.panelbitmap.scaleY = scale;
+		this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX;
+		this.height = this.panelbitmap.image.height*this.panelbitmap.scaleY;
+		for (let p=0; p < this.elements.length; p++) {
+			this.elements[p].setPosition();
 		}
-		size_ul.on('click', 'li', function(e) {
-				e.preventDefault();
-				console.log("click size");
-				$(this).data('node').changeSize($(this).data('size'));
-		});
-		
-		var delete_button = $('<div>')
-			.addClass('field')
-			.append($('<input>')
-				.addClass('button delete-button')
-				.attr({'id':'delete', 'type':'submit', 'value':'Delete Panel'})
-				.on('click', function() {
-					console.log("lol");
-					$(this).data('node').parent.removeChild(currentlySelected);
-				}));
+		drawAllConnections();
 
-		$("#properties").empty().append(p_header, node_name, panel_image, panel_size, delete_button);
-
-		//$("#property-name")
-		
-		
-		$("#property-imagepath").on('change', function() {
-			console.log("image changed..");
-			loadNodeImage($(this).value, $(this).data('node'));
-		});
-		
 	};
 
 	Panel.prototype.removeChild = function(child) {
@@ -679,22 +565,6 @@ function drop(ev) {
 		view.removeChild(elm);
 		this.Node_removeChild(child);
 		drawAllConnections();
-	};
-
-	Panel.prototype.changeSize = function(size) {
-		console.log('changing size!');
-		this.size = size;
-		var scale = 0.25;
-		scale = this.size*400*scale / this.panelbitmap.image.width;
-		this.panelbitmap.scaleX = scale;
-		this.panelbitmap.scaleY = scale;
-		var ps = document.querySelector("#property-size");
-		for (s=0; s < ps.children.length; s++) {
-			ps.children[s].className = (s+1 == this.size) ? "selected" : "";
-		}
-		this.selected.graphics.clear();
-		var thickness = 3;
-		this.selected.graphics.f("#0099ee").dr(-thickness,-thickness,this.panelbitmap.image.width*this.panelbitmap.scaleX+thickness*2, this.panelbitmap.image.height*this.panelbitmap.scaleY+thickness*2);
 	};
 
 	window.Panel = createjs.promote(Panel, "Node");
@@ -711,13 +581,11 @@ function drop(ev) {
 
 	PanelElement.prototype.setup = function(obj) {
 		if (obj.goto != -1) this.goto = obj.goto;
-		//this.type = obj.type;
 		this.align = obj.align;
 		this.bubble_type = obj.bubble_type;
 		this.text = obj.text;
         this.position = obj.position;
 
-		//var panel = panels[i];
 		var sb = obj;
 
 		var div = document.querySelector("#view").appendChild(document.createElement("DIV"));
@@ -752,18 +620,11 @@ function drop(ev) {
 		div.style.top = 0;
 		div.style.left = 0;
 
-		//document.querySelector("#view").appendChild(div);
-
-		
-
-
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
 
 		this.x = sb.position.x * this.panelbitmap.image.width*this.panelbitmap.scaleX;
 		this.y = sb.position.y * this.panelbitmap.image.height*this.panelbitmap.scaleY;
-		//this.x = elm.x;
-		//this.y = elm.y;
 		this.regX = div.clientWidth/2;
 		this.regY = div.clientHeight;
 		this.width = div.clientWidth;
@@ -803,115 +664,33 @@ function drop(ev) {
 		//elements.addChild(elm);
 	};
 
-	PanelElement.prototype.updateElement = function() {
-		var element = this.children[1].htmlElement; 
+	PanelElement.prototype.update = function(update) {
+
+		for (let property in update) {
+			this[property] = update[property];
+		}
+		/*if (update.text !== undefined) this.text = update.text;
+		if (update.bubble_type !== undefined) this.bubble_type = update.bubble_type;
+		if (update.image !== undefined) this.image = update.image;
+		if (update.position !== undefined) this.position = update.position;
+		if (update.align !== undefined) this.align = update.align;*/
+
+		var element = this.children[1].htmlElement;
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
 		this.width = element.clientWidth;
 		this.height = element.clientHeight;
 		this.regX = element.clientWidth/2;
 		this.regY = element.clientHeight;
-
-		/*var image = "";
-		var bubble_size = "medium";
-		if (this.text.length < 4) {
-			bubble_size = "small";
-		}
-		var bubble_orient = this.bubble_type;
-		image += bubble_size;
-		if (bubble_orient == "box") {
-			image += "_box.png";
-		}
-		else image += "_bubble_" + bubble_orient + ".png";
-		element.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";*/
+		this.hitArea.graphics.clear().f("#000").dr(0,0,this.width,this.height);
 		element.style.backgroundImage = this.image;
 
 		if (this.align !== undefined && this.align.x == "right") {
 			this.regX = element.clientWidth;
 		}
-	};
 
-	PanelElement.prototype.showProperties = function() {
-		var node = this;
-		//if (currentlySelected == this) return;
-		//currentlySelected = this;
 
-		//console.log("Showing properties for node " + node.name );
 
-		var property_panel = document.querySelector("#properties");
-
-		var property_header = 	'<div id="object-name">' +
-									'<p>' + node.parent.name + '<span class="element-id">' + node.parent.constructor.name + ' #' + nodeContainer.getChildIndex(node.parent) + ' - ' + node.constructor.name + '</span></p>' +
-								'</div>';
-		property_panel.innerHTML = property_header;
-
-		//var node_name = '<div class="field labelside"><p>Name:</p><input type="text" value="' + node.name + '" id="property-name"></div>';
-		//property_panel.innerHTML += node_name;
-
-		var prop_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
-		property_panel.innerHTML += prop_image;
-
-		console.log("Yo!");
-
-		document.querySelector("#property-imagepath").onchange = function() {
-			console.log("Whut!");
-			//node.image = propimage.value;
-			var img = new Image();
-			img.src = propimage.value;
-			img.onload = function() {
-				node.image = propimage.value;
-				node.updateElement();
-				//node.panelbitmap.image = img;
-				//node.selected.graphics.clear();
-				//var thickness = 3;
-				//node.selected.graphics.f("#0099ee").dr(-thickness,-thickness,node.panelbitmap.image.width*node.panelbitmap.scaleX+thickness*2, node.panelbitmap.image.height*node.panelbitmap.scaleY+thickness*2);
-			};
-			img.onerror = function() {
-				var dialog = document.querySelector("#dialog");
-				dialog.innerHTML = "<p>'" + propimage.value + "' could not be loaded<p>";
-				//dialog.style.top = "50%";
-				//dialog.style.left = "50%";
-				dialog.style.opacity = "0.8";
-				dialog.style.backgroundColor = "#522";
-				setTimeout(function() {
-					dialog.style.opacity = "0";
-				}, 2000);
-			};
-		};
-
-		var prop_text = '<div class="field labeltop"><p>Text:</p><textarea id="property-text">' +
-		node.text +
-		'</textarea></div>';
-
-		//var panel_image = '<div class="field labeltop"><p>Image URL:</p><input type="text" value="' + node.image + '" id="property-imagepath"></div>';
-		property_panel.innerHTML += prop_text;
-
-		//var panel_size = '<div class="field labelside"><p>Size:</p><ul id="property-size" class="numberbuttons noselect">';
-		
-		//panel_size += '</ul></div>';
-		
-		/*panel_size += '</ul></div>';
-		property_panel.innerHTML += panel_size;*/
-		/*var propname = document.querySelector("#property-name");
-		propname.onchange = function() {
-			node.name = propname.value;
-		}*/
-
-		var delete_button = '<div class="field"><input id="delete" class="button delete-button" type="submit" value="Delete Panel"></div>';
-		property_panel.innerHTML += delete_button;
-		document.querySelector("#delete").onclick = function() {
-			console.log(node.parent);
-			node.parent.removeChild(currentlySelected);
-		};
-
-		var proptext = document.querySelector("#property-text");
-		proptext.onkeyup = function() {
-			//console.log(proptext.value);
-			node.text = proptext.value;
-			node.updateElement();
-		};
-
-		
-		
+		drawAllConnections();
 	};
 
 	PanelElement.prototype.setDragOffset = function(evt) {
@@ -923,7 +702,8 @@ function drop(ev) {
 		//currentlySelected = evt.target.parent;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target;
-		openTab("propertyTab");
+		handleSelection({node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)});
+		//openTab("propertyTab");
 		//evt.target.showProperties();
 	};
 
@@ -941,10 +721,44 @@ function drop(ev) {
 		if (local.y > panel.height) local.y = panel.height;
 		evt.target.x = local.x;
 		evt.target.y = local.y;
+		this.position = evt.target.outputPosition();
+		let sel = {node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)};
+		let pos = evt.target.outputPosition();
+		handleChange(sel, {position: pos});
         /*evt.target.position = { 
             x: local.x/evt.target.panelbitmap.image.width/evt.target.panelbitmap.scaleX*100, 
             y: local.y/evt.target.panelbitmap.image.height/evt.target.panelbitmap.scaleY*100 }*/
 		evt.target.parent.drawConnections();
+	};
+
+	PanelElement.prototype.setPosition = function() {
+		var panelbitmap = this.panelbitmap;
+		var panel = {
+			width: panelbitmap.image.width*panelbitmap.scaleX,
+			height: panelbitmap.image.height*panelbitmap.scaleY
+		};
+
+		if (this.align === undefined) {
+			this.x = this.position.x * panel.width;
+			this.y = this.position.y * panel.height;
+		} else {
+			this.x = panel.width - this.position.x * panel.width;
+			this.y = panel.height - this.position.y * panel.height;
+		}
+	};
+
+	PanelElement.prototype.outputPosition = function() {
+		let elm = this;
+		let bitm = elm.panelbitmap;
+		let pos = {
+							x:elm.x/(bitm.image.width*bitm.scaleX),
+							y:elm.y/(bitm.image.height*bitm.scaleY)
+						};
+		if (elm.align !== undefined) {
+			if (elm.align.x == "right") pos.x = 1 - pos.x;
+			if (elm.align.y == "bottom") pos.y = 1 - pos.y;
+		}
+		return pos;
 	};
 
 	window.PanelElement = createjs.promote(PanelElement, "Container");
@@ -959,40 +773,12 @@ function drop(ev) {
 		this.startnode = 0;
 	} createjs.extend(NodeContainer, createjs.Container);
 
-
-	NodeContainer.prototype.showProperties = function() {
-
-		//console.log(this);
-
-		//f (currentlySelected == this) return;
-		//currentlySelected = this;
-
-		var property_panel = document.querySelector("#properties");
-
-		var property_header = 	'<div id="object-name">' +
-									'<p>Project Properties</p>' +
-								'</div>';
-		property_panel.innerHTML = property_header;
-
-		var prop_startnode = '<div class="field labelside"><p>Start node:</p><input type="number" value="' + this.startnode + '" id="property-startnode"></div>';
-		property_panel.innerHTML += prop_startnode;
-
-		var propstart = document.querySelector("#property-startnode");
-		var container = this;
-		propstart.onchange = function() {
-			console.log("Start node changed", propstart.value);
-			container.startnode = propstart.value;
-			console.log(container.startnode);
-		};
-		
-	};
-
 	NodeContainer.prototype.makeConnections = function() {
 
-		for (i=0; i < this.children.length; i++) {
+		for (let i=0; i < this.children.length; i++) {
 			var node = this.children[i];
 			if (node.goto !== undefined) node.goto = this.getChildAt(node.goto);
-			for (e=0; e < node.children.length; e++) {
+			for (let e=0; e < node.children.length; e++) {
 				var elem = node.children[e];
 				if (elem instanceof PanelElement && elem.goto !== undefined) elem.goto = this.getChildAt(elem.goto);
 			}
@@ -1003,7 +789,7 @@ function drop(ev) {
 	// Overwrite Container.removeChild()
 	NodeContainer.prototype.removeChild = function(child) {
 		var view = document.querySelector("#view");
-		for (e=0; e<child.children.length; e++) {
+		for (let e=0; e<child.children.length; e++) {
 			var elm = child.children[e];
 			console.log(elm);
 			if (elm instanceof PanelElement) {
@@ -1027,7 +813,7 @@ function drop(ev) {
 		};
 
 		output.nodes = [];
-		for (i=0; i < this.children.length; i++) {
+		for (let i=0; i < this.children.length; i++) {
 			var ref = this.children[i];
 			// cycle through all nodes, saving their data to an object
 			var node = {};
@@ -1045,7 +831,7 @@ function drop(ev) {
 
 				node.elements = [];
 
-				for (e=0; e < ref.children.length; e++) {
+				for (let e=0; e < ref.children.length; e++) {
 					var r_elem = ref.children[e];
 					if (r_elem instanceof PanelElement) {
 						var elem = {};

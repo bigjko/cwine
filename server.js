@@ -13,7 +13,7 @@
 		});
 
 		app.get('/edit', function (req, res) {
-		  res.sendFile(path + 'app/editor/views/cwine.html');
+		  res.sendFile(path + 'app/editor/views/index.html');
 		});
 
 		app.use(express.static('app/shared/public'));

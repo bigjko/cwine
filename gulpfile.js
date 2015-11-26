@@ -14,6 +14,7 @@ var browserify = require('browserify'),
 
 gulp.task('browserify-editor', function() {
   return browserify(editorSource, {debug:true})
+  .transform(babelify, { presets: ['react','es2015']})
   .bundle()
   .pipe(source(editorDestFile))
   .pipe(gulp.dest(editorDestFolder));
@@ -56,4 +57,4 @@ gulp.task('express', function () {
   server.serve();
 });
 
-gulp.task('default', ['watch-editor', 'watch-game', 'express']);
+gulp.task('default', ['browserify-editor', 'watch-editor', 'watch-game', 'express']);

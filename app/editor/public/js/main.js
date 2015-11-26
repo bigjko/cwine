@@ -1,7 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var loader = require('./loader.js');
-var editor = require('./editor-react.js');
+var editor = require('./editor.js');
 const update = require('react-addons-update');
 //const $ = require('jquery');
 

@@ -4,6 +4,7 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const Tabs = require('react-simpletabs');
 const Textarea = require('react-textarea-autosize');
+import {ModalContainer, ModalDialog} from 'react-modal-dialog';
 
 const Sidebar = React.createClass({
 	render: function() {
@@ -32,6 +33,22 @@ const Sidebar = React.createClass({
 		);
 	}
 });
+
+/// FILE
+
+const File = React.createClass({
+	render: function() {
+		return (
+			<div id="file-panel" className="noselect">
+				<button onClick={this.props.loadjson} className="button">Load Default JSON</button>
+				<ModalButton className="button button-primary" action={this.props.onsave} header="Saved!" text="Project has been saved locally.">Save</ModalButton>
+				<button className="button button-disabled">Export to .zip</button>
+			</div>
+		);
+	}
+});
+
+/// IMAGE PANEL
 
 const ImagePanel = React.createClass({
 	render: function() {
@@ -66,17 +83,7 @@ const ImageList = React.createClass({
 	}
 });
 
-const File = React.createClass({
-	render: function() {
-		return (
-			<div id="file-panel" className="noselect">
-				<button onClick={this.props.loadjson} className="button">Load Default JSON</button>
-				<button onClick={this.props.onsave} className="button button-primary">Save</button>
-				<button className="button button-disabled">Export to .zip</button>
-			</div>
-		);
-	}
-});
+/// PROPERTY PANELS
 
 const PanelProperties = React.createClass({
 	render: function() {
@@ -139,12 +146,14 @@ const ProjectProperties = React.createClass({
 		return (
 			<div>
 				<h6><span className="node-type">Project</span> {this.props.config.name}</h6>
-				<InputField label="top" name="Project Name:" valueName="name" value={this.props.config.name} onchange={this.props.onchange} />
-				<InputField label="side" name="Start Node:" valueName="startnode" value={this.props.config.startnode} onchange={this.props.onchange} />
+				<InputField label="top" name="Project Name" valueName="name" value={this.props.config.name} onchange={this.props.onchange} />
+				<InputField label="side" name="Start Node" valueName="startnode" value={this.props.config.startnode} onchange={this.props.onchange} />
 			</div>
 		);
 	}
 });
+
+/// PROPERTY COMPONENTS
 
 const InputField = React.createClass({
 	render: function() {
@@ -173,6 +182,36 @@ const StaticField = React.createClass({
 			</div>
 		);
 	}
+});
+
+const ModalButton = React.createClass({
+  getInitialState: function() {
+    return {isShowingModal: false};
+  },
+  handleClick: function(evt) {
+  	this.props.action(evt);
+  	this.setState({isShowingModal: true});
+  	console.log("show dialog!");
+  },
+  handleClose: function() { 
+  	this.setState({isShowingModal: false});
+  },
+  render: function() {
+    return (
+      <button onClick={this.handleClick} className={this.props.className}>
+                <span>{this.props.children}</span>
+
+        {this.state.isShowingModal ?
+          <ModalContainer onClose={this.handleClose}>
+            <ModalDialog onClose={this.handleClose}>
+            <h1>{this.props.header}</h1>
+            <p>{this.props.text}</p>
+            </ModalDialog>
+          </ModalContainer>
+        : null}
+      </button>
+    );
+  }
 });
 
 export default Sidebar;
