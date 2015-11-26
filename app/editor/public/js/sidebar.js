@@ -100,9 +100,9 @@ const PanelProperties = React.createClass({
 		return (
 			<div className="noselect">
 				<h6><span className="node-type">Panel #{this.props.selected.node}</span> {this.props.node.name}</h6>
-				<InputField name="Name" valueName="name" value={this.props.node.name} onchange={this.props.onchange} />
-				<InputField name="Size" valueName="size" value={this.props.node.size} onchange={this.props.onchange} description="work in progress: value from 1 - 5" />
-				<StaticField name="Image" value={this.props.node.image} />
+				<InputField label="side" name="Name" valueName="name" value={this.props.node.name} onchange={this.props.onchange} />
+				<InputField label="side" name="Size" valueName="size" value={this.props.node.size} onchange={this.props.onchange} description="work in progress: value from 1 - 5" />
+				<StaticField label="top" name="Image" value={this.props.node.image} />
 				<div className="field labeltop">
 					<p>Panel Elements:</p>
 					<ul className="element-list">{elementList}</ul>
@@ -125,8 +125,8 @@ const ElementProperties = React.createClass({
 					<p>Text:</p>
 					<Textarea minRow={1} name="text" value={ this.props.node.text } onChange={this.props.onchange} />
 				</div>
-				<StaticField name="Image" value={this.props.node.image} />
-				<StaticField name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
+				<StaticField label="top" name="Image" value={this.props.node.image} />
+				<StaticField label="side" name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
 
 				<button onClick={this.props.onremove} className="button delete-button">Delete Element</button>
 			</div>
@@ -139,8 +139,8 @@ const ProjectProperties = React.createClass({
 		return (
 			<div>
 				<h6><span className="node-type">Project</span> {this.props.config.name}</h6>
-				<InputField name="Project Name:" valueName="name" value={this.props.config.name} onchange={this.props.onchange} />
-				<InputField name="Start Node:" valueName="startnode" value={this.props.config.startnode} onchange={this.props.onchange} />
+				<InputField label="top" name="Project Name:" valueName="name" value={this.props.config.name} onchange={this.props.onchange} />
+				<InputField label="side" name="Start Node:" valueName="startnode" value={this.props.config.startnode} onchange={this.props.onchange} />
 			</div>
 		);
 	}
@@ -149,11 +149,12 @@ const ProjectProperties = React.createClass({
 const InputField = React.createClass({
 	render: function() {
 		let description;
+		let fieldclass = 'field label' + this.props.label;
 		if (this.props.description !== undefined) description = (
-				<span className="prop-description noselect">{this.props.description}</span>
+				<span className="prop-description">{this.props.description}</span>
 			);
 		return (
-			<div className="field labelside">
+			<div className={fieldclass}>
 				<p>{this.props.name}:</p>
 				<input type="text" name={this.props.valueName} value={ this.props.value } onChange={this.props.onchange} />
 				{description}
@@ -164,8 +165,9 @@ const InputField = React.createClass({
 
 const StaticField = React.createClass({
 	render: function() {
+		let fieldclass = 'field label' + this.props.label;
 		return (
-			<div className="field labelside">
+			<div className={fieldclass}>
 					<p>{this.props.name}:</p>
 					<span className="static-value">{this.props.value}</span>
 			</div>
