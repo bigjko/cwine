@@ -69,7 +69,7 @@ exports.loadJSON = function(path, callback) {
 	var request = new XMLHttpRequest();
 	request.open('GET', path + '?_=' + new Date().getTime(), true);
 
-	var mobile_small_panels = 0;
+	//var mobile_small_panels = 0;
 
 	request.onload = function() {
 		if (request.status >= 200 && request.status < 400) {

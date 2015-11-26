@@ -34,7 +34,7 @@ function init() {
 
 const Editor = React.createClass({
 	getInitialState: function() {
-		return { nodes: [], currentlySelected: { node: 1 } };
+		return { nodes: [], currentlySelected: { node: 1 }, config: {} };
 	},
 	handleCanvasSelection: function(selected) {
 		this.setState({ currentlySelected: selected });
@@ -58,6 +58,10 @@ const Editor = React.createClass({
 					nodes: update(this.state.nodes, {[sel.node]: {[event.target.name]: {$set: event.target.value}}})
 				});
 			}
+		} else {
+			this.setState({
+				config: update(this.state.config, {[event.target.name]: {$set: event.target.value}})
+			});
 		}
 		console.log("Change!");
 		// maybe use $.extend(node, change) here
@@ -103,25 +107,19 @@ const Editor = React.createClass({
 		    reader.readAsDataURL(f);
 	    }
 	},
-	reloadImages: function () {
-		for (let f in this.state.localImages) {
-			let file = this.state.localImages[f].file;
-		    console.log(file.name);
-
-		    var reader = new FileReader();
-
-		    reader.onload = (function(ed, f) {
-		    		//debugger;
-		    		console.log("reloaded");
-		    		return function(e) {
-			        	ed.setState({
-			        		localImages: update(ed.state.localImages, {[f]: {image: {$set: e.target.result}}})
-			        	});
-		        	};
-		    }(this, f));
-
-		    reader.readAsDataURL(file);
-		}
+	removeNode: function (ev) {
+		let sel = this.state.currentlySelected;
+		let data = editor.removeNode(sel);
+		this.setState({nodes: data.nodes});
+	},
+	changeNodes: function (data) {
+		this.setState({nodes: data.nodes});
+	},
+	loadJSON: function (evt) {
+		loader.loadJSON('js/panels.json', function (data) {
+			this.setState({nodes: data.nodes, config: data.config, currentlySelected: undefined});
+			editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.changeNodes);
+		}.bind(this));
 	},
 	handleSave: function (evt) {
 		loader.save({ config: this.state.config, nodes: this.state.nodes, images: this.state.localImages });
@@ -129,14 +127,14 @@ const Editor = React.createClass({
 	},
 	componentDidMount: function() {
 		loader.load(function(data) {
-			editor.init(data, this.handleCanvasSelection, this.handleCanvasChange);
+			editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.changeNodes);
 			this.setState({
 				config: data.config,
 				nodes: data.nodes,
 				currentlySelected: { node: 3 },
 				localImages: data.images
 			});
-			if (this.state.localImages !== undefined) this.reloadImages();
+			//if (this.state.localImages !== undefined) this.reloadImages();
 		}.bind(this));
 	},
 	render: function() {
@@ -145,12 +143,15 @@ const Editor = React.createClass({
 		return (
 			<Sidebar 
 				nodes={this.state.nodes}
+				config={this.state.config}
 				images={this.state.localImages}
 				current={this.state.currentlySelected}
 				onchange={this.handleChange}
 				onselect={this.handleSidebarSelection}
 				onfiles={this.handleFiles}
-				onsave={this.handleSave} />
+				onsave={this.handleSave}
+				loadjson={this.loadJSON}
+				onremove={this.removeNode} />
 		);
 	}
 

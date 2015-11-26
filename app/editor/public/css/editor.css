@@ -380,6 +380,9 @@ textarea {
 	border-color:#b44;
 }
 
+#sidebar .button-disabled {
+	opacity:0.3;
+}
 
 .close {
 	background-color: #555;

@@ -22,11 +22,13 @@ var currentLocalImages;
 
 let handleSelection;
 let handleChange;
+let changeData;
 
-exports.init = function(obj, onselect, onchange) {
+exports.init = function(obj, onselect, onchange, changedata) {
 
 	handleSelection = onselect;
 	handleChange = onchange;
+	changeData = changedata;
 
     panels = obj.nodes;
     config = obj.config;
@@ -175,6 +177,7 @@ function initviewContainer() {
 	dragBox.on("mousedown", function(evt) {
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = nodeContainer;
+		handleSelection({});
 		//openTab("propertyTab");
 		//nodeContainer.showProperties();
 		dragoffset.x = evt.stageX - viewContainer.x + viewContainer.regX*viewScale;
@@ -212,7 +215,19 @@ function newPanel(x, y, image) {
 		y: y
 	};
 	nodeContainer.addChild(new Panel(obj));
+	changeData(nodeContainer.toObject());
 }
+
+exports.removeNode = function(sel) {
+	if (sel.node !== undefined) {
+		if (sel.element !== undefined) {
+			nodeContainer.children[sel.node].removeChild(elements[sel.element]);
+		} else {
+			nodeContainer.removeChild(nodeContainer.children[sel.node]);
+		}
+	}
+	return nodeContainer.toObject();
+};
 
 function newPanelElement(x, y, panel, image) {
 	var elm = {};
@@ -241,6 +256,8 @@ function newPanelElement(x, y, panel, image) {
 	socketpos = sock.owner.localToLocal(sock.owner.width, sock.owner.height/2, sock.parent);
 	sock.x = socketpos.x;
 	sock.y = socketpos.y;
+
+	changeData(nodeContainer.toObject());
 }
 
 function zoom(zoomModifier) {
@@ -376,15 +393,29 @@ const drop = function (ev) {
 	};
 
 	Node.prototype.releaseLine = function(evt) {
-		evt.target.parent.goto = undefined;
-		evt.target.parent.owner.goto = undefined;
-		evt.target.parent.line.graphics.clear();
-		var targ = stage.getObjectUnderPoint(evt.stageX, evt.stageY);
-		if (targ.parent instanceof Node) {
-			evt.target.parent.goto = targ.parent;
-			evt.target.parent.owner.goto = targ.parent;
+		let socket = evt.target.parent;
+		let panel = evt.target.parent.parent;
+		let owner = evt.target.parent.owner;
+		socket.goto = undefined;
+		owner.goto = undefined;
+		socket.line.graphics.clear();
+		var target = stage.getObjectUnderPoint(evt.stageX, evt.stageY).parent;
+		if (target instanceof Node) {
+			socket.goto = target;
+			owner.goto = target;
+			let nodeindex;
+			let elmindex;
+			if (owner instanceof PanelElement) {
+				nodeindex = nodeContainer.getChildIndex(panel);
+				elmindex = panel.elements.indexOf(owner);
+			} else {
+				nodeindex = nodeContainer.getChildIndex(owner);
+			}
+			let gotoindex = nodeContainer.getChildIndex(socket.goto);
+			handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
 		}
-		evt.target.parent.parent.drawConnections();
+
+		panel.drawConnections();
 	};
 
 	Node.prototype.addSocket = function(x, y, goto, addTo, radius, color) {
@@ -758,7 +789,7 @@ const drop = function (ev) {
 	// Overwrite Container.removeChild()
 	NodeContainer.prototype.removeChild = function(child) {
 		var view = document.querySelector("#view");
-		for (e=0; e<child.children.length; e++) {
+		for (let e=0; e<child.children.length; e++) {
 			var elm = child.children[e];
 			console.log(elm);
 			if (elm instanceof PanelElement) {
@@ -782,7 +813,7 @@ const drop = function (ev) {
 		};
 
 		output.nodes = [];
-		for (i=0; i < this.children.length; i++) {
+		for (let i=0; i < this.children.length; i++) {
 			var ref = this.children[i];
 			// cycle through all nodes, saving their data to an object
 			var node = {};
@@ -800,7 +831,7 @@ const drop = function (ev) {
 
 				node.elements = [];
 
-				for (e=0; e < ref.children.length; e++) {
+				for (let e=0; e < ref.children.length; e++) {
 					var r_elem = ref.children[e];
 					if (r_elem instanceof PanelElement) {
 						var elem = {};

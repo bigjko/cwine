@@ -8,18 +8,18 @@ const Textarea = require('react-textarea-autosize');
 const Sidebar = React.createClass({
 	render: function() {
 		let sel = this.props.current;
-		let panel = <ProjectProperties />;
+		let panel = <ProjectProperties config={this.props.config} onchange={this.props.onchange} />;
 		console.log(sel);
 		if (this.props.nodes.length > 0 && sel !== undefined && sel.node !== undefined) {
 			if (sel.element !== undefined) {
-				panel = <ElementProperties selected={sel} node={this.props.nodes[sel.node].elements[sel.element]} onchange={this.props.onchange} />;
+				panel = <ElementProperties selected={sel} node={this.props.nodes[sel.node].elements[sel.element]} onchange={this.props.onchange} onremove={this.props.onremove} />;
 			}
-			else panel = <PanelProperties selected={sel} node={this.props.nodes[sel.node]} onchange={this.props.onchange} onselect={this.props.onselect} />;
+			else panel = <PanelProperties selected={sel} node={this.props.nodes[sel.node]} onchange={this.props.onchange} onselect={this.props.onselect} onremove={this.props.onremove} />;
 		}
 
 		return (
 			<div>
-				<File onsave={this.props.onsave} />
+				<File onsave={this.props.onsave} loadjson={this.props.loadjson} />
 				<Tabs>
 					<Tabs.Panel title="Properties">
 						{panel}
@@ -70,9 +70,9 @@ const File = React.createClass({
 	render: function() {
 		return (
 			<div id="file-panel" className="noselect">
-				<button className="button">Load Default JSON</button>
+				<button onClick={this.props.loadjson} className="button">Load Default JSON</button>
 				<button onClick={this.props.onsave} className="button button-primary">Save</button>
-				<button className="button">Export to .zip</button>
+				<button className="button button-disabled">Export to .zip</button>
 			</div>
 		);
 	}
@@ -108,7 +108,7 @@ const PanelProperties = React.createClass({
 					<ul className="element-list">{elementList}</ul>
 				</div>
 				
-				<button className="button delete-button">Delete Panel</button>
+				<button onClick={this.props.onremove} className="button delete-button">Delete Panel</button>
 
 			</div>
 		);
@@ -126,7 +126,9 @@ const ElementProperties = React.createClass({
 					<Textarea minRow={1} name="text" value={ this.props.node.text } onChange={this.props.onchange} />
 				</div>
 				<StaticField name="Image" value={this.props.node.image} />
-				<StaticField name="Position" value={[this.props.node.position.x.toFixed(2), this.props.node.position.y.toFixed(2)]} />
+				<StaticField name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
+
+				<button onClick={this.props.onremove} className="button delete-button">Delete Element</button>
 			</div>
 		);
 	}
@@ -135,9 +137,11 @@ const ElementProperties = React.createClass({
 const ProjectProperties = React.createClass({
 	render: function() {
 		return (
-			<h4>
-				Project
-			</h4>
+			<div>
+				<h6><span className="node-type">Project</span> {this.props.config.name}</h6>
+				<InputField name="Project Name:" valueName="name" value={this.props.config.name} onchange={this.props.onchange} />
+				<InputField name="Start Node:" valueName="startnode" value={this.props.config.startnode} onchange={this.props.onchange} />
+			</div>
 		);
 	}
 });

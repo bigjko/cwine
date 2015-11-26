@@ -1,5 +1,6 @@
 {
     "config": {
+        "name": "Die Sieben Raben",
         "startnode": "0"
     },
     "nodes": [
