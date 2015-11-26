@@ -20,15 +20,14 @@
 		app.use(express.static('app/editor/public'));
 		app.use(express.static('app/game/public'));
 
-
 		app.use('*', function (req, res) {
 		  res.sendFile(path + 'app/shared/views/error/404.html');
 		});
 
 		app.listen((process.env.PORT || 8080),function(){
 		  console.log("Live at Port 8080");
-		});	
-	}
+		});
+	};
 
     if (!module.parent) {
         mod.serve();

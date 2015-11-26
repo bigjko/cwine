@@ -1,5 +1,6 @@
 var browserify = require('browserify'),
     watchify = require('watchify'),
+    babelify = require('babelify'),
     gulp = require('gulp'),
     source = require('vinyl-source-stream'),
     editorSource = 'app/editor/public/js/main.js',
@@ -13,6 +14,7 @@ var browserify = require('browserify'),
 
 gulp.task('browserify-editor', function() {
   return browserify(editorSource, {debug:true})
+  .transform(babelify, { presets: ['react','es2015']})
   .bundle()
   .pipe(source(editorDestFile))
   .pipe(gulp.dest(editorDestFolder));
@@ -26,7 +28,7 @@ gulp.task('browserify-game', function() {
 });
 
 gulp.task('watch-editor', function() {
-  var bundler = watchify(browserify(editorSource, {debug:true}));
+  var bundler = watchify(browserify(editorSource, {debug:true})).transform(babelify, { presets: ['react','es2015']});
   bundler.on('update', rebundle);
 
   function rebundle() {
@@ -55,4 +57,4 @@ gulp.task('express', function () {
   server.serve();
 });
 
-gulp.task('default', ['browserify-editor', 'browserify-game', 'watch-editor', 'watch-game', 'express']);
+gulp.task('default', ['browserify-editor', 'watch-editor', 'watch-game', 'express']);
