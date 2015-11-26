@@ -41,22 +41,22 @@ exports.loadAllImages = function(path, callback) {
 	request.send();
 };
 
-exports.save = function(obj, path) {
+exports.save = function(obj) {
 	localforage.setItem('cwine', obj, function(err, result) { 	
-		var dialog = document.querySelector("#dialog");
+		/*var dialog = document.querySelector("#dialog");
 		dialog.innerHTML = "<p>Cwine saved successfully<p>";
 		dialog.style.opacity = "0.8";
 		dialog.style.backgroundColor = "#333";
 		setTimeout(function() {
 			dialog.style.opacity = "0";
-		}, 2000);
+		}, 2000);*/
 	});
 };
 
 exports.load = function(callback) {
 
 	localforage.getItem('cwine', function(err, value) {
-		preloadImages(value,callback); 	
+		preloadImages(value,callback);
 		//callback(value);
 	});
 };

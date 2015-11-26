@@ -19,7 +19,7 @@ const Sidebar = React.createClass({
 
 		return (
 			<div>
-				<File />
+				<File onsave={this.props.onsave} />
 				<Tabs>
 					<Tabs.Panel title="Properties">
 						{panel}
@@ -71,7 +71,7 @@ const File = React.createClass({
 		return (
 			<div id="file-panel" className="noselect">
 				<button className="button">Load Default JSON</button>
-				<button className="button button-primary">Save</button>
+				<button onClick={this.props.onsave} className="button button-primary">Save</button>
 				<button className="button">Export to .zip</button>
 			</div>
 		);

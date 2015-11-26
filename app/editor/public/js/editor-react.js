@@ -94,6 +94,20 @@ exports.init = function(obj, onselect, onchange) {
 	}
 };
 
+exports.updateData = function(data) {
+
+};
+
+exports.updateNode = function(sel, update) {
+	console.log("update node!");
+	if (sel.node !== undefined) {
+		if (sel.element !== undefined) {
+			nodeContainer.children[sel.node].elements[sel.element].update(update);
+		}
+		nodeContainer.children[sel.node].update(update);
+	}
+};
+
 function initNodes() {
 	nodeContainer = new NodeContainer();
 	nodeContainer.startnode = config.startnode;
@@ -311,11 +325,16 @@ const drop = function (ev) {
 
 	Node.prototype.handleMouseMove = function(evt) {
 		//console.log(evt.target);
-		evt.target.parent.x = evt.stageX/viewScale - dragoffset.x;
-		evt.target.parent.y = evt.stageY/viewScale - dragoffset.y;
+		let panel = evt.target.parent;
 
-		evt.target.parent.x = Math.round(evt.target.parent.x*0.1)*10;
-		evt.target.parent.y = Math.round(evt.target.parent.y*0.1)*10;
+		panel.x = evt.stageX/viewScale - dragoffset.x;
+		panel.y = evt.stageY/viewScale - dragoffset.y;
+
+		panel.x = Math.round(panel.x*0.1)*10;
+		panel.y = Math.round(panel.y*0.1)*10;
+
+		let sel = {node: nodeContainer.getChildIndex(panel)};
+		handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
 
 		//console.log(evt.target.parent);
 		//drawConnections(evt.target.parent);
@@ -327,7 +346,12 @@ const drop = function (ev) {
 			var socket = this.sockets[s];
 			socket.line.graphics.clear();
 			if (socket.owner instanceof PanelElement) {
-				var socketpos = socket.owner.localToLocal(socket.owner.width, socket.owner.height/2, socket.parent);
+				let socketpos = socket.owner.localToLocal(socket.owner.width, socket.owner.height/2, socket.parent);
+				socket.x = socketpos.x;
+				socket.y = socketpos.y;
+			}
+			else {
+				let socketpos = { x: socket.owner.width, y: socket.owner.height/2 };
 				socket.x = socketpos.x;
 				socket.y = socketpos.y;
 			}
@@ -479,6 +503,30 @@ const drop = function (ev) {
 		}	
 	};
 
+	Panel.prototype.update = function(update) {
+		//this.x = update.editor.position.x;
+		//this.y = update.editor.position.y;
+		for (let property in update) {
+			this[property] = update[property];
+			if (property == 'image') {
+				// FIX THIS IMAGE SHIT!
+				this.panelbitmap = new Bitmap(this.image);
+			}
+			console.log("Changed", property, update[property]);
+		}
+		let scale = 0.25;
+		scale = this.size*400*scale / this.panelbitmap.image.width;
+		this.panelbitmap.scaleX = scale;
+		this.panelbitmap.scaleY = scale;
+		this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX;
+		this.height = this.panelbitmap.image.height*this.panelbitmap.scaleY;
+		for (let p=0; p < this.elements.length; p++) {
+			this.elements[p].setPosition();
+		}
+		drawAllConnections();
+
+	};
+
 	Panel.prototype.removeChild = function(child) {
 		var view = document.querySelector("#view");
 		var elm = child.children[1].htmlElement;
@@ -502,13 +550,11 @@ const drop = function (ev) {
 
 	PanelElement.prototype.setup = function(obj) {
 		if (obj.goto != -1) this.goto = obj.goto;
-		//this.type = obj.type;
 		this.align = obj.align;
 		this.bubble_type = obj.bubble_type;
 		this.text = obj.text;
         this.position = obj.position;
 
-		//var panel = panels[i];
 		var sb = obj;
 
 		var div = document.querySelector("#view").appendChild(document.createElement("DIV"));
@@ -543,18 +589,11 @@ const drop = function (ev) {
 		div.style.top = 0;
 		div.style.left = 0;
 
-		//document.querySelector("#view").appendChild(div);
-
-		
-
-
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
 
 		this.x = sb.position.x * this.panelbitmap.image.width*this.panelbitmap.scaleX;
 		this.y = sb.position.y * this.panelbitmap.image.height*this.panelbitmap.scaleY;
-		//this.x = elm.x;
-		//this.y = elm.y;
 		this.regX = div.clientWidth/2;
 		this.regY = div.clientHeight;
 		this.width = div.clientWidth;
@@ -594,31 +633,33 @@ const drop = function (ev) {
 		//elements.addChild(elm);
 	};
 
-	PanelElement.prototype.updateElement = function() {
-		var element = this.children[1].htmlElement; 
+	PanelElement.prototype.update = function(update) {
+
+		for (let property in update) {
+			this[property] = update[property];
+		}
+		/*if (update.text !== undefined) this.text = update.text;
+		if (update.bubble_type !== undefined) this.bubble_type = update.bubble_type;
+		if (update.image !== undefined) this.image = update.image;
+		if (update.position !== undefined) this.position = update.position;
+		if (update.align !== undefined) this.align = update.align;*/
+
+		var element = this.children[1].htmlElement;
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
 		this.width = element.clientWidth;
 		this.height = element.clientHeight;
 		this.regX = element.clientWidth/2;
 		this.regY = element.clientHeight;
-
-		/*var image = "";
-		var bubble_size = "medium";
-		if (this.text.length < 4) {
-			bubble_size = "small";
-		}
-		var bubble_orient = this.bubble_type;
-		image += bubble_size;
-		if (bubble_orient == "box") {
-			image += "_box.png";
-		}
-		else image += "_bubble_" + bubble_orient + ".png";
-		element.style.backgroundImage = "url(\"game/img/bubbles/"+image+"\")";*/
+		this.hitArea.graphics.clear().f("#000").dr(0,0,this.width,this.height);
 		element.style.backgroundImage = this.image;
 
 		if (this.align !== undefined && this.align.x == "right") {
 			this.regX = element.clientWidth;
 		}
+
+
+
+		drawAllConnections();
 	};
 
 	PanelElement.prototype.setDragOffset = function(evt) {
@@ -649,10 +690,44 @@ const drop = function (ev) {
 		if (local.y > panel.height) local.y = panel.height;
 		evt.target.x = local.x;
 		evt.target.y = local.y;
+		this.position = evt.target.outputPosition();
+		let sel = {node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)};
+		let pos = evt.target.outputPosition();
+		handleChange(sel, {position: pos});
         /*evt.target.position = { 
             x: local.x/evt.target.panelbitmap.image.width/evt.target.panelbitmap.scaleX*100, 
             y: local.y/evt.target.panelbitmap.image.height/evt.target.panelbitmap.scaleY*100 }*/
 		evt.target.parent.drawConnections();
+	};
+
+	PanelElement.prototype.setPosition = function() {
+		var panelbitmap = this.panelbitmap;
+		var panel = {
+			width: panelbitmap.image.width*panelbitmap.scaleX,
+			height: panelbitmap.image.height*panelbitmap.scaleY
+		};
+
+		if (this.align === undefined) {
+			this.x = this.position.x * panel.width;
+			this.y = this.position.y * panel.height;
+		} else {
+			this.x = panel.width - this.position.x * panel.width;
+			this.y = panel.height - this.position.y * panel.height;
+		}
+	};
+
+	PanelElement.prototype.outputPosition = function() {
+		let elm = this;
+		let bitm = elm.panelbitmap;
+		let pos = {
+							x:elm.x/(bitm.image.width*bitm.scaleX),
+							y:elm.y/(bitm.image.height*bitm.scaleY)
+						};
+		if (elm.align !== undefined) {
+			if (elm.align.x == "right") pos.x = 1 - pos.x;
+			if (elm.align.y == "bottom") pos.y = 1 - pos.y;
+		}
+		return pos;
 	};
 
 	window.PanelElement = createjs.promote(PanelElement, "Container");

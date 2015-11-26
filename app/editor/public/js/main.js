@@ -45,7 +45,9 @@ const Editor = React.createClass({
 	},
 	handleChange: function(event) {
 		let sel = this.state.currentlySelected;
+		//editor.updateNode(sel, {[event.target.name]: event.target.value});
 		if (sel.node !== undefined) {
+			editor.updateNode(sel, {[event.target.name]: event.target.value});
 			if (sel.element !== undefined) {
 				this.setState({
 					nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[event.target.name]: {$set: event.target.value}}}}})
@@ -59,6 +61,23 @@ const Editor = React.createClass({
 		}
 		console.log("Change!");
 		// maybe use $.extend(node, change) here
+	},
+	handleCanvasChange: function(sel, values) {
+		console.log("Canvas Change!");
+		for (let property in values) {
+			if (sel.node !== undefined) {
+				if (sel.element !== undefined) {
+					this.setState({
+						nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[property]: {$set: values[property]}}}}})
+					});
+				}
+				else {
+					this.setState({
+						nodes: update(this.state.nodes, {[sel.node]: {[property]: {$set: values[property]}}})
+					});
+				}
+			}	
+		}
 	},
 	handleFiles: function (evt) {
 		console.log("handling files");
@@ -75,7 +94,7 @@ const Editor = React.createClass({
 		    reader.onload = (function(ed, array, theFile) {
 		    		//debugger;
 		    		return function(e) {
-			    		array.push({file:theFile, image:e.target.result});
+			    		array.push({file:theFile, image:e.target.result, path: window.URL.createObjectURL(theFile)});
 			        	ed.setState({localImages: files});
 			        	console.log(array);
 		        	};
@@ -84,13 +103,40 @@ const Editor = React.createClass({
 		    reader.readAsDataURL(f);
 	    }
 	},
+	reloadImages: function () {
+		for (let f in this.state.localImages) {
+			let file = this.state.localImages[f].file;
+		    console.log(file.name);
+
+		    var reader = new FileReader();
+
+		    reader.onload = (function(ed, f) {
+		    		//debugger;
+		    		console.log("reloaded");
+		    		return function(e) {
+			        	ed.setState({
+			        		localImages: update(ed.state.localImages, {[f]: {image: {$set: e.target.result}}})
+			        	});
+		        	};
+		    }(this, f));
+
+		    reader.readAsDataURL(file);
+		}
+	},
+	handleSave: function (evt) {
+		loader.save({ config: this.state.config, nodes: this.state.nodes, images: this.state.localImages });
+		console.log("save");
+	},
 	componentDidMount: function() {
 		loader.load(function(data) {
-			editor.init(data, this.handleCanvasSelection, this.handleChange);
+			editor.init(data, this.handleCanvasSelection, this.handleCanvasChange);
 			this.setState({
+				config: data.config,
 				nodes: data.nodes,
-				currentlySelected: { node: 3 }
+				currentlySelected: { node: 3 },
+				localImages: data.images
 			});
+			if (this.state.localImages !== undefined) this.reloadImages();
 		}.bind(this));
 	},
 	render: function() {
@@ -103,7 +149,8 @@ const Editor = React.createClass({
 				current={this.state.currentlySelected}
 				onchange={this.handleChange}
 				onselect={this.handleSidebarSelection}
-				onfiles={this.handleFiles} />
+				onfiles={this.handleFiles}
+				onsave={this.handleSave} />
 		);
 	}
 
