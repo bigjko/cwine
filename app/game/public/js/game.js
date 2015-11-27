@@ -31,6 +31,8 @@ function loadJSON(path) {
   request.send();
 }
 
+window.loadJSON = loadJSON;
+
 function loadLocal() {
   var localforage = require('localforage');
 
@@ -40,6 +42,8 @@ function loadLocal() {
     preloadImages(panels,start);
   });
 }
+
+window.loadLocal = loadLocal;
 
 function preloadImages(array, callback) {
   var loaded = 0;
@@ -198,5 +202,5 @@ function newPanelElement(id) {
 
 //// LOAD COMIC
 
-loadLocal();
+//loadLocal();
 
