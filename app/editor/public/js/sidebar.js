@@ -20,7 +20,7 @@ const Sidebar = React.createClass({
 
 		return (
 			<div>
-				<File onsave={this.props.onsave} loadjson={this.props.loadjson} />
+				<File onsave={this.props.onsave} loadjson={this.props.loadjson} onexport={this.props.onexport} />
 				<Tabs>
 					<Tabs.Panel title="Properties">
 						{panel}
@@ -42,7 +42,7 @@ const File = React.createClass({
 			<div id="file-panel" className="noselect">
 				<button onClick={this.props.loadjson} className="button">Load Default JSON</button>
 				<ModalButton className="button button-primary" action={this.props.onsave} header="Saved!" text="Project has been saved locally.">Save</ModalButton>
-				<button className="button button-disabled">Export to .zip</button>
+				<button onClick={this.props.onexport} className="button">Export to .zip</button>
 			</div>
 		);
 	}

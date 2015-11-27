@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var loader = require('./loader.js');
+const exporter = require('./exporter.js');
 var editor = require('./editor.js');
 const update = require('react-addons-update');
 //const $ = require('jquery');
@@ -125,6 +126,9 @@ const Editor = React.createClass({
 		loader.save({ config: this.state.config, nodes: this.state.nodes, images: this.state.localImages });
 		console.log("save");
 	},
+	exportToZip: function (evt) {
+		exporter.exportToZip({config: this.state.config, nodes: this.state.nodes});
+	},
 	componentDidMount: function() {
 		loader.load(function(data) {
 			editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.changeNodes);
@@ -151,7 +155,8 @@ const Editor = React.createClass({
 				onfiles={this.handleFiles}
 				onsave={this.handleSave}
 				loadjson={this.loadJSON}
-				onremove={this.removeNode} />
+				onremove={this.removeNode}
+				onexport={this.exportToZip} />
 		);
 	}
 

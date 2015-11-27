@@ -1,18 +1,33 @@
 @font-face {
-    font-family: UnmaskedBB;
-    src: url(font/UnmaskedBB.otf);
+    font-family: 'KomikaHand';
+    src: url('font/Komika_Hand.ttf');
+    font-weight: normal;
+    font-style: normal;
+
 }
 
 @font-face {
-    font-family: UnmaskedBB;
-    src: url(font/UnmaskedBB_ital.otf);
-    font-style:italic;
+    font-family: 'KomikaHand';
+    src: url('font/Komika_Hand_Bold.ttf');
+    font-weight: bold;
+    font-style: normal;
+
 }
 
 @font-face {
-    font-family: UnmaskedBB;
-    src: url(font/UnmaskedBB_bold.otf);
-    font-weight:bold;
+    font-family: 'KomikaHand';
+    src: url('font/Komika_Hand_Italic.eot');
+    font-weight: normal;
+    font-style: italic;
+
+}
+
+@font-face {
+    font-family: 'KomikaHand';
+    src: url('font/Komika_Hand_Bold_Italic.eot');
+    font-weight: bold;
+    font-style: italic;
+
 }
 
 body {
@@ -113,9 +128,9 @@ header img {
 
 .bubble p {
 	white-space:nowrap;
-	padding: 15px 15px 22px 15px;
+	padding: 12px 18px 20px;
 	margin:0;
-	font-size: 90%;
+	font-size: 80%;
 	line-height: 1rem;
 	display:block;
 }
@@ -134,7 +149,7 @@ header img {
 
 .box p {
 	padding: 15px;
-	font-size:100%;
+	font-size:80%;
 }
 
 .panel img {
@@ -152,7 +167,7 @@ header img {
 	width:18.4%;
 	float:left;
 	position:relative;
-	font-family:UnmaskedBB;
+	font-family:'KomikaHand' Verdana, Geneva, sans-serif;
 	-webkit-transition: opacity 1s;
     transition: opacity 1s;
 	/*background-color:#500;*/
@@ -180,7 +195,7 @@ footer {
 	text-align:center;
 	font-style:italic;
 	text-transform:uppercase;
-	font-size:1rem;
+	font-size:60%;
 	letter-spacing:0.2rem;
 	color:#ccc;
 }
