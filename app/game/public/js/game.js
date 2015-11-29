@@ -2,9 +2,9 @@ var panels;
 var config;
 
 var $ = require('jquery');
-var jQBridget = require('jquery-bridget');
-var Packery = require('packery');
-$.bridget('packery', Packery);
+//var jQBridget = require('jquery-bridget');
+//var Packery = require('packery');
+//$.bridget('packery', Packery);
 
 function loadJSON(path) {
   var request = new XMLHttpRequest();
@@ -130,16 +130,11 @@ function start() {
   
   var panels = getPanel(start_id);
 
-  $container = $('#panels');
+  var diff = $('#panels').clientWidth / $('#panels').css('width');
+  $('#panels').css('font-size', 13*diff + 'px');
 
-  $container
-    .append(panels)
-    .packery({
-      itemSelector: '.panel',
-      gutter: '.gutter-size',
-      percentPosition: true,
-      isFitWidth : true
-    });
+  $container = $('#panels');
+  $container.append(panels);
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
@@ -155,7 +150,7 @@ function addPanel(id) {
 
   $container.append(panels);
 
-  $container.packery('appended', panels);
+  //$container.packery('appended', panels);
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
@@ -188,6 +183,7 @@ function getPanel(id) {
 
 function newPanelElement(id) {
 
+  var li = $('<li>').addClass('panel-list');
   var paneldiv = $('<div>').addClass('panel noselect ' + 'w' + panels[id].size).css('opacity', 1);
   var panelimg = $('<img>').attr('src', panels[id].image);
 
@@ -199,6 +195,11 @@ function newPanelElement(id) {
   }
   return paneldiv;
 }
+
+$('#panels').resize(function() {
+  var diff = $('#panels').clientWidth / $('#panels').css('width');
+  $('#bubble').css('font-size', 13*diff + 'px');
+});
 
 //// LOAD COMIC
 

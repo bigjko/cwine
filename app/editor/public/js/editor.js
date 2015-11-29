@@ -220,11 +220,14 @@ function newPanel(x, y, image) {
 
 exports.removeNode = function(sel) {
 	if (sel.node !== undefined) {
+		let panel = nodeContainer.children[sel.node];
 		if (sel.element !== undefined) {
-			nodeContainer.children[sel.node].removeChild(elements[sel.element]);
+			let element = panel.elements[sel.element];
+			panel.removeChild(element);
 		} else {
-			nodeContainer.removeChild(nodeContainer.children[sel.node]);
+			nodeContainer.removeChild(panel);
 		}
+		handleSelection({});
 	}
 	return nodeContainer.toObject();
 };

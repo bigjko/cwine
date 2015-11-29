@@ -60,6 +60,7 @@ header img {
 	width:60%;
 	max-width:800px;
 	margin:0 auto;
+	font-size: 13px;
 }
 
 #progress {
@@ -130,8 +131,6 @@ header img {
 	white-space:nowrap;
 	padding: 12px 18px 20px;
 	margin:0;
-	font-size: 80%;
-	line-height: 1rem;
 	display:block;
 }
 
@@ -149,27 +148,25 @@ header img {
 
 .box p {
 	padding: 15px;
-	font-size:80%;
 }
 
 .panel img {
 	max-width: 100%;
 	max-height:100%;
+	vertical-align: top;
   	box-sizing: border-box;
-	float:left;
-}
-
-.gutter-size {
-	width:2%;
 }
 
 .panel {
 	width:18.4%;
-	float:left;
 	position:relative;
 	font-family:'KomikaHand' Verdana, Geneva, sans-serif;
 	-webkit-transition: opacity 1s;
     transition: opacity 1s;
+    margin-right:2%;
+    margin-bottom:2%;
+    display:inline-block;
+    
 	/*background-color:#500;*/
 }
 
