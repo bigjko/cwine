@@ -108,6 +108,9 @@ function speechBubble(sb) {
   bubble.addClass('bubble');
   if (sb.bubble_type == 'down') bubble.addClass('center-origin');
   if (sb.bubble_type == 'box') bubble.addClass('box');
+  if (sb.width !== undefined && sb.width !== "") bubble.css('width',sb.width+'%');
+  if (sb.height !== undefined && sb.height !== "") bubble.css('height', sb.height+'%');
+  if ((sb.width === undefined || sb.width === "") && (sb.height === undefined || sb.height === "")) bubble.css('white-space', 'nowrap');
 
   // INTERACTIVE BUBBLE!
   if (sb.goto !== undefined) {
@@ -130,11 +133,19 @@ function start() {
   
   var panels = getPanel(start_id);
 
-  var diff = $('#panels').clientWidth / $('#panels').css('width');
-  $('#panels').css('font-size', 13*diff + 'px');
+  /*var diff = $('#panels').clientWidth / $('#panels').css('width');
+  $('#panels').css('font-size', 13*diff + 'px');*/
+  var diff = $('#panels').innerWidth() / 800;
+  $('#panels').css({'font-size': 12*diff + 'px'});
+  $( window ).resize(function() {
+    var diff = $('#panels').innerWidth() / 800;
+    $('#panels').css({'font-size': 12*diff + 'px'});
+    $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
+  });
 
   $container = $('#panels');
   $container.append(panels);
+  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
@@ -149,6 +160,8 @@ function addPanel(id) {
   var panels = getPanel(id);
 
   $container.append(panels);
+  var diff = $('#panels').innerWidth() / 800;
+  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
 
   //$container.packery('appended', panels);
 
@@ -195,11 +208,6 @@ function newPanelElement(id) {
   }
   return paneldiv;
 }
-
-$('#panels').resize(function() {
-  var diff = $('#panels').clientWidth / $('#panels').css('width');
-  $('#bubble').css('font-size', 13*diff + 'px');
-});
 
 //// LOAD COMIC
 

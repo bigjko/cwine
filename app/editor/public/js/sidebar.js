@@ -167,6 +167,10 @@ const ElementProperties = React.createClass({
 					<Textarea minRow={1} name="text" value={ this.props.node.text } onChange={this.props.onchange} />
 				</div>
 				<StaticField label="top" name="Image" value={this.props.node.image} />
+				<MultiField label="side" name="Size">
+					<Field title="Width" name="width" after="%" value={this.props.node.width} onChange={this.props.onchange} />
+					<Field title="Height" name="height" after="%" value={this.props.node.height} onChange={this.props.onchange} />
+				</MultiField>
 				<StaticField label="side" name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
 
 				<button onClick={this.props.onremove} className="button delete-button">Delete Element</button>
@@ -188,6 +192,34 @@ const ProjectProperties = React.createClass({
 });
 
 /// PROPERTY COMPONENTS
+
+const Field = React.createClass({
+	render: function() {
+		let after;
+		if (this.props.after != undefined) {
+			after = <span>{this.props.after}</span>;
+		}
+		return (
+			<div className="small-field">
+				<span>{this.props.title}:</span>
+				<input className="small-input" type="text" name={this.props.name} value={ this.props.value } onChange={this.props.onChange} />
+				{after}
+			</div>
+		);
+	}
+});
+
+const MultiField = React.createClass({
+	render: function() {
+		let fieldclass = 'field label' + this.props.label + ' multi-field';
+		return (
+			<div className={fieldclass}>
+				<p>{this.props.name}:</p>
+				{this.props.children}
+			</div>
+		);
+	}
+});
 
 const InputField = React.createClass({
 	render: function() {

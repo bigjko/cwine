@@ -128,8 +128,10 @@ header img {
 }
 
 .bubble p {
-	white-space:nowrap;
+	/*white-space:nowrap;*/
+	/*padding: 12px 18px 20px;*/
 	padding: 12px 18px 20px;
+	line-height: 0.85rem;
 	margin:0;
 	display:block;
 }
@@ -147,6 +149,7 @@ header img {
 }
 
 .box p {
+	/*padding: 15px;*/
 	padding: 15px;
 }
 

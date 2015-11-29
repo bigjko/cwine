@@ -623,6 +623,14 @@ const drop = function (ev) {
 		div.style.top = 0;
 		div.style.left = 0;
 
+
+		if (obj.width !== undefined && obj.width !== "") {
+			div.style.width = this.panelbitmap.image.width*this.panelbitmap.scaleX*(obj.width/100)/0.6 + 'px';
+		}
+		if (obj.height !== undefined && obj.height !== "") {
+			div.style.height = this.panelbitmap.image.height*this.panelbitmap.scaleX*(obj.height/100)/0.6 + 'px';
+		}
+
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
 
@@ -668,9 +676,18 @@ const drop = function (ev) {
 	};
 
 	PanelElement.prototype.update = function(update) {
+		var element = this.children[1].htmlElement;
 
 		for (let property in update) {
-			this[property] = update[property];
+			if (property == 'width') {
+				this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX*(update.width/100)/0.6;
+				element.style.width = this.width + 'px';
+			}
+			else if (property == 'height') {
+				this.height = this.panelbitmap.image.height*this.panelbitmap.scaleX*(update.height/100)/0.6;
+				element.style.height = this.height + 'px';
+			}
+			else this[property] = update[property];
 		}
 		/*if (update.text !== undefined) this.text = update.text;
 		if (update.bubble_type !== undefined) this.bubble_type = update.bubble_type;
@@ -678,10 +695,13 @@ const drop = function (ev) {
 		if (update.position !== undefined) this.position = update.position;
 		if (update.align !== undefined) this.align = update.align;*/
 
-		var element = this.children[1].htmlElement;
+		
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
+
 		this.width = element.clientWidth;
 		this.height = element.clientHeight;
+		//this.width = element.clientWidth;
+		//this.height = element.clientHeight;
 		this.regX = element.clientWidth/2;
 		this.regY = element.clientHeight;
 		this.hitArea.graphics.clear().f("#000").dr(0,0,this.width,this.height);

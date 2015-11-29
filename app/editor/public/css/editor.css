@@ -248,6 +248,16 @@ textarea {
 .labelside input[type="text"] {
 }
 
+.multi-field input[type="text"] {
+	width:50%;
+}
+.small-field {
+	font-size:80%;
+	margin:0;
+	width:40%;
+	float:left;
+}
+
 .labelside p {
 	line-height:30px;
 	float:left;
@@ -482,14 +492,14 @@ textarea {
 	pointer-events:none;
 	padding: 12px 18px 20px;
 	margin:0;
-	font-size: 80%;
+	font-size: 12px;
 	line-height: 1.4rem;
 }
 
 .box p {
 	pointer-events:none;
+	font-size: 12px;
 	padding: 15px;
-	font-size:100%;
 }
 
 /*!
