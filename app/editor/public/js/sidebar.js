@@ -188,6 +188,8 @@ const ProjectProperties = React.createClass({
 				<h6><span className="node-type">Project</span> {this.props.config.name}</h6>
 				<InputField label="top" name="Project Name" valueName="name" value={this.props.config.name} onchange={this.props.onchange} />
 				<InputField label="side" name="Start Node" valueName="startnode" value={this.props.config.startnode} onchange={this.props.onchange} />
+				<FieldLabel label="side" name="Comic Width"><Field after="%" name="comic_width" value={this.props.config.comic_width} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="side" name="Max Width"><Field after="px" name="comic_maxwidth" value={this.props.config.comic_maxwidth} onChange={this.props.onchange} /></FieldLabel>
 			</div>
 		);
 	}
@@ -198,12 +200,16 @@ const ProjectProperties = React.createClass({
 const Field = React.createClass({
 	render: function() {
 		let after;
+		let title;
 		if (this.props.after != undefined) {
 			after = <span>{this.props.after}</span>;
 		}
+		if (this.props.title !== undefined) {
+			title = <span>{this.props.title}:</span>
+		}
 		return (
 			<div className="small-field">
-				<span>{this.props.title}:</span>
+				{title}
 				<input className="small-input" type="text" name={this.props.name} value={ this.props.value } onChange={this.props.onChange} />
 				{after}
 			</div>

@@ -163,7 +163,7 @@ const Editor = React.createClass({
 				this.setState({
 					config: data.config,
 					nodes: data.nodes,
-					currentlySelected: { node: 3 },
+					currentlySelected: {},
 					localImages: data.images
 				});
 			}

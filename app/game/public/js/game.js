@@ -135,6 +135,8 @@ function start() {
 
   /*var diff = $('#panels').clientWidth / $('#panels').css('width');
   $('#panels').css('font-size', 13*diff + 'px');*/
+  if (config.comic_width !== undefined) $('#panels').css('width', config.comic_width+'%');
+  if (config.comic_maxwidth !== undefined) $('#panels').css('max-width', config.comic_maxwidth+'px');
   var diff = $('#panels').innerWidth() / 800;
   $('#panels').css({'font-size': 12*diff + 'px'});
   $( window ).resize(function() {
