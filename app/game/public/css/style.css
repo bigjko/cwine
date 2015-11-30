@@ -161,32 +161,31 @@ header img {
 }
 
 .panel {
-	width:18.4%;
+	width:18%;
 	position:relative;
 	font-family:'KomikaHand' Verdana, Geneva, sans-serif;
 	-webkit-transition: opacity 1s;
     transition: opacity 1s;
-    margin-right:2%;
-    margin-bottom:2%;
+    margin:1%;
     display:inline-block;
     
 	/*background-color:#500;*/
 }
 
 .w2 {
-	width:38.8%;
+	width:38%;
 }
 
 .w3 {
-	width:59.2%;
+	width:58%;
 }
 
 .w4 {
-	width:79.6%;
+	width:78%;
 }
 
 .w5 {
-	width:100%;
+	width:98%;
 }
 
 footer {
