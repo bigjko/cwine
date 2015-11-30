@@ -245,16 +245,31 @@ textarea {
 	
 }
 
+.labelafter p {
+	margin-left:10px;
+	display:inline-block;
+}
+
+.labelafter input[type="checkbox"] {
+	display:inline-block;
+}
+
 .labelside input[type="text"] {
 }
 
 .multi-field input[type="text"] {
 	width:50%;
+	margin: 0 5px;
+}
+.multi-field {
+	display:block;
+	height:30px;
 }
 .small-field {
 	font-size:80%;
 	margin:0;
-	width:40%;
+	margin-right: 2%;
+	width:48%;
 	float:left;
 }
 

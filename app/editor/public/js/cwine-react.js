@@ -19,25 +19,48 @@ const Editor = React.createClass({
 	},
 	handleChange: function(event) {
 		let sel = this.state.currentlySelected;
+		let property = event.target.name;
+		let value = event.target.value;
+		if (event.target.type == 'checkbox') {
+			value = event.target.checked;
+		}
+		console.log("Change",property,"to",value);
 		//editor.updateNode(sel, {[event.target.name]: event.target.value});
 		if (sel.node !== undefined) {
-			editor.updateNode(sel, {[event.target.name]: event.target.value});
+			editor.updateNode(sel, {[property]: value});
 			if (sel.element !== undefined) {
+				if (this.state.nodes[sel.node].elements[sel.element].keepAspect && (property == 'width' || property == 'height')) {
+					let size = editor.getImageSize({node:sel.node, element:sel.element});;
+					let ratio;
+					let prop2;
+					if (property == 'width') {
+						ratio = size.height / size.width;
+						prop2 = 'height';
+					} else {
+						ratio = size.width / size.height;
+						prop2 = 'width';
+					}
+					editor.updateNode(sel, {[prop2]: value*ratio});
+					console.log('Change', prop2, 'to', Math.round(value*ratio));
+					this.setState({
+						nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[prop2]: {$set: Math.round(value*ratio)}}}},
+														 [sel.node]: {elements: {[sel.element]: {[property]: {$set: value}}}}})
+					});
+				} else
 				this.setState({
-					nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[event.target.name]: {$set: event.target.value}}}}})
+					nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[property]: {$set: value}}}}})
 				});
 			}
 			else {
 				this.setState({
-					nodes: update(this.state.nodes, {[sel.node]: {[event.target.name]: {$set: event.target.value}}})
+					nodes: update(this.state.nodes, {[sel.node]: {[property]: {$set: value}}})
 				});
 			}
 		} else {
 			this.setState({
-				config: update(this.state.config, {[event.target.name]: {$set: event.target.value}})
+				config: update(this.state.config, {[property]: {$set: value}})
 			});
 		}
-		console.log("Change!");
 		// maybe use $.extend(node, change) here
 	},
 	handleCanvasChange: function(sel, values) {

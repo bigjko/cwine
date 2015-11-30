@@ -167,10 +167,12 @@ const ElementProperties = React.createClass({
 					<Textarea minRow={1} name="text" value={ this.props.node.text } onChange={this.props.onchange} />
 				</div>
 				<StaticField label="top" name="Image" value={this.props.node.image} />
-				<MultiField label="side" name="Size">
+				<FieldLabel label="side" name="">
 					<Field title="Width" name="width" after="%" value={this.props.node.width} onChange={this.props.onchange} />
 					<Field title="Height" name="height" after="%" value={this.props.node.height} onChange={this.props.onchange} />
-				</MultiField>
+				</FieldLabel>
+				<CheckMark label="after" title="Keep original aspect" name="keepAspect" checked={this.props.node.keepAspect} onChange={this.props.onchange} />
+
 				<StaticField label="side" name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
 
 				<button onClick={this.props.onremove} className="button delete-button">Delete Element</button>
@@ -209,13 +211,27 @@ const Field = React.createClass({
 	}
 });
 
-const MultiField = React.createClass({
+const FieldLabel = React.createClass({
 	render: function() {
+		let name = '';
+		if (this.props.name !== '') name = this.props.name + ':';
 		let fieldclass = 'field label' + this.props.label + ' multi-field';
 		return (
 			<div className={fieldclass}>
-				<p>{this.props.name}:</p>
+				<p>{name}</p>
 				{this.props.children}
+			</div>
+		);
+	}
+});
+
+const CheckMark = React.createClass({
+	render: function() {
+		let fieldclass = 'field label' + this.props.label;
+		return (
+			<div className={fieldclass}>
+				<input type="checkbox" name={this.props.name} checked={ this.props.checked } onChange={this.props.onChange} />
+				<p>{this.props.title}</p>
 			</div>
 		);
 	}

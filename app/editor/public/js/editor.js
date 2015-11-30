@@ -105,8 +105,7 @@ exports.updateNode = function(sel, update) {
 	if (sel.node !== undefined) {
 		if (sel.element !== undefined) {
 			nodeContainer.children[sel.node].elements[sel.element].update(update);
-		}
-		nodeContainer.children[sel.node].update(update);
+		} else nodeContainer.children[sel.node].update(update);
 	}
 };
 
@@ -230,6 +229,24 @@ exports.removeNode = function(sel) {
 		handleSelection({});
 	}
 	return nodeContainer.toObject();
+};
+
+exports.getImageSize = function(sel) {
+	let width;
+	let height;
+	if (sel.node !== undefined) {
+		let panel = nodeContainer.children[sel.node];
+		if (sel.element !== undefined) {
+			let element = panel.elements[sel.element];
+			width = element.loadimage.get(0).naturalWidth;
+			height = element.loadimage.get(0).naturalHeight;
+		} else {
+			width = panel.panelbitmap.image.width;
+			height = panel.panelbitmap.image.height;
+		}
+	}
+	console.log(width, height);
+	return { width: width, height: height };
 };
 
 function newPanelElement(x, y, panel, image) {
@@ -667,6 +684,7 @@ const drop = function (ev) {
 		div.opacity = '1';
 		elm.x = 0;
 		elm.y = 0;
+		this.loadimage = $('<img />').attr('src', this.image);
 		//this.addChild(hitshape);
 		this.on("mousedown", this.setDragOffset);
 		this.on("pressmove", this.dragElement);
@@ -695,7 +713,14 @@ const drop = function (ev) {
 		if (update.position !== undefined) this.position = update.position;
 		if (update.align !== undefined) this.align = update.align;*/
 
-		
+		if (this.width === '' || this.width == 0 || this.width === undefined)
+		{
+			element.style.width = "";
+		}
+		if (this.height === '' || this.height == 0 || this.height === undefined)
+		{
+			element.style.height = "";
+		}
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
 
 		this.width = element.clientWidth;
