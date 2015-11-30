@@ -146,13 +146,16 @@ const Editor = React.createClass({
 	},
 	componentDidMount: function() {
 		loader.load(function(data) {
-			editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.changeNodes);
-			this.setState({
-				config: data.config,
-				nodes: data.nodes,
-				currentlySelected: { node: 3 },
-				localImages: data.images
-			});
+			if (data !== null) 
+			{	
+				editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.changeNodes);
+				this.setState({
+					config: data.config,
+					nodes: data.nodes,
+					currentlySelected: { node: 3 },
+					localImages: data.images
+				});
+			}
 			//if (this.state.localImages !== undefined) this.reloadImages();
 		}.bind(this));
 	},

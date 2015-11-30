@@ -56,7 +56,8 @@ exports.save = function(obj) {
 exports.load = function(callback) {
 
 	localforage.getItem('cwine', function(err, value) {
-		preloadImages(value,callback);
+		if (value === null) callback(null);
+		else preloadImages(value,callback);
 		//callback(value);
 	});
 };

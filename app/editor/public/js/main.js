@@ -3,8 +3,8 @@ var ReactDOM = require('react-dom');
 
 //const $ = require('jquery');
 
-let project = {};
-let currentlySelected = undefined;
+/*let project = {};
+let currentlySelected = undefined;*/
 
 import Editor from './cwine-react.js';
 

@@ -197,7 +197,6 @@ const ProjectProperties = React.createClass({
 
 const Field = React.createClass({
 	render: function() {
-		console.log("rendering field", this.props.title);
 		let after;
 		if (this.props.after != undefined) {
 			after = <span>{this.props.after}</span>;
