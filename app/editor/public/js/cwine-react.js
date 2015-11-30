@@ -30,25 +30,26 @@ const Editor = React.createClass({
 			editor.updateNode(sel, {[property]: value});
 			if (sel.element !== undefined) {
 				if (this.state.nodes[sel.node].elements[sel.element].keepAspect && (property == 'width' || property == 'height')) {
-					let size = editor.getImageSize({node:sel.node, element:sel.element});;
+					let size = editor.getImageSize({node:sel.node, element:sel.element});
+					let panelsize = editor.getImageSize({node:sel.node});
 					let ratio;
 					let prop2;
 					if (property == 'width') {
-						ratio = size.height / size.width;
+						ratio = (size.height / size.width) * (panelsize.width / panelsize.height);
 						prop2 = "height";
 					} else {
-						ratio = size.width / size.height;
+						ratio = (size.width / size.height) * (panelsize.height / panelsize.width);
 						prop2 = "width";
 					}
-					editor.updateNode(sel, {[prop2]: value*ratio});
-					console.log('Change', prop2, 'to', value*ratio);
+					editor.updateNode(sel, {[prop2]: (value*ratio).toFixed(2)});
+					//console.log('Change', prop2, 'to', value*ratio);
 					this.setState({
 						nodes: update(this.state.nodes,
 						    {
 						        [sel.node]: {
 						            elements: {
 						                [sel.element]: {
-						                    [prop2]: {$set: (value*ratio)},
+						                    [prop2]: {$set: (value*ratio).toFixed(2)},
 						                    [property]: {$set: value}
 						                }
 						            }
