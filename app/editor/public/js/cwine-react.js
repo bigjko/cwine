@@ -43,8 +43,18 @@ const Editor = React.createClass({
 					editor.updateNode(sel, {[prop2]: value*ratio});
 					console.log('Change', prop2, 'to', value*ratio);
 					this.setState({
-						nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[prop2]: {$set: (value*ratio)}}}},
-														 [sel.node]: {elements: {[sel.element]: {[property]: {$set: value}}}}})
+						nodes: update(this.state.nodes,
+						    {
+						        [sel.node]: {
+						            elements: {
+						                [sel.element]: {
+						                    [prop2]: {$set: (value*ratio)},
+						                    [property]: {$set: value}
+						                }
+						            }
+						        }
+						    }
+						)
 					});
 				} else
 				this.setState({
