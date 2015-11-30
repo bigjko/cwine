@@ -35,15 +35,15 @@ const Editor = React.createClass({
 					let prop2;
 					if (property == 'width') {
 						ratio = size.height / size.width;
-						prop2 = 'height';
+						prop2 = "height";
 					} else {
 						ratio = size.width / size.height;
-						prop2 = 'width';
+						prop2 = "width";
 					}
 					editor.updateNode(sel, {[prop2]: value*ratio});
-					console.log('Change', prop2, 'to', Math.round(value*ratio));
+					console.log('Change', prop2, 'to', value*ratio);
 					this.setState({
-						nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[prop2]: {$set: Math.round(value*ratio)}}}},
+						nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[prop2]: {$set: (value*ratio)}}}},
 														 [sel.node]: {elements: {[sel.element]: {[property]: {$set: value}}}}})
 					});
 				} else
@@ -61,6 +61,7 @@ const Editor = React.createClass({
 				config: update(this.state.config, {[property]: {$set: value}})
 			});
 		}
+		this.forceUpdate();
 		// maybe use $.extend(node, change) here
 	},
 	handleCanvasChange: function(sel, values) {
