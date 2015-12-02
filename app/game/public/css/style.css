@@ -164,7 +164,7 @@ header img {
 .panel {
 	width:23%;
 	position:relative;
-	font-family:'KomikaHand' Verdana, Geneva, sans-serif;
+	font-family:'KomikaHand', Verdana, Geneva, sans-serif;
 	-webkit-transition: opacity 1s;
     transition: opacity 1s;
     margin:1%;

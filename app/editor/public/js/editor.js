@@ -287,7 +287,7 @@ function newPanelElement(x, y, panel, image) {
 	sock.x = socketpos.x;
 	sock.y = socketpos.y;
 
-	addNode({type:'element', node:nodeContainer.nodes.indexOf(panel)});
+	addNode({type:'element', node:nodeContainer.nodes.indexOf(panel)}, panelelement.toObject());
 }
 
 function zoom(zoomModifier) {
@@ -607,7 +607,10 @@ const drop = function (ev) {
 		obj.name = this.name;
 		obj.size = this.size;
 		obj.goto = this.goto;
+		obj.image = this.image;
 		obj.editor = { position: { x: this.x, y: this.y }};
+
+		return obj;
 	};
 
 	window.Panel = createjs.promote(Panel, "Node");
@@ -762,6 +765,20 @@ const drop = function (ev) {
 
 
 		drawAllConnections();
+	};
+
+	PanelElement.prototype.toObject = function() {
+		let obj = {};
+
+		obj.text = this.text;
+		obj.align = this.align;
+		obj.keepAspect = this.keepAspect;
+		obj.image = this.image;
+		//obj.goto = this.goto;
+		obj.bubble_type = this.bubble_type;
+		obj.position = this.position;
+
+		return obj;
 	};
 
 	PanelElement.prototype.setDragOffset = function(evt) {

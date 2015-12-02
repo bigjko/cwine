@@ -499,7 +499,7 @@ textarea {
 
 .bubble {
 	pointer-events:none;
-	font-family:'KomikaHand' Verdana, Geneva, sans-serif;
+	font-family:'KomikaHand', Verdana, Geneva, sans-serif;
 	text-align: center;
 	background-size: 100% 100%;
 }

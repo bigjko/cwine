@@ -105,19 +105,23 @@ function preloadImages(obj, callback) {
 	images.push("img/bubbles/small_bubble_down.png");
 	images.push("img/bubbles/x_small_bubble_left.png");*/
 	for (var i=0; i<obj.nodes.length; i++) {
-		if (obj.nodes[i] !== null) images.push(obj.nodes[i].image);
+		if (obj.nodes[i] !== undefined && obj.nodes[i] !== null) {
+			let image = obj.nodes[i].image;
+			if (images.indexOf(image) == -1) images.push(image);
+		}
+		
 	}
 
 	function imageLoaded() {
 		loaded++;
-		//console.log("Image loaded.." + loaded + "/" + images.length);
+		console.log("Image loaded.." + loaded + "/" + images.length);
 		updateProgress();
 	}
 
 	function updateProgress() {
 		document.getElementById("progress_bar").style.width = (loaded/images.length * 100).toString() + "%";
-		//console.log("update progress..");
-		if (loaded == images.length) {
+		console.log("update progress..");
+		if (loaded >= images.length) {
 			console.log("Finished preloading images..");
 			setTimeout(function() {
 				document.getElementById("progress").style.opacity = "0";

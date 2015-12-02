@@ -145,15 +145,25 @@ const Editor = React.createClass({
 		if (sel.type == 'node') {
 			this.setState({
 				nodes: update(this.state.nodes,
-					{ $push: data }
+					{ $push: [data] }
 				)
 			});
 		} else if (sel.type == 'element') {
-			this.setState({
-				nodes: update(this.state.nodes,
-					{ [sel.node]: { elements: { $push: data } }}
-				)
-			});
+			if (this.state.nodes[sel.node].elements !== undefined) {
+				this.setState({
+					nodes: update(this.state.nodes,
+						{ [sel.node]: { elements: { $push: [data] } }}
+					)
+				});
+			} else {
+				this.setState({
+					nodes: update(this.state.nodes,
+						{ [sel.node]: { elements: { $set: [data] } }}
+					)
+				});
+			}
+
+			
 		}
 
 	},
