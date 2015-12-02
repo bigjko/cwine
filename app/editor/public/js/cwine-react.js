@@ -70,9 +70,15 @@ const Editor = React.createClass({
 		} else {
 			this.setState({
 				config: update(this.state.config, {[property]: {$set: value}})
+			}, function() {
+				if (property == 'comic_fontsize') {
+					editor.updateConfig(this.state.config);
+					editor.updateAll();
+				}
 			});
+		
 		}
-		this.forceUpdate();
+		//this.forceUpdate();
 		// maybe use $.extend(node, change) here
 	},
 	handleCanvasChange: function(sel, values) {

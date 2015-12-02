@@ -109,6 +109,19 @@ exports.updateNode = function(sel, update) {
 	}
 };
 
+exports.updateConfig = function(conf) {
+	config = conf;
+};
+
+exports.updateAll = function() {
+	for (var p=0; p<nodeContainer.nodes.length;p++) {
+		let panel = nodeContainer.nodes[p];
+		if (panel !== null) {
+			panel.update();
+		}
+	}
+};
+
 function initNodes() {
 	nodeContainer = new NodeContainer();
 	nodeContainer.nodes = [];
@@ -587,7 +600,10 @@ const drop = function (ev) {
 		this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX;
 		this.height = this.panelbitmap.image.height*this.panelbitmap.scaleY;
 		for (let p=0; p < this.elements.length; p++) {
-			this.elements[p].setPosition();
+			let elm = this.elements[p];
+			if (elm !== null) {
+				this.elements[p].update();
+			}
 		}
 		drawAllConnections();
 
@@ -665,7 +681,12 @@ const drop = function (ev) {
 		div.style.position = "absolute";
 		div.style.top = 0;
 		div.style.left = 0;
-
+		if (config.comic_fontsize !== undefined) {
+			div.children[0].style.fontSize = config.comic_fontsize + 'px';
+		}
+		if (config.comic_font !== undefined) {
+			div.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
+		}
 
 		if (obj.width !== undefined && obj.width !== "") {
 			div.style.width = this.panelbitmap.image.width*this.panelbitmap.scaleX*(obj.width/100)/0.6 + 'px';
@@ -748,6 +769,12 @@ const drop = function (ev) {
 			element.style.height = "";
 		}
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
+		if (config.comic_fontsize !== undefined) {
+			element.children[0].style.fontSize = config.comic_fontsize + 'px';
+		}
+		if (config.comic_font !== undefined) {
+			element.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
+		}
 
 		this.width = element.clientWidth;
 		this.height = element.clientHeight;
@@ -756,6 +783,7 @@ const drop = function (ev) {
 		this.regX = element.clientWidth/2;
 		this.regY = element.clientHeight;
 		this.hitArea.graphics.clear().f("#000").dr(0,0,this.width,this.height);
+		this.setPosition();
 		element.style.backgroundImage = this.image;
 
 		if (this.align !== undefined && this.align.x == "right") {

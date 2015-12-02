@@ -179,6 +179,14 @@ const ProjectProperties = React.createClass({
 				<FieldLabel label="side" name="Start Node"><Field name="startnode" value={this.props.config.startnode} onChange={this.props.onchange} /></FieldLabel>
 				<FieldLabel label="side" name="Comic Width"><Field after="%" name="comic_width" value={this.props.config.comic_width} onChange={this.props.onchange} /></FieldLabel>
 				<FieldLabel label="side" name="Max Width"><Field after="px" name="comic_maxwidth" value={this.props.config.comic_maxwidth} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="side" name="Default Font Size"><Field after="px" name="comic_fontsize" value={this.props.config.comic_fontsize} onChange={this.props.onchange} /></FieldLabel>
+
+				<label htmlFor='font'>Default Font</label>
+				<select id='font' name='comic_font' value={this.props.config.comic_font} onChange={this.props.onchange}>
+					<option value='KomikaHand'>KomikaHand</option>
+					<option value='Open Sans'>Open Sans</option>
+				</select>
+
 			</div>
 		);
 	}

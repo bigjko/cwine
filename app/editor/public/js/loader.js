@@ -114,13 +114,13 @@ function preloadImages(obj, callback) {
 
 	function imageLoaded() {
 		loaded++;
-		console.log("Image loaded.." + loaded + "/" + images.length);
+		//console.log("Image loaded.." + loaded + "/" + images.length);
 		updateProgress();
 	}
 
 	function updateProgress() {
 		document.getElementById("progress_bar").style.width = (loaded/images.length * 100).toString() + "%";
-		console.log("update progress..");
+		//console.log("update progress..");
 		if (loaded >= images.length) {
 			console.log("Finished preloading images..");
 			setTimeout(function() {

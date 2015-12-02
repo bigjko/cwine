@@ -49,7 +49,7 @@ function preloadImages(array, callback) {
   var loaded = 0;
   var images = [];
   for (var i=0; i<array.length; i++) {
-    images.push(array[i].image);
+    if (array[i] !== null && array[i] !== undefined && array.indexOf(array[i].image) == -1) images.push(array[i].image);
   }
 
   function updateProgress() {
@@ -138,10 +138,18 @@ function start() {
   if (config.comic_width !== undefined) $('#panels').css('width', config.comic_width+'%');
   if (config.comic_maxwidth !== undefined) $('#panels').css('max-width', config.comic_maxwidth+'px');
   var diff = $('#panels').innerWidth() / 800;
-  $('#panels').css({'font-size': 12*diff + 'px'});
+  var fontsize = 12;
+  if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
+  $('#panels').css({'font-size': fontsize*diff + 'px'});
+  if (config.comic_font !== undefined) {
+      $('#panels').css('font-family', '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif');
+  }
+
   $( window ).resize(function() {
     var diff = $('#panels').innerWidth() / 800;
-    $('#panels').css({'font-size': 12*diff + 'px'});
+    var fontsize = 12;
+    if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
+    $('#panels').css({'font-size': fontsize*diff + 'px'});
     $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
   });
 
@@ -164,6 +172,7 @@ function addPanel(id) {
   $container.append(panels);
   var diff = $('#panels').innerWidth() / 800;
   $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
+
 
   //$container.packery('appended', panels);
 
