@@ -71,10 +71,8 @@ const Editor = React.createClass({
 			this.setState({
 				config: update(this.state.config, {[property]: {$set: value}})
 			}, function() {
-				if (property == 'comic_fontsize') {
-					editor.updateConfig(this.state.config);
-					editor.updateAll();
-				}
+				editor.updateConfig(this.state.config);
+				editor.updateAll();
 			});
 		
 		}

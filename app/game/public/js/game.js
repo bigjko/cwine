@@ -148,9 +148,11 @@ function start() {
   $( window ).resize(function() {
     var diff = $('#panels').innerWidth() / 800;
     var fontsize = 12;
+    var lineheight = 0.85;
+    if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
     if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
     $('#panels').css({'font-size': fontsize*diff + 'px'});
-    $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
+    $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
   });
 
   $container = $('#panels');
@@ -171,7 +173,9 @@ function addPanel(id) {
 
   $container.append(panels);
   var diff = $('#panels').innerWidth() / 800;
-  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
+  var lineheight = 0.85;
+  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
+  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
 
 
   //$container.packery('appended', panels);

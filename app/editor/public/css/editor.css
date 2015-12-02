@@ -139,11 +139,18 @@ canvas {
 
 #sidebar label {
 	color:#ccc;
-	font-size:1rem;
+	float:left;
+	line-height: 25px;
+	margin-right: 10px;
 }
 
 #file {
 	padding:10px;
+}
+
+select {
+	height:25px;
+	color:#333;
 }
 
 input[type="text"] {

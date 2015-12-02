@@ -687,6 +687,9 @@ const drop = function (ev) {
 		if (config.comic_font !== undefined) {
 			div.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
 		}
+		if (config.comic_lineheight !== undefined) {
+			div.children[0].style.lineHeight = config.comic_lineheight + 'rem';
+		}
 
 		if (obj.width !== undefined && obj.width !== "") {
 			div.style.width = this.panelbitmap.image.width*this.panelbitmap.scaleX*(obj.width/100)/0.6 + 'px';
@@ -774,6 +777,9 @@ const drop = function (ev) {
 		}
 		if (config.comic_font !== undefined) {
 			element.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
+		}
+		if (config.comic_lineheight !== undefined) {
+			element.children[0].style.lineHeight = config.comic_lineheight + 'rem';
 		}
 
 		this.width = element.clientWidth;
