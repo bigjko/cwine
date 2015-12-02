@@ -10,7 +10,7 @@ const Sidebar = React.createClass({
 	render: function() {
 		let sel = this.props.current;
 		let panel = <ProjectProperties config={this.props.config} onchange={this.props.onchange} />;
-		console.log(sel);
+		//console.log(sel);
 		if (this.props.nodes.length > 0 && sel !== undefined && sel.node !== undefined) {
 			if (sel.element !== undefined) {
 				panel = <ElementProperties selected={sel} node={this.props.nodes[sel.node].elements[sel.element]} onchange={this.props.onchange} onremove={this.props.onremove} />;
@@ -84,7 +84,7 @@ const ImagePanel = React.createClass({
 
 const ImageList = React.createClass({
 	drag: function(ev) {
-		console.log(ev.target.src);
+		//console.log(ev.target.src);
 		ev.dataTransfer.setData("text/plain", ev.target.src);
 	},
 	render: function() {

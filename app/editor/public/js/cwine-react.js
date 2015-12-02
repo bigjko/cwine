@@ -24,7 +24,7 @@ const Editor = React.createClass({
 		if (event.target.type == 'checkbox') {
 			value = event.target.checked;
 		}
-		console.log("Change",property,"to",value);
+		//console.log("Change",property,"to",value);
 		//editor.updateNode(sel, {[event.target.name]: event.target.value});
 		if (sel.node !== undefined) {
 			editor.updateNode(sel, {[property]: value});
@@ -80,7 +80,7 @@ const Editor = React.createClass({
 		// maybe use $.extend(node, change) here
 	},
 	handleCanvasChange: function(sel, values) {
-		console.log("Canvas Change!");
+		//console.log("Canvas Change!");
 		for (let property in values) {
 			if (sel.node !== undefined) {
 				if (sel.element !== undefined) {
@@ -139,7 +139,6 @@ const Editor = React.createClass({
 					currentlySelected: {}
 				});
 			}
-			debugger;
 		}
 		
 		//this.setState({nodes: data.nodes});
