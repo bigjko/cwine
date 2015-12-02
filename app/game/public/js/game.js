@@ -155,9 +155,11 @@ function start() {
     $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
   });
 
+  var lineheight = 0.85;
+  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
   $container = $('#panels');
   $container.append(panels);
-  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': 0.85*diff+'rem'});
+  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
