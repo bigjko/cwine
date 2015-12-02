@@ -105,7 +105,7 @@ function preloadImages(obj, callback) {
 	images.push("img/bubbles/small_bubble_down.png");
 	images.push("img/bubbles/x_small_bubble_left.png");*/
 	for (var i=0; i<obj.nodes.length; i++) {
-		images.push(obj.nodes[i].image);
+		if (obj.nodes[i] !== null) images.push(obj.nodes[i].image);
 	}
 
 	function imageLoaded() {

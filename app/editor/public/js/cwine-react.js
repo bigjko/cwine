@@ -118,17 +118,50 @@ const Editor = React.createClass({
 	},
 	removeNode: function (ev) {
 		let sel = this.state.currentlySelected;
-		let data = editor.removeNode(sel);
-		this.setState({nodes: data.nodes});
+		if (sel.node !== undefined) {
+			let data = editor.removeNode(sel);
+			if (sel.element !== undefined) {
+				this.setState({
+					nodes: update(this.state.nodes,
+						{ [sel.node] : { elements: { [sel.element]: { $set: null }}}}
+					),
+					currentlySelected: {}
+				});
+			} else {
+				this.setState({
+					nodes: update(this.state.nodes,
+						{ [sel.node] : { $set: null }}
+					),
+					currentlySelected: {}
+				});
+			}
+			debugger;
+		}
+		
+		//this.setState({nodes: data.nodes});
 	},
-	changeNodes: function (data) {
-		this.setState({nodes: data.nodes});
+	addNode: function (sel, data) {
+		// Add node
+		if (sel.type == 'node') {
+			this.setState({
+				nodes: update(this.state.nodes,
+					{ $push: data }
+				)
+			});
+		} else if (sel.type == 'element') {
+			this.setState({
+				nodes: update(this.state.nodes,
+					{ [sel.node]: { elements: { $push: data } }}
+				)
+			});
+		}
+
 	},
 	handleLoad: function (evt) {
 		if (evt.target.name == "demo") {
 			loader.loadJSON('js/panels.json', function (data) {
 				this.setState({nodes: data.nodes, config: data.config, currentlySelected: undefined});
-				editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.changeNodes);
+				editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.addNode);
 			}.bind(this));
 		}
 		else if (evt.target.name == "fromfile") {
@@ -139,7 +172,7 @@ const Editor = React.createClass({
 				return function(e) {
 					let json = JSON.parse(e.target.result);
 					th.setState({ nodes:json.nodes, config:json.config, currentlySelected:undefined });
-					editor.init(json, th.handleCanvasSelection, th.handleCanvasChange, th.changeNodes);
+					editor.init(json, th.handleCanvasSelection, th.handleCanvasChange, th.addNode);
 				};
 			}(this));
 			reader.readAsText(file);
@@ -159,7 +192,7 @@ const Editor = React.createClass({
 		loader.load(function(data) {
 			if (data !== null) 
 			{	
-				editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.changeNodes);
+				editor.init(data, this.handleCanvasSelection, this.handleCanvasChange, this.addNode);
 				this.setState({
 					config: data.config,
 					nodes: data.nodes,

@@ -20,7 +20,9 @@ const Sidebar = React.createClass({
 
 		return (
 			<div>
-				<File onsave={this.props.onsave} onloading={this.props.onloading} onexport={this.props.onexport} />
+				<ModalButton className="button button-primary" action={this.props.onsave} header="Saved!" text="Project has been saved locally.">Save</ModalButton>
+				<LoadModal header="Load" onloading={this.props.onloading} />
+				<button onClick={this.props.onexport} className="button">Export to .zip</button>
 				<Tabs>
 					<Tabs.Panel title="Properties">
 						{panel}
@@ -29,21 +31,6 @@ const Sidebar = React.createClass({
 						<ImagePanel onfiles={this.props.onfiles} images={this.props.images} />
 					</Tabs.Panel>
 				</Tabs>
-			</div>
-		);
-	}
-});
-
-/// FILE
-
-const File = React.createClass({
-	render: function() {
-		return (
-			<div id="file-panel" className="noselect">
-				
-				<ModalButton className="button button-primary" action={this.props.onsave} header="Saved!" text="Project has been saved locally.">Save</ModalButton>
-				<LoadModal header="Load" onloading={this.props.onloading} />
-				<button onClick={this.props.onexport} className="button">Export to .zip</button>
 			</div>
 		);
 	}
@@ -125,11 +112,13 @@ const PanelProperties = React.createClass({
 		let elementList;
 		if (this.props.node.elements !== undefined) {
 			elementList = this.props.node.elements.map(function(element, index) {
-				return (
-					<li className="element-list-item" onClick={this.props.onselect} data-selection={JSON.stringify({node: this.props.selected.node, element:index})} key={index}>
-						{element.text}
-					</li>
-				);
+				if (element !== null) {
+					return (
+						<li className="element-list-item" onClick={this.props.onselect} data-selection={JSON.stringify({node: this.props.selected.node, element:index})} key={index}>
+							{element.text}
+						</li>
+					);
+				}
 			}.bind(this));
 		}
 		if (this.props.node.goto !== undefined) gotohtml = (
@@ -142,7 +131,7 @@ const PanelProperties = React.createClass({
 			<div className="noselect">
 				<h6><span className="node-type">Panel #{this.props.selected.node}</span> {this.props.node.name}</h6>
 				<InputField label="side" name="Name" valueName="name" value={this.props.node.name} onchange={this.props.onchange} />
-				<InputField label="side" name="Size" valueName="size" value={this.props.node.size} onchange={this.props.onchange} description="work in progress: value from 1 - 5" />
+				<InputField label="side" name="Size" valueName="size" value={this.props.node.size} onchange={this.props.onchange} description="work in progress: value from 1 - 4" />
 				<StaticField label="top" name="Image" value={this.props.node.image} />
 				<div className="field labeltop">
 					<p>Panel Elements:</p>

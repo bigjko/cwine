@@ -126,6 +126,7 @@ canvas {
 	width:280px;
 	height:100%;
 	padding:0;
+	padding-top:10px;
 	background-color:#444;
 	background-color:rgba(40,40,40,0.8);
 	color:#ccc;

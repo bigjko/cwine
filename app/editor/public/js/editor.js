@@ -22,13 +22,13 @@ var currentLocalImages;
 
 let handleSelection;
 let handleChange;
-let changeData;
+let addNode;
 
-exports.init = function(obj, onselect, onchange, changedata) {
+exports.init = function(obj, onselect, onchange, addnode) {
 
 	handleSelection = onselect;
 	handleChange = onchange;
-	changeData = changedata;
+	addNode = addnode;
 
     panels = obj.nodes;
     config = obj.config;
@@ -111,10 +111,16 @@ exports.updateNode = function(sel, update) {
 
 function initNodes() {
 	nodeContainer = new NodeContainer();
+	nodeContainer.nodes = [];
 	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
-		var panel = new Panel(panels[p]);
-		nodeContainer.addChild(panel);
+		if (panels[p] !== null) {
+			var panel = new Panel(panels[p]);
+			nodeContainer.addChild(panel);
+			nodeContainer.nodes.push(panel);
+		} else {
+			nodeContainer.nodes.push(null);
+		}
 	}
 	nodeContainer.makeConnections();
 	viewContainer.addChild(nodeContainer);
@@ -213,20 +219,24 @@ function newPanel(x, y, image) {
 		x: x,
 		y: y
 	};
-	nodeContainer.addChild(new Panel(obj));
-	changeData(nodeContainer.toObject());
+	let panel = new Panel(obj);
+	nodeContainer.addChild(panel);
+	nodeContainer.nodes.push(panel);
+	addNode({type:'node'}, panel.toObject());
 }
 
 exports.removeNode = function(sel) {
 	if (sel.node !== undefined) {
-		let panel = nodeContainer.children[sel.node];
+		let panel = nodeContainer.nodes[sel.node];
 		if (sel.element !== undefined) {
 			let element = panel.elements[sel.element];
 			panel.removeChild(element);
+			panel.elements[sel.element] = null;
 		} else {
 			nodeContainer.removeChild(panel);
+			nodeContainer.nodes[sel.node] = null;
 		}
-		handleSelection({});
+		//handleSelection({});
 	}
 	return nodeContainer.toObject();
 };
@@ -277,7 +287,7 @@ function newPanelElement(x, y, panel, image) {
 	sock.x = socketpos.x;
 	sock.y = socketpos.y;
 
-	changeData(nodeContainer.toObject());
+	addNode({type:'element', node:nodeContainer.nodes.indexOf(panel)});
 }
 
 function zoom(zoomModifier) {
@@ -356,7 +366,7 @@ const drop = function (ev) {
 		//evt.target.dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target.parent;
-		handleSelection({ node: nodeContainer.getChildIndex(evt.target.parent) });
+		handleSelection({ node: nodeContainer.nodes.indexOf(evt.target.parent) });
 		//openTab("propertyTab");
 	};
 
@@ -370,7 +380,7 @@ const drop = function (ev) {
 		panel.x = Math.round(panel.x*0.1)*10;
 		panel.y = Math.round(panel.y*0.1)*10;
 
-		let sel = {node: nodeContainer.getChildIndex(panel)};
+		let sel = {node: nodeContainer.nodes.indexOf(panel)};
 		handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
 
 		//console.log(evt.target.parent);
@@ -426,12 +436,12 @@ const drop = function (ev) {
 			let nodeindex;
 			let elmindex;
 			if (owner instanceof PanelElement) {
-				nodeindex = nodeContainer.getChildIndex(panel);
+				nodeindex = nodeContainer.nodes.indexOf(panel);
 				elmindex = panel.elements.indexOf(owner);
 			} else {
-				nodeindex = nodeContainer.getChildIndex(owner);
+				nodeindex = nodeContainer.nodes.indexOf(owner);
 			}
-			let gotoindex = nodeContainer.getChildIndex(socket.goto);
+			let gotoindex = nodeContainer.nodes.indexOf(socket.goto);
 			handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
 		}
 
@@ -537,19 +547,24 @@ const drop = function (ev) {
 		this.elements = [];
 		if (obj.elements !== undefined) {
 			for (let e=0; e < obj.elements.length; e++) {
-				var element = new PanelElement(obj.elements[e], this.panelbitmap);
+				if (obj.elements[e] !== null) {
+					var element = new PanelElement(obj.elements[e], this.panelbitmap);
 
-				//this.elements.push(element);
-				this.addChild(element);
-				this.elements.push(element);
-				//console.log(element.children.length);
-				socketpos = {
-					x: element.x + element.width*element.scaleX,
-					y: element.y + element.height/2*element.scaleY
-				};
-				sock = this.addSocket(socketpos.x, socketpos.y, element.goto, this, 3, "#fff");
-				sock.owner = element;
-				sock.dashes = [10,5];
+					//this.elements.push(element);
+					this.addChild(element);
+					this.elements.push(element);
+					//console.log(element.children.length);
+					socketpos = {
+						x: element.x + element.width*element.scaleX,
+						y: element.y + element.height/2*element.scaleY
+					};
+					sock = this.addSocket(socketpos.x, socketpos.y, element.goto, this, 3, "#fff");
+					sock.owner = element;
+					sock.dashes = [10,5];
+				} else {
+					this.elements.push(null);
+				}
+				
 			}
 		}	
 	};
@@ -585,6 +600,14 @@ const drop = function (ev) {
 		view.removeChild(elm);
 		this.Node_removeChild(child);
 		drawAllConnections();
+	};
+
+	Panel.prototype.toObject = function() {
+		let obj = {};
+		obj.name = this.name;
+		obj.size = this.size;
+		obj.goto = this.goto;
+		obj.editor = { position: { x: this.x, y: this.y }};
 	};
 
 	window.Panel = createjs.promote(Panel, "Node");
@@ -750,7 +773,7 @@ const drop = function (ev) {
 		//currentlySelected = evt.target.parent;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target;
-		handleSelection({node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)});
+		handleSelection({node: nodeContainer.nodes.indexOf(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)});
 		//openTab("propertyTab");
 		//evt.target.showProperties();
 	};
@@ -770,7 +793,7 @@ const drop = function (ev) {
 		evt.target.x = local.x;
 		evt.target.y = local.y;
 		this.position = evt.target.outputPosition();
-		let sel = {node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)};
+		let sel = {node: nodeContainer.nodes.indexOf(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)};
 		let pos = evt.target.outputPosition();
 		handleChange(sel, {position: pos});
         /*evt.target.position = { 
@@ -823,13 +846,26 @@ const drop = function (ev) {
 
 	NodeContainer.prototype.makeConnections = function() {
 
-		for (let i=0; i < this.children.length; i++) {
-			var node = this.children[i];
-			if (node.goto !== undefined) node.goto = this.getChildAt(node.goto);
-			for (let e=0; e < node.children.length; e++) {
-				var elem = node.children[e];
-				if (elem instanceof PanelElement && elem.goto !== undefined) elem.goto = this.getChildAt(elem.goto);
-			}
+		for (let i=0; i < this.nodes.length; i++) {
+			var node = this.nodes[i];
+			if (node !== null) {
+				if (node.goto !== undefined) 
+					if (this.nodes[node.goto] !== null) {
+						node.goto = this.nodes[node.goto];
+					} else {
+						node.goto = undefined;
+					}
+				for (let e=0; e < node.elements.length; e++) {
+					var elem = node.elements[e];
+					if (elem instanceof PanelElement && elem.goto !== undefined) {
+						if (node.elements[elem.goto] !== null) {
+							elem.goto = this.nodes[elem.goto];
+						} else {
+							elem.goto = undefined;
+						}
+					} 
+				}
+			}			
 		}
 
 	};
@@ -837,15 +873,14 @@ const drop = function (ev) {
 	// Overwrite Container.removeChild()
 	NodeContainer.prototype.removeChild = function(child) {
 		var view = document.querySelector("#view");
-		for (let e=0; e<child.children.length; e++) {
-			var elm = child.children[e];
-			console.log(elm);
-			if (elm instanceof PanelElement) {
+		for (let e=0; e<child.elements.length; e++) {
+			let elm = child.elements[e];
+			if (elm !== null && elm instanceof PanelElement) {
 				elm = elm.children[1].htmlElement;
-				console.log(elm);
 				view.removeChild(elm);
 			}
 		}
+		//this.nodes[indexOf(child)] = null;
 		this.Container_removeChild(child);
 		drawAllConnections();
 	};
@@ -871,7 +906,7 @@ const drop = function (ev) {
 				node.name = ref.name;
 				node.size = ref.size;
 				node.image = ref.image;
-				node.goto = this.getChildIndex(ref.goto);
+				node.goto = this.nodes.indexOf(ref.goto);
 				if (node.goto == -1) node.goto = undefined;
 				node.editor = {
 					position: { x: ref.x, y: ref.y }
@@ -900,7 +935,7 @@ const drop = function (ev) {
 							if (elem.align.x == "right") elem.position.x = 1 - elem.position.x;
 							if (elem.align.y == "bottom") elem.position.y = 1 - elem.position.y;
 						}
-						elem.goto = this.getChildIndex(r_elem.goto);
+						elem.goto = this.nodes.indexOf(r_elem.goto);
 						if (elem.goto == -1) elem.goto = undefined;
 
 						node.elements.push(elem);
