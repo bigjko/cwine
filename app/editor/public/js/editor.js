@@ -385,20 +385,25 @@ const drop = function (ev) {
 
 	Node.prototype.handleMouseMove = function(evt) {
 		//console.log(evt.target);
+		
 		let panel = evt.target.parent;
-
+		let old = {x: panel.x, y: panel.y};
+		
 		panel.x = evt.stageX/viewScale - dragoffset.x;
 		panel.y = evt.stageY/viewScale - dragoffset.y;
 
 		panel.x = Math.round(panel.x*0.1)*10;
 		panel.y = Math.round(panel.y*0.1)*10;
-
-		let sel = {node: nodeContainer.nodes.indexOf(panel)};
-		handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
+		
+		if (old.x != panel.x || old.y != panel.y) {
+			let sel = {node: nodeContainer.nodes.indexOf(panel)};
+			handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
+			drawAllConnections();
+		}
 
 		//console.log(evt.target.parent);
 		//drawConnections(evt.target.parent);
-		drawAllConnections();
+		
 	};
 
 	Node.prototype.drawConnections = function() {
