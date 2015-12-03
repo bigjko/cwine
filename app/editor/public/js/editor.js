@@ -104,8 +104,8 @@ exports.updateNode = function(sel, update) {
 	console.log("update node!");
 	if (sel.node !== undefined) {
 		if (sel.element !== undefined) {
-			nodeContainer.children[sel.node].elements[sel.element].update(update);
-		} else nodeContainer.children[sel.node].update(update);
+			nodeContainer.nodes[sel.node].elements[sel.element].update(update);
+		} else nodeContainer.nodes[sel.node].update(update);
 	}
 };
 
