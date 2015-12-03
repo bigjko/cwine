@@ -113,7 +113,7 @@ function speechBubble(sb) {
   if ((sb.width === undefined || sb.width === "") && (sb.height === undefined || sb.height === "")) bubble.css('white-space', 'nowrap');
 
   // INTERACTIVE BUBBLE!
-  if (sb.goto !== undefined) {
+  if (sb.goto !== undefined && panels[sb.goto] !== null) {
     bubble.addClass('clickable');
     bubble.on('click', function() {
       addPanel(sb.goto);
@@ -191,14 +191,13 @@ function addPanel(id) {
 function getPanel(id) {
   var elems = [];
 
-  var count = 0;
-  
+  var count = 0; 
   var p = newPanelElement(id);
  
   elems.push(p.get(0));
 
   
-  while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null) {
+  while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null && panels[panels[id].goto] !== null) {
     id = panels[id].goto;
     count++;
     p = newPanelElement(id);
@@ -212,7 +211,7 @@ function getPanel(id) {
 }
 
 function newPanelElement(id) {
-
+  console.log(id);
   var li = $('<li>').addClass('panel-list');
   var paneldiv = $('<div>').addClass('panel noselect ' + 'w' + panels[id].size).css('opacity', 1);
   var panelimg = $('<img>').attr('src', panels[id].image);
@@ -222,7 +221,7 @@ function newPanelElement(id) {
   if (panels[id].elements !== undefined && panels[id].elements !== null) {
     for (var e=0; e < panels[id].elements.length; e++) {
       var el = panels[id].elements[e];
-      paneldiv.append(speechBubble(el));
+      if (el !== null) paneldiv.append(speechBubble(el));
     }
   } 
   return paneldiv;
