@@ -258,7 +258,7 @@ exports.getImageSize = function(sel) {
 	let width;
 	let height;
 	if (sel.node !== undefined) {
-		let panel = nodeContainer.children[sel.node];
+		let panel = nodeContainer.nodes[sel.node];
 		if (sel.element !== undefined) {
 			let element = panel.elements[sel.element];
 			width = element.loadimage.get(0).naturalWidth;
@@ -952,8 +952,8 @@ const drop = function (ev) {
 		};
 
 		output.nodes = [];
-		for (let i=0; i < this.children.length; i++) {
-			var ref = this.children[i];
+		for (let i=0; i < this.nodes.length; i++) {
+			var ref = this.nodes[i];
 			// cycle through all nodes, saving their data to an object
 			var node = {};
 
@@ -970,8 +970,8 @@ const drop = function (ev) {
 
 				node.elements = [];
 
-				for (let e=0; e < ref.children.length; e++) {
-					var r_elem = ref.children[e];
+				for (let e=0; e < ref.elements.length; e++) {
+					var r_elem = ref.elements[e];
 					if (r_elem instanceof PanelElement) {
 						var elem = {};
 
