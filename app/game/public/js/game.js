@@ -113,7 +113,7 @@ function speechBubble(sb) {
   if ((sb.width === undefined || sb.width === "") && (sb.height === undefined || sb.height === "")) bubble.css('white-space', 'nowrap');
 
   // INTERACTIVE BUBBLE!
-  if (sb.goto !== undefined && panels[sb.goto] !== null) {
+  if (sb.goto !== undefined && sb.goto !== null && panels[sb.goto] !== null) {
     bubble.addClass('clickable');
     bubble.on('click', function() {
       addPanel(sb.goto);
