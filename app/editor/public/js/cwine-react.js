@@ -82,8 +82,8 @@ const Editor = React.createClass({
 	handleCanvasChange: function(sel, values) {
 		//console.log("Canvas Change!");
 		for (let property in values) {
-			if (sel.node !== undefined) {
-				if (sel.element !== undefined) {
+			if (sel.node !== undefined && sel.node !== null) {
+				if (sel.element !== undefined && sel.element !== null) {
 					this.setState({
 						nodes: update(this.state.nodes, {[sel.node]: {elements: {[sel.element]: {[property]: {$set: values[property]}}}}})
 					});

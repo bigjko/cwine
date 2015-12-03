@@ -447,22 +447,22 @@ const drop = function (ev) {
 		socket.goto = undefined;
 		owner.goto = undefined;
 		socket.line.graphics.clear();
+		let gotoindex = null;
+		let nodeindex = null;
+		let elmindex = null;
+		if (owner instanceof PanelElement) {
+			nodeindex = nodeContainer.nodes.indexOf(panel);
+			elmindex = panel.elements.indexOf(owner);
+		} else {
+			nodeindex = nodeContainer.nodes.indexOf(owner);
+		}
 		var target = stage.getObjectUnderPoint(evt.stageX, evt.stageY).parent;
 		if (target instanceof Node) {
 			socket.goto = target;
-			owner.goto = target;
-			let nodeindex;
-			let elmindex;
-			if (owner instanceof PanelElement) {
-				nodeindex = nodeContainer.nodes.indexOf(panel);
-				elmindex = panel.elements.indexOf(owner);
-			} else {
-				nodeindex = nodeContainer.nodes.indexOf(owner);
-			}
-			let gotoindex = nodeContainer.nodes.indexOf(socket.goto);
-			handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
+			owner.goto = target;			
+			gotoindex = nodeContainer.nodes.indexOf(socket.goto);
 		}
-
+		handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
 		panel.drawConnections();
 	};
 
