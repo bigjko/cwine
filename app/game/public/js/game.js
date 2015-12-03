@@ -219,10 +219,12 @@ function newPanelElement(id) {
 
   paneldiv.append(panelimg);
 
-  for (var e=0; e < panels[id].elements.length; e++) {
-    var el = panels[id].elements[e];
-    paneldiv.append(speechBubble(el));
-  }
+  if (panels[id].elements !== undefined && panels[id].elements !== null) {
+    for (var e=0; e < panels[id].elements.length; e++) {
+      var el = panels[id].elements[e];
+      paneldiv.append(speechBubble(el));
+    }
+  } 
   return paneldiv;
 }
 
