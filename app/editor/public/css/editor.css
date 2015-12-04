@@ -126,6 +126,7 @@ canvas {
 	width:280px;
 	height:100%;
 	padding:0;
+	padding-top:10px;
 	background-color:#444;
 	background-color:rgba(40,40,40,0.8);
 	color:#ccc;
@@ -138,11 +139,18 @@ canvas {
 
 #sidebar label {
 	color:#ccc;
-	font-size:1rem;
+	float:left;
+	line-height: 25px;
+	margin-right: 10px;
 }
 
 #file {
 	padding:10px;
+}
+
+select {
+	height:25px;
+	color:#333;
 }
 
 input[type="text"] {
@@ -245,7 +253,32 @@ textarea {
 	
 }
 
+.labelafter p {
+	margin-left:10px;
+	display:inline-block;
+}
+
+.labelafter input[type="checkbox"] {
+	display:inline-block;
+}
+
 .labelside input[type="text"] {
+}
+
+.multi-field input[type="text"] {
+	width:50%;
+	margin: 0 5px;
+}
+.multi-field {
+	display:block;
+	height:30px;
+}
+.small-field {
+	font-size:80%;
+	margin:0;
+	margin-right: 2%;
+	width:48%;
+	float:left;
 }
 
 .labelside p {
@@ -473,7 +506,7 @@ textarea {
 
 .bubble {
 	pointer-events:none;
-	font-family:'KomikaHand' Verdana, Geneva, sans-serif;
+	font-family:'KomikaHand', Verdana, Geneva, sans-serif;
 	text-align: center;
 	background-size: 100% 100%;
 }
@@ -482,14 +515,14 @@ textarea {
 	pointer-events:none;
 	padding: 12px 18px 20px;
 	margin:0;
-	font-size: 80%;
+	font-size: 12px;
 	line-height: 1.4rem;
 }
 
 .box p {
 	pointer-events:none;
+	font-size: 12px;
 	padding: 15px;
-	font-size:100%;
 }
 
 /*!

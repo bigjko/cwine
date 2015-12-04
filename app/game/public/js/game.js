@@ -2,9 +2,9 @@ var panels;
 var config;
 
 var $ = require('jquery');
-var jQBridget = require('jquery-bridget');
-var Packery = require('packery');
-$.bridget('packery', Packery);
+//var jQBridget = require('jquery-bridget');
+//var Packery = require('packery');
+//$.bridget('packery', Packery);
 
 function loadJSON(path) {
   var request = new XMLHttpRequest();
@@ -49,7 +49,7 @@ function preloadImages(array, callback) {
   var loaded = 0;
   var images = [];
   for (var i=0; i<array.length; i++) {
-    images.push(array[i].image);
+    if (array[i] !== null && array[i] !== undefined && array.indexOf(array[i].image) == -1) images.push(array[i].image);
   }
 
   function updateProgress() {
@@ -108,9 +108,12 @@ function speechBubble(sb) {
   bubble.addClass('bubble');
   if (sb.bubble_type == 'down') bubble.addClass('center-origin');
   if (sb.bubble_type == 'box') bubble.addClass('box');
+  if (sb.width !== undefined && sb.width !== "") bubble.css('width',sb.width+'%');
+  if (sb.height !== undefined && sb.height !== "") bubble.css('height', sb.height+'%');
+  if ((sb.width === undefined || sb.width === "") && (sb.height === undefined || sb.height === "")) bubble.css('white-space', 'nowrap');
 
   // INTERACTIVE BUBBLE!
-  if (sb.goto !== undefined) {
+  if (sb.goto !== undefined && sb.goto !== null && panels[sb.goto] !== null) {
     bubble.addClass('clickable');
     bubble.on('click', function() {
       addPanel(sb.goto);
@@ -130,16 +133,33 @@ function start() {
   
   var panels = getPanel(start_id);
 
-  $container = $('#panels');
+  /*var diff = $('#panels').clientWidth / $('#panels').css('width');
+  $('#panels').css('font-size', 13*diff + 'px');*/
+  if (config.comic_width !== undefined) $('#panels').css('width', config.comic_width+'%');
+  if (config.comic_maxwidth !== undefined) $('#panels').css('max-width', config.comic_maxwidth+'px');
+  var diff = $('#panels').innerWidth() / 800;
+  var fontsize = 12;
+  if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
+  $('#panels').css({'font-size': fontsize*diff + 'px'});
+  if (config.comic_font !== undefined) {
+      $('#panels').css('font-family', '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif');
+  }
 
-  $container
-    .append(panels)
-    .packery({
-      itemSelector: '.panel',
-      gutter: '.gutter-size',
-      percentPosition: true,
-      isFitWidth : true
-    });
+  $( window ).resize(function() {
+    var diff = $('#panels').innerWidth() / 800;
+    var fontsize = 12;
+    var lineheight = 0.85;
+    if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
+    if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
+    $('#panels').css({'font-size': fontsize*diff + 'px'});
+    $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
+  });
+
+  var lineheight = 0.85;
+  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
+  $container = $('#panels');
+  $container.append(panels);
+  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
@@ -154,8 +174,13 @@ function addPanel(id) {
   var panels = getPanel(id);
 
   $container.append(panels);
+  var diff = $('#panels').innerWidth() / 800;
+  var lineheight = 0.85;
+  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
+  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
 
-  $container.packery('appended', panels);
+
+  //$container.packery('appended', panels);
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
@@ -166,14 +191,13 @@ function addPanel(id) {
 function getPanel(id) {
   var elems = [];
 
-  var count = 0;
-  
+  var count = 0; 
   var p = newPanelElement(id);
  
   elems.push(p.get(0));
 
   
-  while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null) {
+  while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null && panels[panels[id].goto] !== null) {
     id = panels[id].goto;
     count++;
     p = newPanelElement(id);
@@ -187,16 +211,19 @@ function getPanel(id) {
 }
 
 function newPanelElement(id) {
-
+  console.log(id);
+  var li = $('<li>').addClass('panel-list');
   var paneldiv = $('<div>').addClass('panel noselect ' + 'w' + panels[id].size).css('opacity', 1);
   var panelimg = $('<img>').attr('src', panels[id].image);
 
   paneldiv.append(panelimg);
 
-  for (var e=0; e < panels[id].elements.length; e++) {
-    var el = panels[id].elements[e];
-    paneldiv.append(speechBubble(el));
-  }
+  if (panels[id].elements !== undefined && panels[id].elements !== null) {
+    for (var e=0; e < panels[id].elements.length; e++) {
+      var el = panels[id].elements[e];
+      if (el !== null) paneldiv.append(speechBubble(el));
+    }
+  } 
   return paneldiv;
 }
 

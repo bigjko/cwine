@@ -22,13 +22,13 @@ var currentLocalImages;
 
 let handleSelection;
 let handleChange;
-let changeData;
+let addNode;
 
-exports.init = function(obj, onselect, onchange, changedata) {
+exports.init = function(obj, onselect, onchange, addnode) {
 
 	handleSelection = onselect;
 	handleChange = onchange;
-	changeData = changedata;
+	addNode = addnode;
 
     panels = obj.nodes;
     config = obj.config;
@@ -104,18 +104,36 @@ exports.updateNode = function(sel, update) {
 	console.log("update node!");
 	if (sel.node !== undefined) {
 		if (sel.element !== undefined) {
-			nodeContainer.children[sel.node].elements[sel.element].update(update);
+			nodeContainer.nodes[sel.node].elements[sel.element].update(update);
+		} else nodeContainer.nodes[sel.node].update(update);
+	}
+};
+
+exports.updateConfig = function(conf) {
+	config = conf;
+};
+
+exports.updateAll = function() {
+	for (var p=0; p<nodeContainer.nodes.length;p++) {
+		let panel = nodeContainer.nodes[p];
+		if (panel !== null) {
+			panel.update();
 		}
-		nodeContainer.children[sel.node].update(update);
 	}
 };
 
 function initNodes() {
 	nodeContainer = new NodeContainer();
+	nodeContainer.nodes = [];
 	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
-		var panel = new Panel(panels[p]);
-		nodeContainer.addChild(panel);
+		if (panels[p] !== null) {
+			var panel = new Panel(panels[p]);
+			nodeContainer.addChild(panel);
+			nodeContainer.nodes.push(panel);
+		} else {
+			nodeContainer.nodes.push(null);
+		}
 	}
 	nodeContainer.makeConnections();
 	viewContainer.addChild(nodeContainer);
@@ -214,19 +232,44 @@ function newPanel(x, y, image) {
 		x: x,
 		y: y
 	};
-	nodeContainer.addChild(new Panel(obj));
-	changeData(nodeContainer.toObject());
+	let panel = new Panel(obj);
+	nodeContainer.addChild(panel);
+	nodeContainer.nodes.push(panel);
+	addNode({type:'node'}, panel.toObject());
 }
 
 exports.removeNode = function(sel) {
 	if (sel.node !== undefined) {
+		let panel = nodeContainer.nodes[sel.node];
 		if (sel.element !== undefined) {
-			nodeContainer.children[sel.node].removeChild(elements[sel.element]);
+			let element = panel.elements[sel.element];
+			panel.removeChild(element);
+			panel.elements[sel.element] = null;
 		} else {
-			nodeContainer.removeChild(nodeContainer.children[sel.node]);
+			nodeContainer.removeChild(panel);
+			nodeContainer.nodes[sel.node] = null;
 		}
+		//handleSelection({});
 	}
 	return nodeContainer.toObject();
+};
+
+exports.getImageSize = function(sel) {
+	let width;
+	let height;
+	if (sel.node !== undefined) {
+		let panel = nodeContainer.nodes[sel.node];
+		if (sel.element !== undefined) {
+			let element = panel.elements[sel.element];
+			width = element.loadimage.get(0).naturalWidth;
+			height = element.loadimage.get(0).naturalHeight;
+		} else {
+			width = panel.panelbitmap.image.width;
+			height = panel.panelbitmap.image.height;
+		}
+	}
+	console.log(width, height);
+	return { width: width, height: height };
 };
 
 function newPanelElement(x, y, panel, image) {
@@ -257,7 +300,7 @@ function newPanelElement(x, y, panel, image) {
 	sock.x = socketpos.x;
 	sock.y = socketpos.y;
 
-	changeData(nodeContainer.toObject());
+	addNode({type:'element', node:nodeContainer.nodes.indexOf(panel)}, panelelement.toObject());
 }
 
 function zoom(zoomModifier) {
@@ -336,26 +379,31 @@ const drop = function (ev) {
 		//evt.target.dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target.parent;
-		handleSelection({ node: nodeContainer.getChildIndex(evt.target.parent) });
+		handleSelection({ node: nodeContainer.nodes.indexOf(evt.target.parent) });
 		//openTab("propertyTab");
 	};
 
 	Node.prototype.handleMouseMove = function(evt) {
 		//console.log(evt.target);
+		
 		let panel = evt.target.parent;
-
+		let old = {x: panel.x, y: panel.y};
+		
 		panel.x = evt.stageX/viewScale - dragoffset.x;
 		panel.y = evt.stageY/viewScale - dragoffset.y;
 
 		panel.x = Math.round(panel.x*0.1)*10;
 		panel.y = Math.round(panel.y*0.1)*10;
-
-		let sel = {node: nodeContainer.getChildIndex(panel)};
-		handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
+		
+		if (old.x != panel.x || old.y != panel.y) {
+			let sel = {node: nodeContainer.nodes.indexOf(panel)};
+			handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
+			drawAllConnections();
+		}
 
 		//console.log(evt.target.parent);
 		//drawConnections(evt.target.parent);
-		drawAllConnections();
+		
 	};
 
 	Node.prototype.drawConnections = function() {
@@ -399,22 +447,22 @@ const drop = function (ev) {
 		socket.goto = undefined;
 		owner.goto = undefined;
 		socket.line.graphics.clear();
+		let gotoindex = null;
+		let nodeindex = null;
+		let elmindex = null;
+		if (owner instanceof PanelElement) {
+			nodeindex = nodeContainer.nodes.indexOf(panel);
+			elmindex = panel.elements.indexOf(owner);
+		} else {
+			nodeindex = nodeContainer.nodes.indexOf(owner);
+		}
 		var target = stage.getObjectUnderPoint(evt.stageX, evt.stageY).parent;
 		if (target instanceof Node) {
 			socket.goto = target;
-			owner.goto = target;
-			let nodeindex;
-			let elmindex;
-			if (owner instanceof PanelElement) {
-				nodeindex = nodeContainer.getChildIndex(panel);
-				elmindex = panel.elements.indexOf(owner);
-			} else {
-				nodeindex = nodeContainer.getChildIndex(owner);
-			}
-			let gotoindex = nodeContainer.getChildIndex(socket.goto);
-			handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
+			owner.goto = target;			
+			gotoindex = nodeContainer.nodes.indexOf(socket.goto);
 		}
-
+		handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
 		panel.drawConnections();
 	};
 
@@ -517,19 +565,24 @@ const drop = function (ev) {
 		this.elements = [];
 		if (obj.elements !== undefined) {
 			for (let e=0; e < obj.elements.length; e++) {
-				var element = new PanelElement(obj.elements[e], this.panelbitmap);
+				if (obj.elements[e] !== null) {
+					var element = new PanelElement(obj.elements[e], this.panelbitmap);
 
-				//this.elements.push(element);
-				this.addChild(element);
-				this.elements.push(element);
-				//console.log(element.children.length);
-				socketpos = {
-					x: element.x + element.width*element.scaleX,
-					y: element.y + element.height/2*element.scaleY
-				};
-				sock = this.addSocket(socketpos.x, socketpos.y, element.goto, this, 3, "#fff");
-				sock.owner = element;
-				sock.dashes = [10,5];
+					//this.elements.push(element);
+					this.addChild(element);
+					this.elements.push(element);
+					//console.log(element.children.length);
+					socketpos = {
+						x: element.x + element.width*element.scaleX,
+						y: element.y + element.height/2*element.scaleY
+					};
+					sock = this.addSocket(socketpos.x, socketpos.y, element.goto, this, 3, "#fff");
+					sock.owner = element;
+					sock.dashes = [10,5];
+				} else {
+					this.elements.push(null);
+				}
+				
 			}
 		}	
 	};
@@ -552,7 +605,10 @@ const drop = function (ev) {
 		this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX;
 		this.height = this.panelbitmap.image.height*this.panelbitmap.scaleY;
 		for (let p=0; p < this.elements.length; p++) {
-			this.elements[p].setPosition();
+			let elm = this.elements[p];
+			if (elm !== null) {
+				this.elements[p].update();
+			}
 		}
 		drawAllConnections();
 
@@ -565,6 +621,17 @@ const drop = function (ev) {
 		view.removeChild(elm);
 		this.Node_removeChild(child);
 		drawAllConnections();
+	};
+
+	Panel.prototype.toObject = function() {
+		let obj = {};
+		obj.name = this.name;
+		obj.size = this.size;
+		obj.goto = this.goto;
+		obj.image = this.image;
+		obj.editor = { position: { x: this.x, y: this.y }};
+
+		return obj;
 	};
 
 	window.Panel = createjs.promote(Panel, "Node");
@@ -619,6 +686,22 @@ const drop = function (ev) {
 		div.style.position = "absolute";
 		div.style.top = 0;
 		div.style.left = 0;
+		if (config.comic_fontsize !== undefined) {
+			div.children[0].style.fontSize = config.comic_fontsize + 'px';
+		}
+		if (config.comic_font !== undefined) {
+			div.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
+		}
+		if (config.comic_lineheight !== undefined) {
+			div.children[0].style.lineHeight = config.comic_lineheight + 'rem';
+		}
+
+		if (obj.width !== undefined && obj.width !== "") {
+			div.style.width = this.panelbitmap.image.width*this.panelbitmap.scaleX*(obj.width/100)/0.6 + 'px';
+		}
+		if (obj.height !== undefined && obj.height !== "") {
+			div.style.height = this.panelbitmap.image.height*this.panelbitmap.scaleX*(obj.height/100)/0.6 + 'px';
+		}
 
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
@@ -656,6 +739,7 @@ const drop = function (ev) {
 		div.opacity = '1';
 		elm.x = 0;
 		elm.y = 0;
+		this.loadimage = $('<img />').attr('src', this.image);
 		//this.addChild(hitshape);
 		this.on("mousedown", this.setDragOffset);
 		this.on("pressmove", this.dragElement);
@@ -665,9 +749,18 @@ const drop = function (ev) {
 	};
 
 	PanelElement.prototype.update = function(update) {
+		var element = this.children[1].htmlElement;
 
 		for (let property in update) {
-			this[property] = update[property];
+			if (property == 'width') {
+				this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX*(update.width/100)/0.6;
+				element.style.width = this.width + 'px';
+			}
+			else if (property == 'height') {
+				this.height = this.panelbitmap.image.height*this.panelbitmap.scaleX*(update.height/100)/0.6;
+				element.style.height = this.height + 'px';
+			}
+			else this[property] = update[property];
 		}
 		/*if (update.text !== undefined) this.text = update.text;
 		if (update.bubble_type !== undefined) this.bubble_type = update.bubble_type;
@@ -675,13 +768,33 @@ const drop = function (ev) {
 		if (update.position !== undefined) this.position = update.position;
 		if (update.align !== undefined) this.align = update.align;*/
 
-		var element = this.children[1].htmlElement;
+		if (this.width === '' || this.width == 0 || this.width === undefined)
+		{
+			element.style.width = "";
+		}
+		if (this.height === '' || this.height == 0 || this.height === undefined)
+		{
+			element.style.height = "";
+		}
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
+		if (config.comic_fontsize !== undefined) {
+			element.children[0].style.fontSize = config.comic_fontsize + 'px';
+		}
+		if (config.comic_font !== undefined) {
+			element.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
+		}
+		if (config.comic_lineheight !== undefined) {
+			element.children[0].style.lineHeight = config.comic_lineheight + 'rem';
+		}
+
 		this.width = element.clientWidth;
 		this.height = element.clientHeight;
+		//this.width = element.clientWidth;
+		//this.height = element.clientHeight;
 		this.regX = element.clientWidth/2;
 		this.regY = element.clientHeight;
 		this.hitArea.graphics.clear().f("#000").dr(0,0,this.width,this.height);
+		this.setPosition();
 		element.style.backgroundImage = this.image;
 
 		if (this.align !== undefined && this.align.x == "right") {
@@ -693,6 +806,20 @@ const drop = function (ev) {
 		drawAllConnections();
 	};
 
+	PanelElement.prototype.toObject = function() {
+		let obj = {};
+
+		obj.text = this.text;
+		obj.align = this.align;
+		obj.keepAspect = this.keepAspect;
+		obj.image = this.image;
+		//obj.goto = this.goto;
+		obj.bubble_type = this.bubble_type;
+		obj.position = this.position;
+
+		return obj;
+	};
+
 	PanelElement.prototype.setDragOffset = function(evt) {
 		var global = evt.target.parent.localToGlobal(evt.target.x, evt.target.y);
 		dragoffset = {
@@ -702,7 +829,7 @@ const drop = function (ev) {
 		//currentlySelected = evt.target.parent;
 		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
 		currentlySelected = evt.target;
-		handleSelection({node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)});
+		handleSelection({node: nodeContainer.nodes.indexOf(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)});
 		//openTab("propertyTab");
 		//evt.target.showProperties();
 	};
@@ -722,7 +849,7 @@ const drop = function (ev) {
 		evt.target.x = local.x;
 		evt.target.y = local.y;
 		this.position = evt.target.outputPosition();
-		let sel = {node: nodeContainer.getChildIndex(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)};
+		let sel = {node: nodeContainer.nodes.indexOf(evt.target.parent), element: evt.target.parent.elements.indexOf(evt.target)};
 		let pos = evt.target.outputPosition();
 		handleChange(sel, {position: pos});
         /*evt.target.position = { 
@@ -775,13 +902,26 @@ const drop = function (ev) {
 
 	NodeContainer.prototype.makeConnections = function() {
 
-		for (let i=0; i < this.children.length; i++) {
-			var node = this.children[i];
-			if (node.goto !== undefined) node.goto = this.getChildAt(node.goto);
-			for (let e=0; e < node.children.length; e++) {
-				var elem = node.children[e];
-				if (elem instanceof PanelElement && elem.goto !== undefined) elem.goto = this.getChildAt(elem.goto);
-			}
+		for (let i=0; i < this.nodes.length; i++) {
+			var node = this.nodes[i];
+			if (node !== null) {
+				if (node.goto !== undefined) 
+					if (this.nodes[node.goto] !== null) {
+						node.goto = this.nodes[node.goto];
+					} else {
+						node.goto = undefined;
+					}
+				for (let e=0; e < node.elements.length; e++) {
+					var elem = node.elements[e];
+					if (elem instanceof PanelElement && elem.goto !== undefined) {
+						if (node.elements[elem.goto] !== null) {
+							elem.goto = this.nodes[elem.goto];
+						} else {
+							elem.goto = undefined;
+						}
+					} 
+				}
+			}			
 		}
 
 	};
@@ -789,15 +929,14 @@ const drop = function (ev) {
 	// Overwrite Container.removeChild()
 	NodeContainer.prototype.removeChild = function(child) {
 		var view = document.querySelector("#view");
-		for (let e=0; e<child.children.length; e++) {
-			var elm = child.children[e];
-			console.log(elm);
-			if (elm instanceof PanelElement) {
+		for (let e=0; e<child.elements.length; e++) {
+			let elm = child.elements[e];
+			if (elm !== null && elm instanceof PanelElement) {
 				elm = elm.children[1].htmlElement;
-				console.log(elm);
 				view.removeChild(elm);
 			}
 		}
+		//this.nodes[indexOf(child)] = null;
 		this.Container_removeChild(child);
 		drawAllConnections();
 	};
@@ -813,8 +952,8 @@ const drop = function (ev) {
 		};
 
 		output.nodes = [];
-		for (let i=0; i < this.children.length; i++) {
-			var ref = this.children[i];
+		for (let i=0; i < this.nodes.length; i++) {
+			var ref = this.nodes[i];
 			// cycle through all nodes, saving their data to an object
 			var node = {};
 
@@ -823,7 +962,7 @@ const drop = function (ev) {
 				node.name = ref.name;
 				node.size = ref.size;
 				node.image = ref.image;
-				node.goto = this.getChildIndex(ref.goto);
+				node.goto = this.nodes.indexOf(ref.goto);
 				if (node.goto == -1) node.goto = undefined;
 				node.editor = {
 					position: { x: ref.x, y: ref.y }
@@ -831,8 +970,8 @@ const drop = function (ev) {
 
 				node.elements = [];
 
-				for (let e=0; e < ref.children.length; e++) {
-					var r_elem = ref.children[e];
+				for (let e=0; e < ref.elements.length; e++) {
+					var r_elem = ref.elements[e];
 					if (r_elem instanceof PanelElement) {
 						var elem = {};
 
@@ -852,7 +991,7 @@ const drop = function (ev) {
 							if (elem.align.x == "right") elem.position.x = 1 - elem.position.x;
 							if (elem.align.y == "bottom") elem.position.y = 1 - elem.position.y;
 						}
-						elem.goto = this.getChildIndex(r_elem.goto);
+						elem.goto = this.nodes.indexOf(r_elem.goto);
 						if (elem.goto == -1) elem.goto = undefined;
 
 						node.elements.push(elem);
