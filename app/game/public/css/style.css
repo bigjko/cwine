@@ -163,6 +163,7 @@ header img {
 }
 
 .panel {
+	opacity:0;
 	width:23%;
 	position:relative;
 	-webkit-transition: opacity 1s;

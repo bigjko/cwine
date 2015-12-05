@@ -336,6 +336,7 @@ const drop = function (ev) {
     ev.dataTransfer = ev.originalEvent.dataTransfer;
     ev.clientX = ev.originalEvent.clientX;
     ev.clientY = ev.originalEvent.clientY;
+    let newimage = ev.dataTransfer.getData("text/plain");
     if (ev.target == stage.canvas) {
     	//console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
     	var local = nodeContainer.globalToLocal(ev.clientX, ev.clientY);
@@ -347,9 +348,17 @@ const drop = function (ev) {
     	if (pnl instanceof Panel) {
     		var pos = pnl.globalToLocal(ev.clientX, ev.clientY);
     		console.log(pos);
-    		newPanelElement(pos.x, pos.y, pnl, ev.dataTransfer.getData("text/plain"));
+    		if (ev.originalEvent.ctrlKey) {
+    			console.log('replace image!');
+    			//pnl.image = ev.dataTransfer.getData("text/plain");
+    			pnl.newImage(newimage);
+    			let sel = {node: nodeContainer.nodes.indexOf(pnl)};
+				handleChange(sel, {image: newimage});
+    		} else {
+	    		newPanelElement(pos.x, pos.y, pnl, newimage);
+	    	}
     	}
-    	else newPanel(local.x, local.y, ev.dataTransfer.getData("text/plain"));
+    	else newPanel(local.x, local.y, newimage);
     }
     //var data = ev.dataTransfer.getData("text");
     //ev.target.appendChild(document.getElementById(data));
@@ -587,15 +596,34 @@ const drop = function (ev) {
 		}	
 	};
 
+	Panel.prototype.newImage = function(image) {
+		console.log('IMAGE SHIT!');
+		//this.removeChild(this.panelbitmap)
+		this.image = image;
+		let img = new Image();
+		img.onload = function() {
+			this.update();
+		}.bind(this);
+		img.src = this.image;
+		//console.log(img);
+		this.panelbitmap.image = img;
+	};
+
 	Panel.prototype.update = function(update) {
 		//this.x = update.editor.position.x;
 		//this.y = update.editor.position.y;
 		for (let property in update) {
 			this[property] = update[property];
-			if (property == 'image') {
+			/*if (property == 'image') {
 				// FIX THIS IMAGE SHIT!
-				this.panelbitmap = new Bitmap(this.image);
-			}
+				console.log('IMAGE SHIT!');
+				//this.removeChild(this.panelbitmap)
+				this.image = update.image;
+				let img = new Image();
+				img.src = this.image;
+				//console.log(img);
+				this.panelbitmap.image = img;
+			}*/
 			console.log("Changed", property, update[property]);
 		}
 		let scale = 0.25;
@@ -859,7 +887,7 @@ const drop = function (ev) {
 	};
 
 	PanelElement.prototype.setPosition = function() {
-		var panelbitmap = this.panelbitmap;
+		var panelbitmap = this.parent.panelbitmap;
 		var panel = {
 			width: panelbitmap.image.width*panelbitmap.scaleX,
 			height: panelbitmap.image.height*panelbitmap.scaleY

@@ -161,6 +161,7 @@ const ElementProperties = React.createClass({
 					<Field title="Height" name="height" after="%" value={this.props.node.height} onChange={this.props.onchange} />
 				</FieldLabel>
 				<CheckMark label="after" title="Keep original aspect" name="keepAspect" checked={this.props.node.keepAspect} onChange={this.props.onchange} />
+				<CheckMark label="after" title="Hide on comic progress" name="hideOnProgress" checked={this.props.node.hideOnProgress} onChange={this.props.onchange} />
 
 				<StaticField label="side" name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
 

@@ -111,11 +111,15 @@ function speechBubble(sb) {
   if (sb.width !== undefined && sb.width !== "") bubble.css('width',sb.width+'%');
   if (sb.height !== undefined && sb.height !== "") bubble.css('height', sb.height+'%');
   if ((sb.width === undefined || sb.width === "") && (sb.height === undefined || sb.height === "")) bubble.css('white-space', 'nowrap');
+  if (sb.hideOnProgress) { bubble.addClass('hidenext'); }
 
   // INTERACTIVE BUBBLE!
   if (sb.goto !== undefined && sb.goto !== null && panels[sb.goto] !== null) {
     bubble.addClass('clickable');
     bubble.on('click', function() {
+      $(this).addClass('clicked');
+      //debugger;
+      $(this).parent().children('.hidenext:not(.clicked)').fadeOut();
       addPanel(sb.goto);
     });
   }
@@ -194,14 +198,14 @@ function getPanel(id) {
   var count = 0; 
   var p = newPanelElement(id);
  
-  elems.push(p.get(0));
+  elems.push(p);
 
   
   while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null && panels[panels[id].goto] !== null) {
     id = panels[id].goto;
     count++;
     p = newPanelElement(id);
-    elems.push(p.get(0));
+    elems.push(p);
 
     // In case of infinite looping comic: Abort
     if (count > 50) break;
