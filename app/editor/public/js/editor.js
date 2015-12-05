@@ -376,10 +376,32 @@ const drop = function (ev) {
 	function Node() {
 		this.Container_constructor();
 		this.sockets = [];
+		this.ctrldrag = false;
 	}
 	createjs.extend(Node, createjs.Container);
 
 	Node.prototype.handleMouseDown = function(evt) {
+		let node = evt.target.parent;
+		node.ctrldrag = { dragging: false, socket: null };
+		if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
+			evt.preventDefault();
+			
+			for (let s=0; s < node.sockets.length; s++) {
+				let socket = node.sockets[s];
+				if (socket.owner == node) {
+					let socketEvt = evt.clone();
+					let nodeEvt = evt.clone();
+					node.ctrldrag = {dragging:true, socket: socket};
+					socketEvt.set({type: 'pressmove', target: socket});
+					//nodeEvt.set({type: 'mouseup'});
+					//node.dispatchEvent(nodeEvt);
+					
+					socket.dispatchEvent(socketEvt);
+				}
+			}
+
+			return false;
+		}
 		dragoffset = {
 			x: evt.stageX/viewScale - evt.target.parent.x,
 			y: evt.stageY/viewScale - evt.target.parent.y
@@ -394,7 +416,26 @@ const drop = function (ev) {
 
 	Node.prototype.handleMouseMove = function(evt) {
 		//console.log(evt.target);
-		
+		let node = evt.target.parent;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressmove', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+			return false;
+		}
+		/*if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
+			for (let s=0; s < node.sockets.length; s++) {
+				let socket = node.sockets[s];
+				if (socket.owner == node) {
+					let newEvent = evt.clone();
+					newEvent.set({type: 'pressmove', target: socket});
+					socket.dispatchEvent(newEvent);
+				}
+			}
+			return;
+		}*/
+
 		let panel = evt.target.parent;
 		let old = {x: panel.x, y: panel.y};
 		
@@ -413,6 +454,19 @@ const drop = function (ev) {
 		//console.log(evt.target.parent);
 		//drawConnections(evt.target.parent);
 		
+	};
+
+	Node.prototype.handleMouseUp = function(evt) {
+		let node = evt.target.parent;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressup', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+
+			node.ctrldrag = { dragging: false, socket: null };
+			return false;
+		}
 	};
 
 	Node.prototype.drawConnections = function() {
@@ -442,7 +496,9 @@ const drop = function (ev) {
 	};
 
 	Node.prototype.dragLine = function(evt) {
-		var sock = evt.target.parent;
+		console.log("dragline!");
+		let sock = evt.target;
+		if (sock instanceof createjs.Shape) sock = evt.target.parent;
 		var line = sock.line;
 		line.graphics.clear();
 		var local = line.globalToLocal(evt.stageX, evt.stageY);
@@ -450,9 +506,10 @@ const drop = function (ev) {
 	};
 
 	Node.prototype.releaseLine = function(evt) {
-		let socket = evt.target.parent;
-		let panel = evt.target.parent.parent;
-		let owner = evt.target.parent.owner;
+		let socket = evt.target;
+		if (socket instanceof createjs.Shape) socket = evt.target.parent;
+		let panel = socket.parent;
+		let owner = socket.owner;
 		socket.goto = undefined;
 		owner.goto = undefined;
 		socket.line.graphics.clear();
@@ -556,6 +613,7 @@ const drop = function (ev) {
 			this.addChild(this.panelbitmap);
 			this.panelbitmap.on("mousedown", this.handleMouseDown);
 			this.panelbitmap.on("pressmove", this.handleMouseMove);
+			this.panelbitmap.on("pressup", this.handleMouseUp);
 			this.panelbitmap.shadow = new createjs.Shadow("rgba(0,0,0,0.2)", 3, 3, 4);
 			//this.panelbitmap.on("click", this.showProperties);
 		}
@@ -672,6 +730,7 @@ const drop = function (ev) {
 		this.Container_constructor();
 		this.panelbitmap = bitmap;
 		this.setup(obj);
+		this.ctrldrag = {dragging:false, socket:null};
 	} createjs.extend(PanelElement, createjs.Container);
 
 	PanelElement.prototype.setup = function(obj) {
@@ -771,6 +830,7 @@ const drop = function (ev) {
 		//this.addChild(hitshape);
 		this.on("mousedown", this.setDragOffset);
 		this.on("pressmove", this.dragElement);
+		this.on("pressup", this.handleMouseUp);
 		//this.on("click", this.showProperties);
 		//elm.regY = elm.getBounds().height;
 		//elements.addChild(elm);
@@ -849,6 +909,26 @@ const drop = function (ev) {
 	};
 
 	PanelElement.prototype.setDragOffset = function(evt) {
+		let node = evt.target;
+		node.ctrldrag = { dragging: false, socket: null };
+		if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
+			evt.preventDefault();
+			
+			for (let s=0; s < node.parent.sockets.length; s++) {
+				let socket = node.parent.sockets[s];
+				if (socket.owner == node) {
+					let socketEvt = evt.clone();
+					let nodeEvt = evt.clone();
+					node.ctrldrag = {dragging:true, socket: socket};
+					socketEvt.set({type: 'pressmove', target: socket});
+					//nodeEvt.set({type: 'mouseup'});
+					//node.dispatchEvent(nodeEvt);		
+					socket.dispatchEvent(socketEvt);
+				}
+			}
+
+			return false;
+		}
 		var global = evt.target.parent.localToGlobal(evt.target.x, evt.target.y);
 		dragoffset = {
 			x: evt.stageX - global.x,
@@ -864,6 +944,15 @@ const drop = function (ev) {
 
 	PanelElement.prototype.dragElement = function(evt) {
 		//console.log("Click!");
+		let node = evt.target;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressmove', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+			return false;
+		}
+
 		var local = evt.target.parent.globalToLocal(evt.stageX - dragoffset.x, evt.stageY - dragoffset.y);
 		var panelbitmap = evt.target.parent.panelbitmap;
 		var panel = {
@@ -884,6 +973,19 @@ const drop = function (ev) {
             x: local.x/evt.target.panelbitmap.image.width/evt.target.panelbitmap.scaleX*100, 
             y: local.y/evt.target.panelbitmap.image.height/evt.target.panelbitmap.scaleY*100 }*/
 		evt.target.parent.drawConnections();
+	};
+
+	PanelElement.prototype.handleMouseUp = function(evt) {
+		let node = evt.target;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressup', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+
+			node.ctrldrag = { dragging: false, socket: null };
+			return false;
+		}
 	};
 
 	PanelElement.prototype.setPosition = function() {
