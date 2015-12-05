@@ -163,6 +163,7 @@ function start() {
   if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
   $container = $('#panels');
   $container.append(panels);
+  $('.panel').animate({ opacity: 1 });
   $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
 
   /*setTimeout(function() {
@@ -178,6 +179,7 @@ function addPanel(id) {
   var panels = getPanel(id);
 
   $container.append(panels);
+  $('.panel').animate({ opacity: 1 });
   var diff = $('#panels').innerWidth() / 800;
   var lineheight = 0.85;
   if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
@@ -217,7 +219,7 @@ function getPanel(id) {
 function newPanelElement(id) {
   console.log(id);
   var li = $('<li>').addClass('panel-list');
-  var paneldiv = $('<div>').addClass('panel noselect ' + 'w' + panels[id].size).css('opacity', 1);
+  var paneldiv = $('<div>').addClass('panel noselect hidden ' + 'w' + panels[id].size);
   var panelimg = $('<img>').attr('src', panels[id].image);
 
   paneldiv.append(panelimg);
