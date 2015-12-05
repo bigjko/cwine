@@ -79,6 +79,7 @@
     "react-addons-update": "^0.14.3",
     "react-dom": "^0.14.2",
     "react-file-input": "^0.2.5",
+    "react-menu-aim": "^1.0.0",
     "react-modal-dialog": "^2.0.0",
     "react-simpletabs": "^0.7.0",
     "react-tabs": "^0.5.1",

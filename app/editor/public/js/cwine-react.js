@@ -3,12 +3,17 @@ var ReactDOM = require('react-dom');
 var loader = require('./loader.js');
 const exporter = require('./exporter.js');
 var editor = require('./editor.js');
+var menuData = require('./contextmenuData.js');
 const update = require('react-addons-update');
 import Sidebar from './sidebar.js';
+import Menu from './menu.js';
 
 const Editor = React.createClass({
 	getInitialState: function() {
-		return { nodes: [], currentlySelected: { node: 1 }, config: {} };
+		return { nodes: [], 
+				 currentlySelected: { node: 1 }, 
+				 config: {},
+				 contextMenu: {show:false, x:0, y:0} };
 	},
 	handleCanvasSelection: function(selected) {
 		this.setState({ currentlySelected: selected });
@@ -215,23 +220,42 @@ const Editor = React.createClass({
 			}
 			//if (this.state.localImages !== undefined) this.reloadImages();
 		}.bind(this));
+		let canv = document.querySelector('#edit_canvas');
+		canv.oncontextmenu = function(e) {
+			e.preventDefault();
+			
+			// find x and y of mouse
+
+			this.setState({contextMenu:{show:true, x:e.clientX , y:e.clientY}});
+			
+			return false;
+		}.bind(this);
+		canv.onclick = function(e) {
+			this.setState({contextMenu:{show:false, x:0 , y:0}});
+		}.bind(this);
 	},
 	render: function() {
 		//let currentnode = this.state.nodes[this.state.currentlySelected.node];
 		//if ( this.state.currentlySelected.element !== undefined ) currentnode = currentnode.elements[this.state.currentlySelected.element];
 		return (
-			<Sidebar 
-				nodes={this.state.nodes}
-				config={this.state.config}
-				images={this.state.localImages}
-				current={this.state.currentlySelected}
-				onchange={this.handleChange}
-				onselect={this.handleSidebarSelection}
-				onfiles={this.handleFiles}
-				onsave={this.handleSave}
-				onloading={this.handleLoad}
-				onremove={this.removeNode}
-				onexport={this.handleExport} />
+			<div>
+				{this.state.contextMenu.show ? 
+					<Menu menuData={menuData} position={{x:this.state.contextMenu.x, y:this.state.contextMenu.y}} />
+				: null }
+				<Sidebar 
+					nodes={this.state.nodes}
+					config={this.state.config}
+					images={this.state.localImages}
+					current={this.state.currentlySelected}
+					onchange={this.handleChange}
+					onselect={this.handleSidebarSelection}
+					onfiles={this.handleFiles}
+					onsave={this.handleSave}
+					onloading={this.handleLoad}
+					onremove={this.removeNode}
+					onexport={this.handleExport} />
+				
+			</div>
 		);
 	}
 

@@ -19,7 +19,7 @@ const Sidebar = React.createClass({
 		}
 
 		return (
-			<div>
+			<div id="sidebar">
 				<ModalButton className="button button-primary" action={this.props.onsave} header="Saved!" text="Project has been saved locally.">Save</ModalButton>
 				<LoadModal header="Load" onloading={this.props.onloading} />
 				<button onClick={this.props.onexport} className="button">Export to .zip</button>
