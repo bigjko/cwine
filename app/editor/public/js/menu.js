@@ -52,7 +52,7 @@ const Menu = React.createClass({
         <ul className="sub-menu">
           {this.props.menuData[this.state.activeMenuIndex].subMenu.map((function(subMenu, index){
             return (
-              <li className="sub-menu-item" key={index}>{subMenu}</li>
+              <li className="sub-menu-item" key={index} onClick={function(){self.props.handleMenu.call(self, subMenu.cmd);}}>{subMenu.name}</li>
             );
           }))}
         </ul>

@@ -206,6 +206,16 @@ const Editor = React.createClass({
 	handleExport: function (evt) {
 		exporter.exportToZip({config: this.state.config, nodes: this.state.nodes});
 	},
+	handleMenu: function (cmd, evt) {
+		switch(cmd) {
+			case 'varnode':
+				console.log('varnode');
+			break;
+			case 'ifnode':
+				console.log('ifnode');
+			break;
+		}
+	},
 	componentDidMount: function() {
 		loader.load(function(data) {
 			if (data !== null) 
@@ -240,7 +250,7 @@ const Editor = React.createClass({
 		return (
 			<div>
 				{this.state.contextMenu.show ? 
-					<Menu menuData={menuData} position={{x:this.state.contextMenu.x, y:this.state.contextMenu.y}} />
+					<Menu menuData={menuData} handleMenu={this.handleMenu} position={{x:this.state.contextMenu.x, y:this.state.contextMenu.y}} />
 				: null }
 				<Sidebar 
 					nodes={this.state.nodes}

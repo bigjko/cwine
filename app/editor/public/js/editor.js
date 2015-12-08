@@ -224,6 +224,14 @@ function drawAllConnections() {
 	}
 }
 
+function newNode(x, y, type) {
+	var node = new Node();
+	node.shape = new Shape();
+	node.shape.graphics.f('#ccc').dr(0,0,100,100);
+	nodeContainer.nodes.push(node);
+	addNode({type:'node'}, {type:node.type, editor:{position:{x:node.x, y:node.y}}});
+}
+
 function newPanel(x, y, image) {
 	var obj = {};
 	obj.image = image;
