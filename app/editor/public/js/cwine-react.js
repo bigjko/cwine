@@ -206,13 +206,11 @@ const Editor = React.createClass({
 	handleExport: function (evt) {
 		exporter.exportToZip({config: this.state.config, nodes: this.state.nodes});
 	},
-	handleMenu: function (cmd, evt) {
-		switch(cmd) {
-			case 'varnode':
-				console.log('varnode');
-			break;
-			case 'ifnode':
-				console.log('ifnode');
+	handleMenu: function (cmd, pos) {
+		switch(cmd.name) {
+			case 'addnode':
+				console.log(cmd.name, cmd.type);
+				editor.newNode(pos.x, pos.y, cmd.type);
 			break;
 		}
 	},

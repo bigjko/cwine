@@ -6,7 +6,7 @@ const saveAs = require('filesaverjs').saveAs;
 
 exports.exportToZip = function(json) {
 	let zip = new JSZip();
-	let done = 3;
+	//let done = 3;
 	
 	JSZipUtils.getBinaryContent('js/runtime-export.zip', function(err, data) {
 		if(err) {

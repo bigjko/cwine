@@ -128,9 +128,18 @@ function initNodes() {
 	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
 		if (panels[p] !== null) {
-			var panel = new Panel(panels[p]);
-			nodeContainer.addChild(panel);
-			nodeContainer.nodes.push(panel);
+			let node;
+			if (panels[p].type !== undefined) {
+				if (panels[p].type == 'varnode') {
+					node = new Node();
+					node.setup(panels[p]);
+				}
+			} else {
+				node = new Panel(panels[p]);
+			}
+			//var panel = new Panel(panels[p]);
+			nodeContainer.addChild(node);
+			nodeContainer.nodes.push(node);
 		} else {
 			nodeContainer.nodes.push(null);
 		}
@@ -224,12 +233,18 @@ function drawAllConnections() {
 	}
 }
 
-function newNode(x, y, type) {
+exports.newNode = function(x, y, type) {
+	let pos = nodeContainer.globalToLocal(x,y);
+	console.log('new node', pos.x, pos.y);
+	let obj = {
+		type: type,
+		editor: { position: { x: x, y: y } }
+	};
 	var node = new Node();
-	node.shape = new Shape();
-	node.shape.graphics.f('#ccc').dr(0,0,100,100);
+	node.setup(obj);
 	nodeContainer.nodes.push(node);
-	addNode({type:'node'}, {type:node.type, editor:{position:{x:node.x, y:node.y}}});
+	nodeContainer.addChild(node);
+	addNode({type:'node'}, obj);
 }
 
 function newPanel(x, y, image) {
@@ -387,7 +402,28 @@ const drop = function (ev) {
 		this.ctrldrag = false;
 	}
 	createjs.extend(Node, createjs.Container);
-
+	
+	Node.prototype.setup = function(obj) {
+		this.name = obj.name;
+		this.type = obj.type;
+		if (obj.editor !== undefined) {
+			this.x = obj.editor.position.x;
+			this.y = obj.editor.position.y;
+		}
+		//this.selected = new createjs.Shape();
+		//this.addChild(this.selected);
+		//let pos = nodeContainer.globalToLocal(x,y);
+		//console.log('new node', pos.x, pos.y);
+		//node.x = pos.x;
+		//node.y = pos.y;
+		this.shape = new createjs.Shape();
+		this.shape.graphics.ss(2).s('#222').f('#444').dr(0,0,100,100);
+		this.shape.on("mousedown", this.handleMouseDown);
+		this.shape.on("pressmove", this.handleMouseMove);
+		this.shape.on("pressup", this.handleMouseUp);
+		this.addChild(this.shape);
+	}
+	
 	Node.prototype.handleMouseDown = function(evt) {
 		let node = evt.target.parent;
 		node.ctrldrag = { dragging: false, socket: null };
@@ -1049,15 +1085,17 @@ const drop = function (ev) {
 					} else {
 						node.goto = undefined;
 					}
-				for (let e=0; e < node.elements.length; e++) {
-					var elem = node.elements[e];
-					if (elem instanceof PanelElement && elem.goto !== undefined) {
-						if (node.elements[elem.goto] !== null) {
-							elem.goto = this.nodes[elem.goto];
-						} else {
-							elem.goto = undefined;
-						}
-					} 
+				if (node.elements !== undefined) {
+					for (let e=0; e < node.elements.length; e++) {
+						var elem = node.elements[e];
+						if (elem instanceof PanelElement && elem.goto !== undefined) {
+							if (node.elements[elem.goto] !== null) {
+								elem.goto = this.nodes[elem.goto];
+							} else {
+								elem.goto = undefined;
+							}
+						} 
+					}
 				}
 			}			
 		}
