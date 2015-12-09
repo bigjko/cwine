@@ -416,11 +416,21 @@ const drop = function (ev) {
 		//console.log('new node', pos.x, pos.y);
 		//node.x = pos.x;
 		//node.y = pos.y;
+		if (obj.goto != -1) this.goto = obj.goto;
+		this.width = 100;
+		this.height = 100;
 		this.shape = new createjs.Shape();
 		this.shape.graphics.ss(2).s('#222').f('#444').dr(0,0,100,100);
 		this.shape.on("mousedown", this.handleMouseDown);
 		this.shape.on("pressmove", this.handleMouseMove);
 		this.shape.on("pressup", this.handleMouseUp);
+		if (this.type == 'varnode') {
+			let socket = this.addSocket(this.x+100, this.y+50, undefined, this, 6, '#000');
+			socket.owner = this;
+			this.sockets.push(socket);
+		} else if (this.type == 'ifnode') {
+			
+		}
 		this.addChild(this.shape);
 	}
 	
