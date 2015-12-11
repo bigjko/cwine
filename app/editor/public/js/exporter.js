@@ -89,3 +89,10 @@ exports.exportToZip = function(json) {
    	});
 };
 
+exports.exportToJSON = function(json) {
+	console.log('export to json!');
+	let string = JSON.stringify(json, null, 4);
+	let blob = new Blob ([string], {type:'application/json'});
+	saveAs(blob, 'cwine.json');
+}
+

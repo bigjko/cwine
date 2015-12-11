@@ -22,7 +22,7 @@ const Sidebar = React.createClass({
 			<div id="sidebar">
 				<ModalButton className="button button-primary" action={this.props.onsave} header="Saved!" text="Project has been saved locally.">Save</ModalButton>
 				<LoadModal header="Load" onloading={this.props.onloading} />
-				<button onClick={this.props.onexport} className="button">Export to .zip</button>
+				<ExportModal header="Export" onexport={this.props.onexport} />
 				<Tabs>
 					<Tabs.Panel title="Properties">
 						{panel}
@@ -54,7 +54,7 @@ const LoadModal = React.createClass({
 	render: function() {
 		return (
 			<button onClick={this.handleOpen} className="button">
-				<span>Load</span>
+				<span>{this.props.header}</span>
 				{this.state.isShowingModal &&
 				<ModalContainer onClose={this.handleClose}>
 					<ModalDialog onClose={this.handleClose}>
@@ -62,6 +62,38 @@ const LoadModal = React.createClass({
 						<button onClick={this.props.onloading} className="button" name="demo">Load Demo Comic</button>
 						<input style={{display:'none'}} type="file" name="fromfile" accept=".json" onChange={this.props.onloading} ref={(ref) => this.fileInput = ref} />
 						<br /><button onClick={this.handleClick} className="button">Load From File</button>
+					</ModalDialog>
+				</ModalContainer>}
+			</button>
+		);
+	}
+});
+
+const ExportModal = React.createClass({
+	getInitialState: function() {
+		return {isShowingModal:false};
+	},
+	handleOpen: function(evt) {
+		//this.props.action(evt);
+		this.setState({isShowingModal: true});
+		console.log("show dialog!");
+	},
+	handleClose: function() { 
+		this.setState({isShowingModal: false});
+	},
+	handleClick: function() {
+		this.fileInput.click();
+	},
+	render: function() {
+		return (
+			<button onClick={this.handleOpen} className="button">
+				<span>{this.props.header}</span>
+				{this.state.isShowingModal &&
+				<ModalContainer onClose={this.handleClose}>
+					<ModalDialog onClose={this.handleClose}>
+						<h1>{this.props.header}</h1>
+						<button onClick={this.props.onexport} className="button" name="zip">Export .zip</button>
+						<br /><button onClick={this.props.onexport} className="button" name="json">Export .json</button>
 					</ModalDialog>
 				</ModalContainer>}
 			</button>

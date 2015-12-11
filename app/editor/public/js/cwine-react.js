@@ -204,7 +204,12 @@ const Editor = React.createClass({
 		console.log("save");
 	},
 	handleExport: function (evt) {
-		exporter.exportToZip({config: this.state.config, nodes: this.state.nodes});
+		if (evt.target.name == 'json') {
+			exporter.exportToJSON({config: this.state.config, nodes: this.state.nodes});
+		} else if (evt.target.name == 'zip') {
+			exporter.exportToZip({config: this.state.config, nodes: this.state.nodes});
+		}
+
 	},
 	handleMenu: function (cmd, pos) {
 		switch(cmd.name) {
