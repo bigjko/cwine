@@ -141,22 +141,13 @@ function start() {
   $('#panels').css('font-size', 13*diff + 'px');*/
   if (config.comic_width !== undefined) $('#panels').css('width', config.comic_width+'%');
   if (config.comic_maxwidth !== undefined) $('#panels').css('max-width', config.comic_maxwidth+'px');
-  var diff = $('#panels').innerWidth() / 800;
-  var fontsize = 12;
-  if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
-  $('#panels').css({'font-size': fontsize*diff + 'px'});
+  resizePanels();
   if (config.comic_font !== undefined) {
       $('#panels').css('font-family', '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif');
   }
 
   $( window ).resize(function() {
-    var diff = $('#panels').innerWidth() / 800;
-    var fontsize = 12;
-    var lineheight = 0.85;
-    if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
-    if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
-    $('#panels').css({'font-size': fontsize*diff + 'px'});
-    $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
+    resizePanels();
   });
 
   var lineheight = 0.85;
@@ -164,12 +155,31 @@ function start() {
   $container = $('#panels');
   $container.append(panels);
   $('.panel').animate({ opacity: 1 });
-  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
+  resizePanels();
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
     for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
   },100);*/
+}
+
+function resizePanels() {
+  var diff = $('#panels').innerWidth() / 800;
+  $('#panels').css({'font-size': fontsize*diff + 'px'});
+  var fontsize = 12;
+  var lineheight = 0.85;
+  if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
+  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
+  var padding = '12 18 20';
+  if (config.element_padding !== undefined) padding = config.element_padding;
+  padding = padding.split(' ');
+  if (padding.length == 1) padding += 'px';
+  else padding = padding.join('px ')+'px';
+  console.log(padding);
+  for (var p=0; p<padding.length; p++) {
+    padding[p] *= diff;
+  }
+  $('.bubble p').css({'padding': padding, 'line-height': lineheight*diff+'rem'});
 }
 
 function addPanel(id) {
@@ -180,10 +190,7 @@ function addPanel(id) {
 
   $container.append(panels);
   $('.panel').animate({ opacity: 1 });
-  var diff = $('#panels').innerWidth() / 800;
-  var lineheight = 0.85;
-  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
-  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
+  
 
 
   //$container.packery('appended', panels);

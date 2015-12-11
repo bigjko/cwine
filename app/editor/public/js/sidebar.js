@@ -189,8 +189,9 @@ const ProjectProperties = React.createClass({
 					</select>
 				</div>
 
-				<FieldLabel label="side" name="Font Size"><Field after="px" name="comic_fontsize" value={this.props.config.comic_fontsize} onChange={this.props.onchange} /></FieldLabel>
-				<FieldLabel label="side" name="Line Height"><Field after="em" name="comic_lineheight" value={this.props.config.comic_lineheight} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="side" name="Font Size"><Field className='short-field' after="px" name="comic_fontsize" value={this.props.config.comic_fontsize} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="side" name="Line Height"><Field className='short-field' after="em" name="comic_lineheight" value={this.props.config.comic_lineheight} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="top" name="Element Padding"><Field after="px" name="element_padding" value={this.props.config.element_padding} onChange={this.props.onchange} /></FieldLabel>
 
 
 			</div>
@@ -211,9 +212,9 @@ const Field = React.createClass({
 			title = <span>{this.props.title}:</span>;
 		}
 		return (
-			<div className="small-field">
+			<div className={this.props.className}>
 				{title}
-				<input className="small-input" type="text" name={this.props.name} value={ this.props.value } onChange={this.props.onChange} />
+				<input type="text" name={this.props.name} value={ this.props.value } onChange={this.props.onChange} />
 				{after}
 			</div>
 		);
