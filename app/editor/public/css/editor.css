@@ -159,7 +159,7 @@ input[type="text"] {
 	font-weight:bold;
 	height:25px;
 	width:120px;
-	margin:0;
+	margin:0 10px;
 	top:0;
 }
 
@@ -241,12 +241,17 @@ textarea {
 	margin:0;
 }
 
+.labeltop {
+	height:50px;
+}
+
 .labelside {
 
 }
 
 .labeltop input[type="text"] {
-	width:100%;
+	width:80%;
+	margin-right:10px;
 }
 
 .labeltop p {
@@ -283,7 +288,6 @@ textarea {
 
 .labelside p {
 	line-height:30px;
-	float:left;
 	clear:none;
 	margin-right:10px;
 }

@@ -793,6 +793,7 @@ const drop = function (ev) {
 		this.bubble_type = obj.bubble_type;
 		this.text = obj.text;
         this.position = obj.position;
+		this.padding = obj.padding;
 
 		var sb = obj;
 
@@ -843,6 +844,15 @@ const drop = function (ev) {
 		if (obj.height !== undefined && obj.height !== "") {
 			div.style.height = this.panelbitmap.image.height*this.panelbitmap.scaleX*(obj.height/100)/0.6 + 'px';
 		}
+		if (obj.padding !== undefined && div.children.length > 0) {
+			div.children[0].style.padding = obj.padding.trim().split(' ').join('px ') + 'px';
+		}
+		else if (config.default_padding !== undefined && div.children.length > 0) {
+			let padding = config.default_padding.trim().split(' ').join('px ') + 'px';
+			div.children[0].style.padding = padding;
+			console.log(padding);
+		}
+		
 
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
@@ -919,14 +929,21 @@ const drop = function (ev) {
 			element.style.height = "";
 		}
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
-		if (config.comic_fontsize !== undefined) {
+		if (config.comic_fontsize !== undefined && element.children.length > 0) {
 			element.children[0].style.fontSize = config.comic_fontsize + 'px';
 		}
-		if (config.comic_font !== undefined) {
+		if (config.comic_font !== undefined && element.children.length > 0) {
 			element.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
 		}
-		if (config.comic_lineheight !== undefined) {
+		if (config.comic_lineheight !== undefined && element.children.length > 0) {
 			element.children[0].style.lineHeight = config.comic_lineheight + 'rem';
+		}
+		if (this.padding !== undefined && element.children.length > 0) {
+			element.children[0].style.padding = this.padding.trim().split(' ').join('px ') + 'px';
+		} else if (config.default_padding !== undefined && element.children.length > 0) {
+			let padding = config.default_padding.trim().split(' ').join('px ') + 'px';
+			element.children[0].style.padding = padding;
+			console.log(padding);
 		}
 
 		this.width = element.clientWidth;

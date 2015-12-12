@@ -196,6 +196,7 @@ const ElementProperties = React.createClass({
 				<CheckMark label="after" title="Hide on comic progress" name="hideOnProgress" checked={this.props.node.hideOnProgress} onChange={this.props.onchange} />
 
 				<StaticField label="side" name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
+				<FieldLabel label="top" name="Padding"><Field after="px" name="padding" value={this.props.node.padding} onChange={this.props.onchange} /></FieldLabel>
 
 				<button onClick={this.props.onremove} className="button delete-button">Delete Element</button>
 			</div>
@@ -223,7 +224,7 @@ const ProjectProperties = React.createClass({
 
 				<FieldLabel label="side" name="Font Size"><Field className='short-field' after="px" name="comic_fontsize" value={this.props.config.comic_fontsize} onChange={this.props.onchange} /></FieldLabel>
 				<FieldLabel label="side" name="Line Height"><Field className='short-field' after="em" name="comic_lineheight" value={this.props.config.comic_lineheight} onChange={this.props.onchange} /></FieldLabel>
-				<FieldLabel label="top" name="Element Padding"><Field after="px" name="element_padding" value={this.props.config.element_padding} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="top" name="Default Padding"><Field after="px" name="default_padding" value={this.props.config.default_padding} onChange={this.props.onchange} /></FieldLabel>
 
 
 			</div>
@@ -253,11 +254,12 @@ const Field = React.createClass({
 	}
 });
 
+
 const FieldLabel = React.createClass({
 	render: function() {
 		let name = '';
 		if (this.props.name !== '') name = this.props.name + ':';
-		let fieldclass = 'field label' + this.props.label + ' multi-field';
+		let fieldclass = 'field label' + this.props.label;
 		return (
 			<div className={fieldclass}>
 				<p>{name}</p>
