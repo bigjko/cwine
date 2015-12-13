@@ -57,8 +57,9 @@ const handleImages = function(json) {
 };
 
 exports.exportToZip = function(json) {
+	let copy = JSON.parse(JSON.stringify(json));
 	let zip = new JSZip();
-	let images = handleImages(json);
+	let images = handleImages(copy);
 	console.log(images);
 	//let done = 3;
 	
@@ -68,7 +69,7 @@ exports.exportToZip = function(json) {
    		}
    		zip.load(data);
 		
-   		zip.file('game.json', JSON.stringify(json, null, 4));
+   		zip.file('game.json', JSON.stringify(copy, null, 4));
 		for (let i=0; i<images.length; i++) {
 			zip.file('img/'+images[i].name, images[i].data, {base64:true});
 		}
