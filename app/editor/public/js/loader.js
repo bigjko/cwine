@@ -107,7 +107,7 @@ function preloadImages(obj, callback) {
 	for (var i=0; i<obj.nodes.length; i++) {
 		if (obj.nodes[i] !== undefined && obj.nodes[i] !== null) {
 			let image = obj.nodes[i].image;
-			if (images.indexOf(image) == -1) images.push(image);
+			if (image !== undefined && images.indexOf(image) == -1) images.push(image);
 		}
 		
 	}

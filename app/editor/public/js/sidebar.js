@@ -19,10 +19,10 @@ const Sidebar = React.createClass({
 		}
 
 		return (
-			<div>
+			<div id="sidebar">
 				<ModalButton className="button button-primary" action={this.props.onsave} header="Saved!" text="Project has been saved locally.">Save</ModalButton>
 				<LoadModal header="Load" onloading={this.props.onloading} />
-				<button onClick={this.props.onexport} className="button">Export to .zip</button>
+				<ExportModal header="Export" onexport={this.props.onexport} />
 				<Tabs>
 					<Tabs.Panel title="Properties">
 						{panel}
@@ -54,7 +54,7 @@ const LoadModal = React.createClass({
 	render: function() {
 		return (
 			<button onClick={this.handleOpen} className="button">
-				<span>Load</span>
+				<span>{this.props.header}</span>
 				{this.state.isShowingModal &&
 				<ModalContainer onClose={this.handleClose}>
 					<ModalDialog onClose={this.handleClose}>
@@ -62,6 +62,38 @@ const LoadModal = React.createClass({
 						<button onClick={this.props.onloading} className="button" name="demo">Load Demo Comic</button>
 						<input style={{display:'none'}} type="file" name="fromfile" accept=".json" onChange={this.props.onloading} ref={(ref) => this.fileInput = ref} />
 						<br /><button onClick={this.handleClick} className="button">Load From File</button>
+					</ModalDialog>
+				</ModalContainer>}
+			</button>
+		);
+	}
+});
+
+const ExportModal = React.createClass({
+	getInitialState: function() {
+		return {isShowingModal:false};
+	},
+	handleOpen: function(evt) {
+		//this.props.action(evt);
+		this.setState({isShowingModal: true});
+		console.log("show dialog!");
+	},
+	handleClose: function() { 
+		this.setState({isShowingModal: false});
+	},
+	handleClick: function() {
+		this.fileInput.click();
+	},
+	render: function() {
+		return (
+			<button onClick={this.handleOpen} className="button">
+				<span>{this.props.header}</span>
+				{this.state.isShowingModal &&
+				<ModalContainer onClose={this.handleClose}>
+					<ModalDialog onClose={this.handleClose}>
+						<h1>{this.props.header}</h1>
+						<button onClick={this.props.onexport} className="button" name="zip">Export .zip</button>
+						<br /><button onClick={this.props.onexport} className="button" name="json">Export .json</button>
 					</ModalDialog>
 				</ModalContainer>}
 			</button>
@@ -161,8 +193,10 @@ const ElementProperties = React.createClass({
 					<Field title="Height" name="height" after="%" value={this.props.node.height} onChange={this.props.onchange} />
 				</FieldLabel>
 				<CheckMark label="after" title="Keep original aspect" name="keepAspect" checked={this.props.node.keepAspect} onChange={this.props.onchange} />
+				<CheckMark label="after" title="Hide on comic progress" name="hideOnProgress" checked={this.props.node.hideOnProgress} onChange={this.props.onchange} />
 
 				<StaticField label="side" name="Position" value={'x:' + this.props.node.position.x.toFixed(2) + ', y:' + this.props.node.position.y.toFixed(2)} />
+				<FieldLabel label="top" name="Padding"><Field after="px" name="padding" value={this.props.node.padding} onChange={this.props.onchange} /></FieldLabel>
 
 				<button onClick={this.props.onremove} className="button delete-button">Delete Element</button>
 			</div>
@@ -188,8 +222,9 @@ const ProjectProperties = React.createClass({
 					</select>
 				</div>
 
-				<FieldLabel label="side" name="Font Size"><Field after="px" name="comic_fontsize" value={this.props.config.comic_fontsize} onChange={this.props.onchange} /></FieldLabel>
-				<FieldLabel label="side" name="Line Height"><Field after="em" name="comic_lineheight" value={this.props.config.comic_lineheight} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="side" name="Font Size"><Field className='short-field' after="px" name="comic_fontsize" value={this.props.config.comic_fontsize} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="side" name="Line Height"><Field className='short-field' after="em" name="comic_lineheight" value={this.props.config.comic_lineheight} onChange={this.props.onchange} /></FieldLabel>
+				<FieldLabel label="top" name="Default Padding"><Field after="px" name="default_padding" value={this.props.config.default_padding} onChange={this.props.onchange} /></FieldLabel>
 
 
 			</div>
@@ -210,20 +245,21 @@ const Field = React.createClass({
 			title = <span>{this.props.title}:</span>;
 		}
 		return (
-			<div className="small-field">
+			<div className={this.props.className}>
 				{title}
-				<input className="small-input" type="text" name={this.props.name} value={ this.props.value } onChange={this.props.onChange} />
+				<input type="text" name={this.props.name} value={ this.props.value } onChange={this.props.onChange} />
 				{after}
 			</div>
 		);
 	}
 });
 
+
 const FieldLabel = React.createClass({
 	render: function() {
 		let name = '';
 		if (this.props.name !== '') name = this.props.name + ':';
-		let fieldclass = 'field label' + this.props.label + ' multi-field';
+		let fieldclass = 'field label' + this.props.label;
 		return (
 			<div className={fieldclass}>
 				<p>{name}</p>

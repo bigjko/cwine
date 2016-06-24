@@ -165,6 +165,7 @@ header img {
 .panel {
 	width:23%;
 	position:relative;
+	opacity:0;
 	-webkit-transition: opacity 1s;
     transition: opacity 1s;
     margin:1%;

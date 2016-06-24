@@ -111,16 +111,25 @@ function speechBubble(sb) {
   if (sb.width !== undefined && sb.width !== "") bubble.css('width',sb.width+'%');
   if (sb.height !== undefined && sb.height !== "") bubble.css('height', sb.height+'%');
   if ((sb.width === undefined || sb.width === "") && (sb.height === undefined || sb.height === "")) bubble.css('white-space', 'nowrap');
+  if (sb.hideOnProgress) { bubble.addClass('hidenext'); }
 
   // INTERACTIVE BUBBLE!
   if (sb.goto !== undefined && sb.goto !== null && panels[sb.goto] !== null) {
     bubble.addClass('clickable');
     bubble.on('click', function() {
+      $(this).addClass('clicked');
+      //debugger;
+      $(this).parent().children('.hidenext:not(.clicked)').fadeOut();
       addPanel(sb.goto);
     });
   }
 
   bubble.html('<p>' + sb.text.replace(/\n/g, '<br>') + '</p>');
+  
+  if (sb.padding !== undefined) {
+    bubble.children('p').data('padding', sb.padding);
+    console.log(bubble.children('p').data('padding'));
+  }
 
   return bubble;
 }
@@ -137,34 +146,49 @@ function start() {
   $('#panels').css('font-size', 13*diff + 'px');*/
   if (config.comic_width !== undefined) $('#panels').css('width', config.comic_width+'%');
   if (config.comic_maxwidth !== undefined) $('#panels').css('max-width', config.comic_maxwidth+'px');
-  var diff = $('#panels').innerWidth() / 800;
-  var fontsize = 12;
-  if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
-  $('#panels').css({'font-size': fontsize*diff + 'px'});
   if (config.comic_font !== undefined) {
       $('#panels').css('font-family', '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif');
   }
 
   $( window ).resize(function() {
-    var diff = $('#panels').innerWidth() / 800;
-    var fontsize = 12;
-    var lineheight = 0.85;
-    if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
-    if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
-    $('#panels').css({'font-size': fontsize*diff + 'px'});
-    $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
+    resizePanels();
   });
 
   var lineheight = 0.85;
   if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
   $container = $('#panels');
   $container.append(panels);
-  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
+  $('.panel').animate({ opacity: 1 });
+  resizePanels();
 
   /*setTimeout(function() {
     var panel_divs = document.querySelectorAll(".panel");
     for (var p=0; p<panel_divs.length;p++) { panel_divs[p].style.opacity = 1; }
   },100);*/
+}
+
+function resizePanels() {
+  var diff = $('#panels').innerWidth() / 800;
+  var fontsize = 12;
+  var lineheight = 0.85;
+  if (config.comic_fontsize !== undefined) fontsize = config.comic_fontsize;
+  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
+  $('.bubble p').each( function(index) {
+    if ($(this).data('padding') !== undefined) {
+      console.log('element has padding');
+      padding = $(this).data('padding');
+    } else if (config.default_padding !== undefined) {
+      padding = config.default_padding;
+    } else padding = '12 18 20';
+    for (var p=0; p<padding.length; p++) {
+      padding[p] *= diff;
+    }
+    padding = padding.split(' ').join('px ') + 'px';
+    console.log(padding);
+    $(this).css({'padding': padding, 'line-height': lineheight*diff+'rem'});
+  });
+  
+  $('#panels').css({'font-size': fontsize*diff + 'px'});
 }
 
 function addPanel(id) {
@@ -174,11 +198,9 @@ function addPanel(id) {
   var panels = getPanel(id);
 
   $container.append(panels);
-  var diff = $('#panels').innerWidth() / 800;
-  var lineheight = 0.85;
-  if (config.comic_lineheight !== undefined) lineheight = config.comic_lineheight * 0.6;
-  $('.bubble p').css({'padding': 12*diff+'px '+18*diff+'px '+20*diff+'px', 'line-height': lineheight*diff+'rem'});
-
+  $('.panel').animate({ opacity: 1 });
+  
+  resizePanels();
 
   //$container.packery('appended', panels);
 
@@ -194,14 +216,14 @@ function getPanel(id) {
   var count = 0; 
   var p = newPanelElement(id);
  
-  elems.push(p.get(0));
+  elems.push(p);
 
   
   while (panels[id].goto !== undefined && panels[id].goto != -1 && panels[id].goto !== null && panels[panels[id].goto] !== null) {
     id = panels[id].goto;
     count++;
     p = newPanelElement(id);
-    elems.push(p.get(0));
+    elems.push(p);
 
     // In case of infinite looping comic: Abort
     if (count > 50) break;
@@ -213,7 +235,7 @@ function getPanel(id) {
 function newPanelElement(id) {
   console.log(id);
   var li = $('<li>').addClass('panel-list');
-  var paneldiv = $('<div>').addClass('panel noselect ' + 'w' + panels[id].size).css('opacity', 1);
+  var paneldiv = $('<div>').addClass('panel noselect hidden ' + 'w' + panels[id].size);
   var panelimg = $('<img>').attr('src', panels[id].image);
 
   paneldiv.append(panelimg);

@@ -159,7 +159,7 @@ input[type="text"] {
 	font-weight:bold;
 	height:25px;
 	width:120px;
-	margin:0;
+	margin:0 10px;
 	top:0;
 }
 
@@ -241,12 +241,17 @@ textarea {
 	margin:0;
 }
 
+.labeltop {
+	height:50px;
+}
+
 .labelside {
 
 }
 
 .labeltop input[type="text"] {
-	width:100%;
+	width:80%;
+	margin-right:10px;
 }
 
 .labeltop p {
@@ -283,7 +288,6 @@ textarea {
 
 .labelside p {
 	line-height:30px;
-	float:left;
 	clear:none;
 	margin-right:10px;
 }
@@ -582,4 +586,98 @@ textarea {
 .tab-panel {
 	padding: 10px 20px;
 	background-color:#555;
+}
+
+/* CONTEXT MENU */
+
+.menu-container {
+	position:absolute;
+	top:50%;
+	left:50%;
+	color:#ccc;
+}
+
+.menu-container:before,
+.menu-container:after {
+  content: '';
+  display: block;
+  height: 0;
+  clear: both;
+}
+
+.menu-container.below {
+  position: relative;
+}
+
+.menu-container.below .menu {
+  width: 100%;
+}
+
+.menu-container.below .menu .menu-item {
+  float: left;
+  border: none;
+}
+
+.menu-container.below .sub-menu {
+  position: absolute;
+  top: 30px;
+  border: 1px #eee solid;
+  border-top: none;
+}
+
+.menu, .sub-menu {
+  float: left;
+  height: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px #eee solid;
+}
+
+.menu .menu-item,
+.sub-menu .sub-menu-item {
+  min-width: 80px;
+  line-height: 30px;
+  padding: 0 15px;
+  margin:0;
+  border-top: 1px #eee solid;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 12px;
+  color:#ccc;
+  background-color:#222;
+}
+
+.menu .menu-item:first-child {
+  border-top: none;
+}
+
+.menu .menu-item.active {
+	background-color:#2c3c3c;
+	height:30px;
+	color: #fff;
+	border-right: 1px #fff solid;
+	margin-right: -1px;
+}
+
+.menu .menu-item.active:after {
+	font-size:8px;
+	margin-left:10px;
+	content: '▶';
+}
+
+.sub-menu {
+	border-left: none;
+}
+
+.sub-menu .sub-menu-item {
+	border: none;
+	font-size:10px;
+	line-height:25px;
+	padding:0 10px;
+}
+
+.sub-menu .sub-menu-item:hover {
+	background-color:#2c3c3c;
+  	color: #fff;
 }

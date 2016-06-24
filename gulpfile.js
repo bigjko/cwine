@@ -5,12 +5,11 @@ var browserify = require('browserify'),
     source = require('vinyl-source-stream'),
     editorSource = 'app/editor/public/js/main.js',
     editorDestFolder = 'app/editor/public/js/',
-    editorDestFile = 'cwine-editor.js',
+    editorDestFile = 'cwine-editor-bundle.js',
     gameSource = 'app/game/public/js/game.js',
     gameDestFolder = 'app/game/public/js/',
-    gameDestFile = 'cwine-runtime.js',
+    gameDestFile = 'cwine-runtime-bundle.js',
     server = require('./server.js');
-
 
 gulp.task('browserify-editor', function() {
   return browserify(editorSource, {debug:true})
@@ -30,9 +29,16 @@ gulp.task('browserify-game', function() {
 gulp.task('watch-editor', function() {
   var bundler = watchify(browserify(editorSource, {debug:true})).transform(babelify, { presets: ['react','es2015']});
   bundler.on('update', rebundle);
+  bundler.on('log', function(msg) {
+    console.log('update! ' + new Date());
+  });
 
   function rebundle() {
     return bundler.bundle()
+      .on('error', function(err){
+        console.log(err.message);
+        this.emit('end');
+      })
       .pipe(source(editorDestFile))
       .pipe(gulp.dest(editorDestFolder));
   }
@@ -43,9 +49,16 @@ gulp.task('watch-editor', function() {
 gulp.task('watch-game', function() {
   var bundler = watchify(browserify(gameSource, {debug:true}));
   bundler.on('update', rebundle);
-
+  bundler.on('log', function(msg) {
+    console.log('update! ' + new Date());
+  });
+  
   function rebundle() {
     return bundler.bundle()
+      .on('error', function(err){
+        console.log(err.message);
+        this.emit('end');
+      })
       .pipe(source(gameDestFile))
       .pipe(gulp.dest(gameDestFolder));
   }
@@ -53,8 +66,10 @@ gulp.task('watch-game', function() {
   return rebundle();
 });
 
+
+
 gulp.task('express', function () {
   server.serve();
 });
 
-gulp.task('default', ['browserify-editor', 'watch-editor', 'watch-game', 'express']);
+gulp.task('default', ['watch-editor', 'watch-game', 'express']);

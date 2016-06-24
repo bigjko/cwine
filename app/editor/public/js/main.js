@@ -26,7 +26,7 @@ function init() {
 
 	ReactDOM.render(
 		<Editor />,
-		document.querySelector('#sidebar')
+		document.querySelector('#react')
 	);
 }
 

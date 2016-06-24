@@ -128,9 +128,18 @@ function initNodes() {
 	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
 		if (panels[p] !== null) {
-			var panel = new Panel(panels[p]);
-			nodeContainer.addChild(panel);
-			nodeContainer.nodes.push(panel);
+			let node;
+			if (panels[p].type !== undefined) {
+				if (panels[p].type == 'varnode') {
+					node = new Node();
+					node.setup(panels[p]);
+				}
+			} else {
+				node = new Panel(panels[p]);
+			}
+			//var panel = new Panel(panels[p]);
+			nodeContainer.addChild(node);
+			nodeContainer.nodes.push(node);
 		} else {
 			nodeContainer.nodes.push(null);
 		}
@@ -222,6 +231,20 @@ function drawAllConnections() {
 	for (var c = 0; c < nodeContainer.children.length; c++) {
 		nodeContainer.children[c].drawConnections();
 	}
+}
+
+exports.newNode = function(x, y, type) {
+	let pos = nodeContainer.globalToLocal(x,y);
+	console.log('new node', pos.x, pos.y);
+	let obj = {
+		type: type,
+		editor: { position: { x: x, y: y } }
+	};
+	var node = new Node();
+	node.setup(obj);
+	nodeContainer.nodes.push(node);
+	nodeContainer.addChild(node);
+	addNode({type:'node'}, obj);
 }
 
 function newPanel(x, y, image) {
@@ -336,6 +359,7 @@ const drop = function (ev) {
     ev.dataTransfer = ev.originalEvent.dataTransfer;
     ev.clientX = ev.originalEvent.clientX;
     ev.clientY = ev.originalEvent.clientY;
+    let newimage = ev.dataTransfer.getData("text/plain");
     if (ev.target == stage.canvas) {
     	//console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
     	var local = nodeContainer.globalToLocal(ev.clientX, ev.clientY);
@@ -347,9 +371,17 @@ const drop = function (ev) {
     	if (pnl instanceof Panel) {
     		var pos = pnl.globalToLocal(ev.clientX, ev.clientY);
     		console.log(pos);
-    		newPanelElement(pos.x, pos.y, pnl, ev.dataTransfer.getData("text/plain"));
+    		if (ev.originalEvent.ctrlKey) {
+    			console.log('replace image!');
+    			//pnl.image = ev.dataTransfer.getData("text/plain");
+    			pnl.newImage(newimage);
+    			let sel = {node: nodeContainer.nodes.indexOf(pnl)};
+				handleChange(sel, {image: newimage});
+    		} else {
+	    		newPanelElement(pos.x, pos.y, pnl, newimage);
+	    	}
     	}
-    	else newPanel(local.x, local.y, ev.dataTransfer.getData("text/plain"));
+    	else newPanel(local.x, local.y, newimage);
     }
     //var data = ev.dataTransfer.getData("text");
     //ev.target.appendChild(document.getElementById(data));
@@ -367,10 +399,63 @@ const drop = function (ev) {
 	function Node() {
 		this.Container_constructor();
 		this.sockets = [];
+		this.ctrldrag = false;
 	}
 	createjs.extend(Node, createjs.Container);
-
+	
+	Node.prototype.setup = function(obj) {
+		this.name = obj.name;
+		this.type = obj.type;
+		if (obj.editor !== undefined) {
+			this.x = obj.editor.position.x;
+			this.y = obj.editor.position.y;
+		}
+		//this.selected = new createjs.Shape();
+		//this.addChild(this.selected);
+		//let pos = nodeContainer.globalToLocal(x,y);
+		//console.log('new node', pos.x, pos.y);
+		//node.x = pos.x;
+		//node.y = pos.y;
+		if (obj.goto != -1) this.goto = obj.goto;
+		this.width = 100;
+		this.height = 100;
+		this.shape = new createjs.Shape();
+		this.shape.graphics.ss(2).s('#222').f('#444').dr(0,0,100,100);
+		this.shape.on("mousedown", this.handleMouseDown);
+		this.shape.on("pressmove", this.handleMouseMove);
+		this.shape.on("pressup", this.handleMouseUp);
+		if (this.type == 'varnode') {
+			let socket = this.addSocket(this.x+100, this.y+50, undefined, this, 6, '#000');
+			socket.owner = this;
+			this.sockets.push(socket);
+		} else if (this.type == 'ifnode') {
+			
+		}
+		this.addChild(this.shape);
+	}
+	
 	Node.prototype.handleMouseDown = function(evt) {
+		let node = evt.target.parent;
+		node.ctrldrag = { dragging: false, socket: null };
+		if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
+			evt.preventDefault();
+			
+			for (let s=0; s < node.sockets.length; s++) {
+				let socket = node.sockets[s];
+				if (socket.owner == node) {
+					let socketEvt = evt.clone();
+					let nodeEvt = evt.clone();
+					node.ctrldrag = {dragging:true, socket: socket};
+					socketEvt.set({type: 'pressmove', target: socket});
+					//nodeEvt.set({type: 'mouseup'});
+					//node.dispatchEvent(nodeEvt);
+					
+					socket.dispatchEvent(socketEvt);
+				}
+			}
+
+			return false;
+		}
 		dragoffset = {
 			x: evt.stageX/viewScale - evt.target.parent.x,
 			y: evt.stageY/viewScale - evt.target.parent.y
@@ -385,7 +470,26 @@ const drop = function (ev) {
 
 	Node.prototype.handleMouseMove = function(evt) {
 		//console.log(evt.target);
-		
+		let node = evt.target.parent;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressmove', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+			return false;
+		}
+		/*if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
+			for (let s=0; s < node.sockets.length; s++) {
+				let socket = node.sockets[s];
+				if (socket.owner == node) {
+					let newEvent = evt.clone();
+					newEvent.set({type: 'pressmove', target: socket});
+					socket.dispatchEvent(newEvent);
+				}
+			}
+			return;
+		}*/
+
 		let panel = evt.target.parent;
 		let old = {x: panel.x, y: panel.y};
 		
@@ -404,6 +508,19 @@ const drop = function (ev) {
 		//console.log(evt.target.parent);
 		//drawConnections(evt.target.parent);
 		
+	};
+
+	Node.prototype.handleMouseUp = function(evt) {
+		let node = evt.target.parent;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressup', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+
+			node.ctrldrag = { dragging: false, socket: null };
+			return false;
+		}
 	};
 
 	Node.prototype.drawConnections = function() {
@@ -433,7 +550,9 @@ const drop = function (ev) {
 	};
 
 	Node.prototype.dragLine = function(evt) {
-		var sock = evt.target.parent;
+		console.log("dragline!");
+		let sock = evt.target;
+		if (sock instanceof createjs.Shape) sock = evt.target.parent;
 		var line = sock.line;
 		line.graphics.clear();
 		var local = line.globalToLocal(evt.stageX, evt.stageY);
@@ -441,9 +560,10 @@ const drop = function (ev) {
 	};
 
 	Node.prototype.releaseLine = function(evt) {
-		let socket = evt.target.parent;
-		let panel = evt.target.parent.parent;
-		let owner = evt.target.parent.owner;
+		let socket = evt.target;
+		if (socket instanceof createjs.Shape) socket = evt.target.parent;
+		let panel = socket.parent;
+		let owner = socket.owner;
 		socket.goto = undefined;
 		owner.goto = undefined;
 		socket.line.graphics.clear();
@@ -547,6 +667,7 @@ const drop = function (ev) {
 			this.addChild(this.panelbitmap);
 			this.panelbitmap.on("mousedown", this.handleMouseDown);
 			this.panelbitmap.on("pressmove", this.handleMouseMove);
+			this.panelbitmap.on("pressup", this.handleMouseUp);
 			this.panelbitmap.shadow = new createjs.Shadow("rgba(0,0,0,0.2)", 3, 3, 4);
 			//this.panelbitmap.on("click", this.showProperties);
 		}
@@ -587,15 +708,34 @@ const drop = function (ev) {
 		}	
 	};
 
+	Panel.prototype.newImage = function(image) {
+		console.log('IMAGE SHIT!');
+		//this.removeChild(this.panelbitmap)
+		this.image = image;
+		let img = new Image();
+		img.onload = function() {
+			this.update();
+		}.bind(this);
+		img.src = this.image;
+		//console.log(img);
+		this.panelbitmap.image = img;
+	};
+
 	Panel.prototype.update = function(update) {
 		//this.x = update.editor.position.x;
 		//this.y = update.editor.position.y;
 		for (let property in update) {
 			this[property] = update[property];
-			if (property == 'image') {
+			/*if (property == 'image') {
 				// FIX THIS IMAGE SHIT!
-				this.panelbitmap = new Bitmap(this.image);
-			}
+				console.log('IMAGE SHIT!');
+				//this.removeChild(this.panelbitmap)
+				this.image = update.image;
+				let img = new Image();
+				img.src = this.image;
+				//console.log(img);
+				this.panelbitmap.image = img;
+			}*/
 			console.log("Changed", property, update[property]);
 		}
 		let scale = 0.25;
@@ -644,6 +784,7 @@ const drop = function (ev) {
 		this.Container_constructor();
 		this.panelbitmap = bitmap;
 		this.setup(obj);
+		this.ctrldrag = {dragging:false, socket:null};
 	} createjs.extend(PanelElement, createjs.Container);
 
 	PanelElement.prototype.setup = function(obj) {
@@ -652,6 +793,7 @@ const drop = function (ev) {
 		this.bubble_type = obj.bubble_type;
 		this.text = obj.text;
         this.position = obj.position;
+		this.padding = obj.padding;
 
 		var sb = obj;
 
@@ -702,6 +844,15 @@ const drop = function (ev) {
 		if (obj.height !== undefined && obj.height !== "") {
 			div.style.height = this.panelbitmap.image.height*this.panelbitmap.scaleX*(obj.height/100)/0.6 + 'px';
 		}
+		if (obj.padding !== undefined && div.children.length > 0) {
+			div.children[0].style.padding = obj.padding.trim().split(' ').join('px ') + 'px';
+		}
+		else if (config.default_padding !== undefined && div.children.length > 0) {
+			let padding = config.default_padding.trim().split(' ').join('px ') + 'px';
+			div.children[0].style.padding = padding;
+			console.log(padding);
+		}
+		
 
 		this.scaleX = 0.6;
 		this.scaleY = 0.6;
@@ -743,6 +894,7 @@ const drop = function (ev) {
 		//this.addChild(hitshape);
 		this.on("mousedown", this.setDragOffset);
 		this.on("pressmove", this.dragElement);
+		this.on("pressup", this.handleMouseUp);
 		//this.on("click", this.showProperties);
 		//elm.regY = elm.getBounds().height;
 		//elements.addChild(elm);
@@ -777,14 +929,21 @@ const drop = function (ev) {
 			element.style.height = "";
 		}
 		element.innerHTML = '<p>' + this.text.replace(/\n/g, "<br>") + '</p>';
-		if (config.comic_fontsize !== undefined) {
+		if (config.comic_fontsize !== undefined && element.children.length > 0) {
 			element.children[0].style.fontSize = config.comic_fontsize + 'px';
 		}
-		if (config.comic_font !== undefined) {
+		if (config.comic_font !== undefined && element.children.length > 0) {
 			element.style.fontFamily = '\'' + config.comic_font + '\', Verdana, Geneva, sans-serif';
 		}
-		if (config.comic_lineheight !== undefined) {
+		if (config.comic_lineheight !== undefined && element.children.length > 0) {
 			element.children[0].style.lineHeight = config.comic_lineheight + 'rem';
+		}
+		if (this.padding !== undefined && element.children.length > 0) {
+			element.children[0].style.padding = this.padding.trim().split(' ').join('px ') + 'px';
+		} else if (config.default_padding !== undefined && element.children.length > 0) {
+			let padding = config.default_padding.trim().split(' ').join('px ') + 'px';
+			element.children[0].style.padding = padding;
+			console.log(padding);
 		}
 
 		this.width = element.clientWidth;
@@ -821,6 +980,26 @@ const drop = function (ev) {
 	};
 
 	PanelElement.prototype.setDragOffset = function(evt) {
+		let node = evt.target;
+		node.ctrldrag = { dragging: false, socket: null };
+		if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
+			evt.preventDefault();
+			
+			for (let s=0; s < node.parent.sockets.length; s++) {
+				let socket = node.parent.sockets[s];
+				if (socket.owner == node) {
+					let socketEvt = evt.clone();
+					let nodeEvt = evt.clone();
+					node.ctrldrag = {dragging:true, socket: socket};
+					socketEvt.set({type: 'pressmove', target: socket});
+					//nodeEvt.set({type: 'mouseup'});
+					//node.dispatchEvent(nodeEvt);		
+					socket.dispatchEvent(socketEvt);
+				}
+			}
+
+			return false;
+		}
 		var global = evt.target.parent.localToGlobal(evt.target.x, evt.target.y);
 		dragoffset = {
 			x: evt.stageX - global.x,
@@ -836,6 +1015,15 @@ const drop = function (ev) {
 
 	PanelElement.prototype.dragElement = function(evt) {
 		//console.log("Click!");
+		let node = evt.target;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressmove', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+			return false;
+		}
+
 		var local = evt.target.parent.globalToLocal(evt.stageX - dragoffset.x, evt.stageY - dragoffset.y);
 		var panelbitmap = evt.target.parent.panelbitmap;
 		var panel = {
@@ -858,8 +1046,21 @@ const drop = function (ev) {
 		evt.target.parent.drawConnections();
 	};
 
+	PanelElement.prototype.handleMouseUp = function(evt) {
+		let node = evt.target;
+		if (node.ctrldrag.dragging) {
+			let socketEvt = evt.clone();
+			socketEvt.set({type: 'pressup', target: node.ctrldrag.socket});
+			
+			node.ctrldrag.socket.dispatchEvent(socketEvt);
+
+			node.ctrldrag = { dragging: false, socket: null };
+			return false;
+		}
+	};
+
 	PanelElement.prototype.setPosition = function() {
-		var panelbitmap = this.panelbitmap;
+		var panelbitmap = this.parent.panelbitmap;
 		var panel = {
 			width: panelbitmap.image.width*panelbitmap.scaleX,
 			height: panelbitmap.image.height*panelbitmap.scaleY
@@ -911,15 +1112,17 @@ const drop = function (ev) {
 					} else {
 						node.goto = undefined;
 					}
-				for (let e=0; e < node.elements.length; e++) {
-					var elem = node.elements[e];
-					if (elem instanceof PanelElement && elem.goto !== undefined) {
-						if (node.elements[elem.goto] !== null) {
-							elem.goto = this.nodes[elem.goto];
-						} else {
-							elem.goto = undefined;
-						}
-					} 
+				if (node.elements !== undefined) {
+					for (let e=0; e < node.elements.length; e++) {
+						var elem = node.elements[e];
+						if (elem instanceof PanelElement && elem.goto !== undefined) {
+							if (node.elements[elem.goto] !== null) {
+								elem.goto = this.nodes[elem.goto];
+							} else {
+								elem.goto = undefined;
+							}
+						} 
+					}
 				}
 			}			
 		}
