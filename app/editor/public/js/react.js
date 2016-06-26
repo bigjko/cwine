@@ -2,7 +2,7 @@ let React = require('react');
 let ReactDOM = require('react-dom');
 let loader = require('./loader.js');
 const exporter = require('./exporter.js');
-let editor = require('./editor.js');
+let editor = require('./editor-konva.js');
 let menuData = require('./context_menu/contextmenuData.js');
 const update = require('react-addons-update');
 import Sidebar from './sidebar.js';
@@ -233,7 +233,7 @@ const Editor = React.createClass({
 			}
 			//if (this.state.localImages !== undefined) this.reloadImages();
 		}.bind(this));
-		let canv = document.querySelector('#edit_canvas');
+		let canv = document.querySelector('#view');
 		canv.oncontextmenu = function(e) {
 			e.preventDefault();
 			
