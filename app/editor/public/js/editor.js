@@ -1,9 +1,13 @@
+import Node from '../lib/canvas/Node';
+import Panel from '../lib/canvas/Panel';
+
 //var classes = require('./classes.js');
 var loader = require("./loader.js");
 var $ = require('jquery');
 
 var panels;
 var config;
+let createjs = window.createjs;
 var stage;
 var viewContainer;
 var nodeContainer;
@@ -107,6 +111,7 @@ exports.updateNode = function(sel, update) {
 			nodeContainer.nodes[sel.node].elements[sel.element].update(update);
 		} else nodeContainer.nodes[sel.node].update(update);
 	}
+	drawAllConnections();
 };
 
 exports.updateConfig = function(conf) {
@@ -120,9 +125,13 @@ exports.updateAll = function() {
 			panel.update();
 		}
 	}
+	drawAllConnections();
 };
 
 function initNodes() {
+	let coolnode = new Node();
+	coolnode.cool();
+
 	nodeContainer = new NodeContainer();
 	nodeContainer.nodes = [];
 	nodeContainer.startnode = config.startnode;
@@ -131,11 +140,12 @@ function initNodes() {
 			let node;
 			if (panels[p].type !== undefined) {
 				if (panels[p].type == 'varnode') {
-					node = new Node();
+					node = new Node(panels[p]);
 					node.setup(panels[p]);
 				}
 			} else {
 				node = new Panel(panels[p]);
+				node.setup(panels[p]);
 			}
 			//var panel = new Panel(panels[p]);
 			nodeContainer.addChild(node);
@@ -255,7 +265,8 @@ function newPanel(x, y, image) {
 		x: x,
 		y: y
 	};
-	let panel = new Panel(obj);
+	let panel = new Panel();
+	panel.setup(obj)
 	nodeContainer.addChild(panel);
 	nodeContainer.nodes.push(panel);
 	addNode({type:'node'}, panel.toObject());
@@ -390,392 +401,8 @@ const drop = function (ev) {
 
 (function() {
 
-	// ------------ //
-	//  NODE class  //
-	// ------------ //
-
-	//var editor = require('./editor.js');
-
-	function Node() {
-		this.Container_constructor();
-		this.sockets = [];
-		this.ctrldrag = false;
-	}
-	createjs.extend(Node, createjs.Container);
 	
-	Node.prototype.setup = function(obj) {
-		this.name = obj.name;
-		this.type = obj.type;
-		if (obj.editor !== undefined) {
-			this.x = obj.editor.position.x;
-			this.y = obj.editor.position.y;
-		}
-		//this.selected = new createjs.Shape();
-		//this.addChild(this.selected);
-		//let pos = nodeContainer.globalToLocal(x,y);
-		//console.log('new node', pos.x, pos.y);
-		//node.x = pos.x;
-		//node.y = pos.y;
-		if (obj.goto != -1) this.goto = obj.goto;
-		this.width = 100;
-		this.height = 100;
-		this.shape = new createjs.Shape();
-		this.shape.graphics.ss(2).s('#222').f('#444').dr(0,0,100,100);
-		this.shape.on("mousedown", this.handleMouseDown);
-		this.shape.on("pressmove", this.handleMouseMove);
-		this.shape.on("pressup", this.handleMouseUp);
-		if (this.type == 'varnode') {
-			let socket = this.addSocket(this.x+100, this.y+50, undefined, this, 6, '#000');
-			socket.owner = this;
-			this.sockets.push(socket);
-		} else if (this.type == 'ifnode') {
-			
-		}
-		this.addChild(this.shape);
-	}
 	
-	Node.prototype.handleMouseDown = function(evt) {
-		let node = evt.target.parent;
-		node.ctrldrag = { dragging: false, socket: null };
-		if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
-			evt.preventDefault();
-			
-			for (let s=0; s < node.sockets.length; s++) {
-				let socket = node.sockets[s];
-				if (socket.owner == node) {
-					let socketEvt = evt.clone();
-					let nodeEvt = evt.clone();
-					node.ctrldrag = {dragging:true, socket: socket};
-					socketEvt.set({type: 'pressmove', target: socket});
-					//nodeEvt.set({type: 'mouseup'});
-					//node.dispatchEvent(nodeEvt);
-					
-					socket.dispatchEvent(socketEvt);
-				}
-			}
-
-			return false;
-		}
-		dragoffset = {
-			x: evt.stageX/viewScale - evt.target.parent.x,
-			y: evt.stageY/viewScale - evt.target.parent.y
-		};
-
-		//evt.target.dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
-		if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
-		currentlySelected = evt.target.parent;
-		handleSelection({ node: nodeContainer.nodes.indexOf(evt.target.parent) });
-		//openTab("propertyTab");
-	};
-
-	Node.prototype.handleMouseMove = function(evt) {
-		//console.log(evt.target);
-		let node = evt.target.parent;
-		if (node.ctrldrag.dragging) {
-			let socketEvt = evt.clone();
-			socketEvt.set({type: 'pressmove', target: node.ctrldrag.socket});
-			
-			node.ctrldrag.socket.dispatchEvent(socketEvt);
-			return false;
-		}
-		/*if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
-			for (let s=0; s < node.sockets.length; s++) {
-				let socket = node.sockets[s];
-				if (socket.owner == node) {
-					let newEvent = evt.clone();
-					newEvent.set({type: 'pressmove', target: socket});
-					socket.dispatchEvent(newEvent);
-				}
-			}
-			return;
-		}*/
-
-		let panel = evt.target.parent;
-		let old = {x: panel.x, y: panel.y};
-		
-		panel.x = evt.stageX/viewScale - dragoffset.x;
-		panel.y = evt.stageY/viewScale - dragoffset.y;
-
-		panel.x = Math.round(panel.x*0.1)*10;
-		panel.y = Math.round(panel.y*0.1)*10;
-		
-		if (old.x != panel.x || old.y != panel.y) {
-			let sel = {node: nodeContainer.nodes.indexOf(panel)};
-			handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
-			drawAllConnections();
-		}
-
-		//console.log(evt.target.parent);
-		//drawConnections(evt.target.parent);
-		
-	};
-
-	Node.prototype.handleMouseUp = function(evt) {
-		let node = evt.target.parent;
-		if (node.ctrldrag.dragging) {
-			let socketEvt = evt.clone();
-			socketEvt.set({type: 'pressup', target: node.ctrldrag.socket});
-			
-			node.ctrldrag.socket.dispatchEvent(socketEvt);
-
-			node.ctrldrag = { dragging: false, socket: null };
-			return false;
-		}
-	};
-
-	Node.prototype.drawConnections = function() {
-		for (let s=0; s < this.sockets.length; s++) {
-			var socket = this.sockets[s];
-			socket.line.graphics.clear();
-			if (socket.owner instanceof PanelElement) {
-				let socketpos = socket.owner.localToLocal(socket.owner.width, socket.owner.height/2, socket.parent);
-				socket.x = socketpos.x;
-				socket.y = socketpos.y;
-			}
-			else {
-				let socketpos = { x: socket.owner.width, y: socket.owner.height/2 };
-				socket.x = socketpos.x;
-				socket.y = socketpos.y;
-			}
-			if (socket.owner.goto !== undefined && this.parent.contains(socket.owner.goto)) {
-				var goto = socket.owner.goto;
-				var local = this.parent.localToLocal(goto.x, goto.y+goto.height/2, socket);
-				
-				if (socket.owner instanceof PanelElement) socket.line.graphics.s(socket.color).ss(socket.strokewidth).sd([10,5]).mt(0+socket.radius, 0).lt(local.x, local.y );
-				else socket.line.graphics.s(socket.color).ss(socket.strokewidth).mt(0+socket.radius, 0).lt(local.x, local.y );
-				socket.alpha = 1;
-			}
-			else socket.alpha = 0.5;
-		}
-	};
-
-	Node.prototype.dragLine = function(evt) {
-		console.log("dragline!");
-		let sock = evt.target;
-		if (sock instanceof createjs.Shape) sock = evt.target.parent;
-		var line = sock.line;
-		line.graphics.clear();
-		var local = line.globalToLocal(evt.stageX, evt.stageY);
-		line.graphics.s(sock.color).ss(sock.strokewidth).mt(0+con_r, 0).lt(local.x,local.y);
-	};
-
-	Node.prototype.releaseLine = function(evt) {
-		let socket = evt.target;
-		if (socket instanceof createjs.Shape) socket = evt.target.parent;
-		let panel = socket.parent;
-		let owner = socket.owner;
-		socket.goto = undefined;
-		owner.goto = undefined;
-		socket.line.graphics.clear();
-		let gotoindex = null;
-		let nodeindex = null;
-		let elmindex = null;
-		if (owner instanceof PanelElement) {
-			nodeindex = nodeContainer.nodes.indexOf(panel);
-			elmindex = panel.elements.indexOf(owner);
-		} else {
-			nodeindex = nodeContainer.nodes.indexOf(owner);
-		}
-		var target = stage.getObjectUnderPoint(evt.stageX, evt.stageY).parent;
-		if (target instanceof Node) {
-			socket.goto = target;
-			owner.goto = target;			
-			gotoindex = nodeContainer.nodes.indexOf(socket.goto);
-		}
-		handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
-		panel.drawConnections();
-	};
-
-	Node.prototype.addSocket = function(x, y, goto, addTo, radius, color) {
-		var socket = new createjs.Container();
-		socket.shape = new createjs.Shape();
-		socket.line = new createjs.Shape();
-		socket.radius = radius;
-
-		socket.x = x;
-		socket.y = y;
-
-		if (color !== undefined) socket.color = color;
-		else socket.color = "#000";
-
-		if (color == "#fff") this.bg_color = "#000";
-		else this.bg_color = "#fff";
-
-		var r = socket.radius;
-		socket.shape.regY = r;
-		socket.shape.regX = 0;
-
-		socket.shape.graphics.f(this.bg_color).dc(r,r,r).f(socket.color).dc(r,r,r-r/3);
-		//socket.shape.scaleX = 1;
-		//socket.shape.scaleY = 1;
-
-		socket.strokewidth = socket.radius/2;
-		socket.cursor = "pointer";
-
-		socket.goto = goto;
-
-		socket.addChild(socket.shape, socket.line);
-
-		socket.on("pressmove", this.dragLine);
-		socket.on("pressup", this.releaseLine);
-
-		this.sockets.push(socket);
-		if (addTo === undefined) this.addChild(socket);
-		else addTo.addChild(socket);
-
-		return socket;
-	};
-
-	window.Node = createjs.promote(Node, "Container");
-
-	//
-	// PANEL class
-	//
-
-	function Panel(obj) {
-		this.Node_constructor();
-		//this.sockets = [];
-		this.setup(obj);
-	}
-	createjs.extend(Panel, Node);
-
-	Panel.prototype.setup = function(obj) {
-		this.name = obj.name;
-		if (obj.editor !== undefined) {
-			this.x = obj.editor.position.x;
-			this.y = obj.editor.position.y;
-		}
-		this.selected = new createjs.Shape();
-		this.addChild(this.selected);
-
-		if (obj.image !== undefined) {
-			this.panelbitmap = new createjs.Bitmap(obj.image);
-            this.image = obj.image;
-			var scale = 0.25;
-			//if (panels[i].size == 4) scale = 0.35;
-            if (obj.size === undefined) this.size = 1;
-            else this.size = obj.size;
-			scale = this.size*400*scale / this.panelbitmap.image.width;
-			this.panelbitmap.scaleX = scale;
-			this.panelbitmap.scaleY = scale;
-			this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX;
-			this.height = this.panelbitmap.image.height*this.panelbitmap.scaleY;
-			//this.panelbitmap.on("mousedown", handleMouseDown);
-			//this.panelbitmap.on("pressmove", handleMouseMove);
-			//this.panelbitmap.on("pressup", handleMouseUp);
-			this.panelbitmap.cursor = "move";
-			this.addChild(this.panelbitmap);
-			this.panelbitmap.on("mousedown", this.handleMouseDown);
-			this.panelbitmap.on("pressmove", this.handleMouseMove);
-			this.panelbitmap.on("pressup", this.handleMouseUp);
-			this.panelbitmap.shadow = new createjs.Shadow("rgba(0,0,0,0.2)", 3, 3, 4);
-			//this.panelbitmap.on("click", this.showProperties);
-		}
-        
-		var socketpos = {
-			x: this.panelbitmap.scaleX*this.panelbitmap.image.width,
-			y: this.panelbitmap.scaleY*this.panelbitmap.image.height/2
-		};
-
-		var sock = this.addSocket(socketpos.x,socketpos.y,obj.goto, this, 6);
-		sock.owner = this;
-        
-        if (obj.goto != -1) this.goto = obj.goto;
-
-		//this.elements = [];
-		this.elements = [];
-		if (obj.elements !== undefined) {
-			for (let e=0; e < obj.elements.length; e++) {
-				if (obj.elements[e] !== null) {
-					var element = new PanelElement(obj.elements[e], this.panelbitmap);
-
-					//this.elements.push(element);
-					this.addChild(element);
-					this.elements.push(element);
-					//console.log(element.children.length);
-					socketpos = {
-						x: element.x + element.width*element.scaleX,
-						y: element.y + element.height/2*element.scaleY
-					};
-					sock = this.addSocket(socketpos.x, socketpos.y, element.goto, this, 3, "#fff");
-					sock.owner = element;
-					sock.dashes = [10,5];
-				} else {
-					this.elements.push(null);
-				}
-				
-			}
-		}	
-	};
-
-	Panel.prototype.newImage = function(image) {
-		console.log('IMAGE SHIT!');
-		//this.removeChild(this.panelbitmap)
-		this.image = image;
-		let img = new Image();
-		img.onload = function() {
-			this.update();
-		}.bind(this);
-		img.src = this.image;
-		//console.log(img);
-		this.panelbitmap.image = img;
-	};
-
-	Panel.prototype.update = function(update) {
-		//this.x = update.editor.position.x;
-		//this.y = update.editor.position.y;
-		for (let property in update) {
-			this[property] = update[property];
-			/*if (property == 'image') {
-				// FIX THIS IMAGE SHIT!
-				console.log('IMAGE SHIT!');
-				//this.removeChild(this.panelbitmap)
-				this.image = update.image;
-				let img = new Image();
-				img.src = this.image;
-				//console.log(img);
-				this.panelbitmap.image = img;
-			}*/
-			console.log("Changed", property, update[property]);
-		}
-		let scale = 0.25;
-		scale = this.size*400*scale / this.panelbitmap.image.width;
-		this.panelbitmap.scaleX = scale;
-		this.panelbitmap.scaleY = scale;
-		this.width = this.panelbitmap.image.width*this.panelbitmap.scaleX;
-		this.height = this.panelbitmap.image.height*this.panelbitmap.scaleY;
-		for (let p=0; p < this.elements.length; p++) {
-			let elm = this.elements[p];
-			if (elm !== null) {
-				this.elements[p].update();
-			}
-		}
-		drawAllConnections();
-
-	};
-
-	Panel.prototype.removeChild = function(child) {
-		var view = document.querySelector("#view");
-		var elm = child.children[1].htmlElement;
-		console.log(elm);
-		view.removeChild(elm);
-		this.Node_removeChild(child);
-		drawAllConnections();
-	};
-
-	Panel.prototype.toObject = function() {
-		let obj = {};
-		obj.name = this.name;
-		obj.size = this.size;
-		obj.goto = this.goto;
-		obj.image = this.image;
-		obj.editor = { position: { x: this.x, y: this.y }};
-
-		return obj;
-	};
-
-	window.Panel = createjs.promote(Panel, "Node");
-
 	// ------------ //
 	// PanelElement //
 	// ------------ //

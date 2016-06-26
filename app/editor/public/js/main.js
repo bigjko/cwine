@@ -6,7 +6,7 @@ var ReactDOM = require('react-dom');
 /*let project = {};
 let currentlySelected = undefined;*/
 
-import Editor from './cwine-react.js';
+import Editor from './react.js';
 
 /*window.onload = function() {
 

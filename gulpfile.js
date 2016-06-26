@@ -4,11 +4,11 @@ var browserify = require('browserify'),
     gulp = require('gulp'),
     source = require('vinyl-source-stream'),
     editorSource = 'app/editor/public/js/main.js',
-    editorDestFolder = 'app/editor/public/js/',
-    editorDestFile = 'cwine-editor-bundle.js',
+    editorDestFolder = 'app/editor/public/bundle/',
+    editorDestFile = 'editor-bundle.js',
     gameSource = 'app/game/public/js/game.js',
-    gameDestFolder = 'app/game/public/js/',
-    gameDestFile = 'cwine-runtime-bundle.js',
+    gameDestFolder = 'app/game/public/bundle/',
+    gameDestFile = 'runtime-bundle.js',
     server = require('./server.js');
 
 gulp.task('browserify-editor', function() {
@@ -65,8 +65,6 @@ gulp.task('watch-game', function() {
 
   return rebundle();
 });
-
-
 
 gulp.task('express', function () {
   server.serve();

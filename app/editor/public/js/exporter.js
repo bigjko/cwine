@@ -63,7 +63,7 @@ exports.exportToZip = function(json) {
 	console.log(images);
 	//let done = 3;
 	
-	JSZipUtils.getBinaryContent('js/runtime-export.zip', function(err, data) {
+	JSZipUtils.getBinaryContent('bundle/runtime-export.zip', function(err, data) {
 		if(err) {
     	  throw err; // or handle the error
    		}
@@ -73,7 +73,7 @@ exports.exportToZip = function(json) {
 		for (let i=0; i<images.length; i++) {
 			zip.file('img/'+images[i].name, images[i].data, {base64:true});
 		}
-   		JSZipUtils.getBinaryContent('js/cwine-runtime.js', function(err, data) {
+   		JSZipUtils.getBinaryContent('runtime-bundle.js', function(err, data) {
 			if(err) {
 	    	  throw err; // or handle the error
 	   		}
