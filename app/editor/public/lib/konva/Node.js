@@ -14,13 +14,14 @@ export default class Node extends Konva.Group {
         this.setup(options);
     }
 
-    cool() {
-        console.log('FUNCTION WORKS!');
-    }
-
     setup(obj) {
-        console.log("Setup Node!");
         this.draggable(true);
+        this.dragBoundFunc(function(pos) {
+            return {
+                x: pos.x/100*100,
+                y: pos.y/100*100
+            }
+        });
         this.name(obj.name);
         this.type = obj.type;
         if (obj.editor !== undefined) {
@@ -57,6 +58,10 @@ export default class Node extends Konva.Group {
             
         }
         this.addChild(this.shape);*/
+        let socket = this.addSocket(103, 50, this.goto, this, 6, '#000');
+        this.add(socket);
+        //socket.owner = this;
+        //this.sockets.push(socket);
     }
 
     /*handleMouseDown(evt) {
@@ -197,8 +202,23 @@ export default class Node extends Konva.Group {
         handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
         panel.drawConnections();
     }
-
+*/
     addSocket(x, y, goto, addTo, radius, color) {
+
+        let socket = new Konva.Circle({
+           x: x,
+           y: y,
+           radius: radius,
+           fill: 'red',
+           stroke: 'black',
+           strokeWidth: 1,
+           draggable: true,
+           name: 'socket'
+        });
+        socket.goto = goto;
+        return socket;
+        //addTo.add(socket);
+/*
         var socket = new createjs.Container();
         socket.shape = new createjs.Shape();
         socket.line = new createjs.Shape();
@@ -235,6 +255,6 @@ export default class Node extends Konva.Group {
         if (addTo === undefined) this.addChild(socket);
         else addTo.addChild(socket);
 
-        return socket;
-    }*/
+        return socket;*/
+    }
 }

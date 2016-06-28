@@ -131,7 +131,7 @@ function initNodes() {
 	//nodeContainer.makeConnections();
 	nodeContainer.add(new Konva.Rect(0,0,100,100,'cool_rect'));
 	stage.add(nodeContainer);
-	//drawAllConnections();
+	drawAllConnections();
 }
 
 window.onresize = function(event) {
@@ -213,9 +213,12 @@ function clearAll() {
 }*/
 
 function drawAllConnections() {
-	for (var c = 0; c < nodeContainer.children.length; c++) {
+	/*for (var c = 0; c < nodeContainer.children.length; c++) {
 		nodeContainer.children[c].drawConnections();
-	}
+	}*/
+	stage.find('.socket').each(function(shape) {
+		console.log(shape.goto);
+	})
 }
 
 exports.newNode = function(x, y, type) {
