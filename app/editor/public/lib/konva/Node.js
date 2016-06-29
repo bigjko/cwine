@@ -1,10 +1,11 @@
 // ------------ //
 //  NODE class  //
 // ------------ //
-
 //var editor = require('./editor.js');
 
 import Konva from 'konva';
+
+const headerHeight = 35;
 
 export default class Node extends Konva.Group {
     constructor(options) {
@@ -40,13 +41,18 @@ export default class Node extends Konva.Group {
         let rect = new Konva.Rect({
             x:0,
             y:0,
-            width:100,
-            height:100,
-            fill:'blue',
+            width:obj.width,
+            height:obj.height,
+            fill:'#444',
             stroke:'black',
             strokeWidth:1
         });
         this.add(rect);
+        this.add(generateHeader(obj.width, this.name()));
+
+        
+        //this.add(newBubble(90,75,25));
+        
         /*this.shape.on("mousedown", this.handleMouseDown);
         this.shape.on("pressmove", this.handleMouseMove);
         this.shape.on("pressup", this.handleMouseUp);*/
@@ -58,160 +64,21 @@ export default class Node extends Konva.Group {
             
         }
         this.addChild(this.shape);*/
-        let socket = this.addSocket(103, 50, this.goto, this, 6, '#000');
+        let socket = this.addSocket(rect.width()+10, rect.height()/2, this.goto, this, 12, '#000');
         this.add(socket);
         //socket.owner = this;
         //this.sockets.push(socket);
     }
 
-    /*handleMouseDown(evt) {
-        let node = evt.target.parent;
-        node.ctrldrag = { dragging: false, socket: null };
-        if (navigator.platform.match("Mac") ? evt.nativeEvent.metaKey : evt.nativeEvent.ctrlKey) {
-            evt.preventDefault();
-            
-            for (let s=0; s < node.sockets.length; s++) {
-                let socket = node.sockets[s];
-                if (socket.owner == node) {
-                    let socketEvt = evt.clone();
-                    let nodeEvt = evt.clone();
-                    node.ctrldrag = {dragging:true, socket: socket};
-                    socketEvt.set({type: 'pressmove', target: socket});
-                    //nodeEvt.set({type: 'mouseup'});
-                    //node.dispatchEvent(nodeEvt);
-                    
-                    socket.dispatchEvent(socketEvt);
-                }
-            }
-
-            return false;
-        }
-        dragoffset = {
-            x: evt.stageX/viewScale - evt.target.parent.x,
-            y: evt.stageY/viewScale - evt.target.parent.y
-        };
-
-        //evt.target.dragoffset.y = evt.stageY/viewScale - evt.target.parent.y;
-
-        if (currentlySelected !== undefined && currentlySelected.selected !== undefined) currentlySelected.selected.graphics.clear();
-        currentlySelected = evt.target.parent;
-        handleSelection({ node: nodeContainer.nodes.indexOf(evt.target.parent) });
-
-        //openTab("propertyTab");
-    }
-
-    handleMouseUp(evt) {
-        let node = evt.target.parent;
-        if (node.ctrldrag.dragging) {
-            let socketEvt = evt.clone();
-            socketEvt.set({type: 'pressup', target: node.ctrldrag.socket});
-            
-            node.ctrldrag.socket.dispatchEvent(socketEvt);
-
-            node.ctrldrag = { dragging: false, socket: null };
-            return false;
-        }
-    }
-
-    handleMouseMove(evt) {
-        let node = evt.target.parent;
-        if (node.ctrldrag.dragging) {
-            let socketEvt = evt.clone();
-            socketEvt.set({type: 'pressmove', target: node.ctrldrag.socket});
-            
-            node.ctrldrag.socket.dispatchEvent(socketEvt);
-            return false;
-        }
-
-        let panel = evt.target.parent;
-        let old = {x: panel.x, y: panel.y};
-        
-        panel.x = evt.stageX/viewScale - dragoffset.x;
-        panel.y = evt.stageY/viewScale - dragoffset.y;
-
-        panel.x = Math.round(panel.x*0.1)*10;
-        panel.y = Math.round(panel.y*0.1)*10;
-        
-        if (old.x != panel.x || old.y != panel.y) {
-            let sel = {node: nodeContainer.nodes.indexOf(panel)};
-            handleChange(sel, {editor: {position: {x:panel.x, y:panel.y}}});
-            //drawAllConnections();
-        }
-    
-    }
-
-    drawConnections() {
-        for (let s=0; s < this.sockets.length; s++) {
-            var socket = this.sockets[s];
-            socket.line.graphics.clear();
-            if (socket.owner instanceof PanelElement) {
-                let socketpos = socket.owner.localToLocal(socket.owner.width, socket.owner.height/2, socket.parent);
-                socket.x = socketpos.x;
-                socket.y = socketpos.y;
-            }
-            else {
-                let socketpos = { x: socket.owner.width, y: socket.owner.height/2 };
-                socket.x = socketpos.x;
-                socket.y = socketpos.y;
-            }
-            if (socket.owner.goto !== undefined && this.parent.contains(socket.owner.goto)) {
-                var goto = socket.owner.goto;
-                var local = this.parent.localToLocal(goto.x, goto.y+goto.height/2, socket);
-                
-                if (socket.owner instanceof PanelElement) socket.line.graphics.s(socket.color).ss(socket.strokewidth).sd([10,5]).mt(0+socket.radius, 0).lt(local.x, local.y );
-                else socket.line.graphics.s(socket.color).ss(socket.strokewidth).mt(0+socket.radius, 0).lt(local.x, local.y );
-                socket.alpha = 1;
-            }
-            else socket.alpha = 0.5;
-        }
-    }
-
-    dragLine(evt) {
-        console.log("dragline!");
-        let sock = evt.target;
-        if (sock instanceof createjs.Shape) sock = evt.target.parent;
-        var line = sock.line;
-        line.graphics.clear();
-        var local = line.globalToLocal(evt.stageX, evt.stageY);
-        line.graphics.s(sock.color).ss(sock.strokewidth).mt(0+con_r, 0).lt(local.x,local.y);
-    }
-
-    releaseLine(evt) {
-        let socket = evt.target;
-        if (socket instanceof createjs.Shape) socket = evt.target.parent;
-        let panel = socket.parent;
-        let owner = socket.owner;
-        socket.goto = undefined;
-        owner.goto = undefined;
-        socket.line.graphics.clear();
-        let gotoindex = null;
-        let nodeindex = null;
-        let elmindex = null;
-        if (owner instanceof PanelElement) {
-            nodeindex = nodeContainer.nodes.indexOf(panel);
-            elmindex = panel.elements.indexOf(owner);
-        } else {
-            nodeindex = nodeContainer.nodes.indexOf(owner);
-        }
-        var target = stage.getObjectUnderPoint(evt.stageX, evt.stageY).parent;
-        if (target instanceof Node) {
-            socket.goto = target;
-            owner.goto = target;			
-            gotoindex = nodeContainer.nodes.indexOf(socket.goto);
-        }
-        handleChange({node: nodeindex, element: elmindex}, {goto: gotoindex});
-        panel.drawConnections();
-    }
-*/
     addSocket(x, y, goto, addTo, radius, color) {
 
         let socket = new Konva.Circle({
            x: x,
            y: y,
            radius: radius,
-           fill: 'red',
-           stroke: 'black',
-           strokeWidth: 1,
+           fill: '#999',
+           stroke: '#666',
+           strokeWidth: 2,
            draggable: true,
            name: 'socket'
         });
@@ -257,4 +124,92 @@ export default class Node extends Konva.Group {
 
         return socket;*/
     }
+}
+
+function generateHeader(width, text) {
+    if (text === undefined) text = "";
+    let maxText = width/(headerHeight*0.6);
+    if (text.length > maxText) text.substring(0,maxText) + "..";
+
+    let header = new Konva.Group({
+        x: 0,
+        y: -headerHeight,
+        name: 'header'
+    });
+    let title = new Konva.Text({
+        x:5,
+        y:headerHeight*0.2/2,
+        text: text,
+        fill: '#ccc',
+        fontSize: headerHeight * 0.8
+    });
+    let rect = new Konva.Rect({
+        name: 'headerRect',
+        x:0,
+        y: 0,
+        width: width,
+        height: headerHeight,
+        fill: '#333',
+        stroke: 'black',
+        strokeWidth: 1,
+        opacity:0.7
+    });
+
+    header.add(rect);
+    header.add(title);
+    return header;
+}
+
+function newBubble(width,height,radius) {
+    let radiusX = (radius > width/2) ? width/2 : radius;
+    let radiusY = (radius > height/2) ? height/2 : radius;
+
+    function roundedRect(context,width,height,radiusX, radiusY) {
+            context.beginPath();
+            context.moveTo(width-radiusX,0);
+            context.quadraticCurveTo(width,0,width,radiusY);
+            context.lineTo(width,height-radiusY);
+            context.quadraticCurveTo(width,height,width-radiusX,height);
+            context.lineTo(radiusX,height);
+            context.quadraticCurveTo(0,height,0,height-radiusY);
+            context.lineTo(0,radiusY);
+            context.quadraticCurveTo(0,0,radiusX,0);
+            context.closePath();
+
+            return context;
+    }
+
+    let bubble = new Konva.Shape({
+        sceneFunc: function (context) {
+            roundedRect(context, width, height, radiusX, radiusY)
+
+            context.strokeShape(this);
+
+            context.beginPath();
+            context.moveTo(width/2,height-5);
+            context.lineTo(width/2+5,height+10);
+            context.lineTo(width/2+10,height-5);
+            context.closePath();
+
+            context.strokeShape(this);
+
+            roundedRect(context, width, height, radiusX, radiusY);
+
+            context.fillShape(this);
+
+            context.beginPath();
+            context.moveTo(width/2,height-5);
+            context.lineTo(width/2+5,height+10);
+            context.lineTo(width/2+10,height-5);
+            context.closePath();
+
+            context.fillShape(this);
+        },
+        fill: 'white',
+        stroke: 'black',
+        strokeWidth: 3,
+        draggable: true
+    });
+
+    return bubble;
 }

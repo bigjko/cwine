@@ -31,6 +31,8 @@ export default class Node extends Container {
         //node.x = pos.x;
         //node.y = pos.y;
         if (obj.goto != -1) this.goto = obj.goto;
+        this.scaleX(0.2);
+        this.scaleY(0.2);
         this.width = 100;
         this.height = 100;
         this.shape = new createjs.Shape();

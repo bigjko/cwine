@@ -1,6 +1,8 @@
 import Konva from 'konva';
 import Node from '../lib/konva/Node';
 
+const sizesX = [368,768,1168,1568];
+
 //var classes = require('./classes.js');
 var loader = require("./loader.js");
 var $ = require('jquery');
@@ -56,13 +58,19 @@ exports.init = function(obj, onselect, onchange, addnode) {
 	
 	initNodes();
 
-	$("#zoomin").on('click', function() { zoom(1); });
-	$("#zoomout").on('click', function() { zoom(-1); });
+	let zoomIn = $('<div>+</div>').attr('id', 'zoomin').addClass('zoom-button noselect plus'));
+	let zoomOut = $('<div>-</div>').attr('id', 'zoomout').addClass('zoom-button noselect'));
+	let zoomButtons = $('<div>').attr('id', 'zoom').append(zoomIn, zoomOut);
+	$('body').append(zoomButtons);
+
+	//$("#zoomin").on('click', function() { zoom(1); });
+	//$("#zoomout").on('click', function() { zoom(-1); });
 	//$('#tabs').on('click', 'li', function() { openTab($(this).prop('id')); });
 	//document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab'); };
 	//document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab'); };
-	$("#edit_canvas").on('drop', function(event) { drop(event); });
-	$("#edit_canvas").on('dragover', function(event) { allowDrop(event); });
+	
+	$("#view").on('drop', function(event) { drop(event); });
+	$("#view").on('dragover', function(event) { allowDrop(event); });
 	
 	/*$("#save").on('click', function() {
 		loader.save(nodeContainer.toObject());
@@ -107,7 +115,10 @@ exports.updateAll = function() {
 };
 
 function initNodes() {
-	nodeContainer = new Konva.Layer();
+	nodeContainer = new Konva.Layer({
+		scaleX:0.4,
+		scaleY:0.4
+	});
 	nodeContainer.nodes = [];
 	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
@@ -119,6 +130,8 @@ function initNodes() {
 				}
 			} else {
 				console.log("Added panel!");
+				panels[p].width = sizesX[panels[p].size - 1];
+				panels[p].height = 450;
 				node = new Node(panels[p]);
 			}
 			//var panel = new Panel(panels[p]);
@@ -131,6 +144,7 @@ function initNodes() {
 	//nodeContainer.makeConnections();
 	nodeContainer.add(new Konva.Rect(0,0,100,100,'cool_rect'));
 	stage.add(nodeContainer);
+	
 	drawAllConnections();
 }
 
@@ -316,15 +330,31 @@ function newPanelElement(x, y, panel, image) {
 }
 
 function zoom(zoomModifier) {
-
+	console.log('zoom!');
+	let sx = nodeContainer.scaleX() + zoomModifier*0.1;
+	let sy = nodeContainer.scaleY() + zoomModifier*0.1;
+	//console.log(zoomModifier);
+	//nodeContainer.scaleX(sx);
+	//nodeContainer.scaleY(sy);
+	//nodeContainer.draw();
+	
 	if (zoomNumber + zoomModifier < 0 || zoomNumber + zoomModifier >= zoomStep.length) return;
 
-	var zoomspeed = 200;
+	//var zoomspeed = 200;
 
 	zoomNumber += zoomModifier;
-	viewScale = zoomStep[zoomNumber];
-	console.log(viewScale);
+	//viewScale = zoomStep[zoomNumber];
+	//console.log(viewScale);
 
+	nodeContainer.tween = new Konva.Tween({
+		node: nodeContainer,
+		scaleX: zoomStep[zoomNumber],
+		scaleY: zoomStep[zoomNumber],
+		easing: Konva.Easings.EaseIn,
+		duration: 0.1
+	});
+	nodeContainer.tween.play();
+/*
 	createjs.Tween.get(viewContainer, {override: true})
 		.to({ scaleX: viewScale, scaleY: viewScale }, zoomspeed, createjs.Ease.cubicOut);
 
