@@ -17,7 +17,7 @@ var viewScale = 1;
 var dragoffset = {x:0, y:0};
 //var dragBox;
 var zoomNumber = 3;
-var zoomStep = [0.2, 0.3, 0.5, 0.75, 1, 1.5, 2];
+var zoomStep = [0.12, 0.15, 0.2, 0.3, 0.5, 0.75, 1, 1.5, 2];
 var dragging_element;
 
 var defaultGamePath = "";
@@ -28,6 +28,8 @@ var currentLocalImages;
 let handleSelection;
 let handleChange;
 let addNode;
+
+let debuglayer;
 
 exports.init = function(obj, onselect, onchange, addnode) {
 
@@ -58,13 +60,13 @@ exports.init = function(obj, onselect, onchange, addnode) {
 	
 	initNodes();
 
-	let zoomIn = $('<div>+</div>').attr('id', 'zoomin').addClass('zoom-button noselect plus'));
-	let zoomOut = $('<div>-</div>').attr('id', 'zoomout').addClass('zoom-button noselect'));
+	let zoomIn = $('<div>+</div>').attr('id', 'zoomin').addClass('zoom-button noselect plus');
+	let zoomOut = $('<div>-</div>').attr('id', 'zoomout').addClass('zoom-button noselect');
 	let zoomButtons = $('<div>').attr('id', 'zoom').append(zoomIn, zoomOut);
 	$('body').append(zoomButtons);
 
-	//$("#zoomin").on('click', function() { zoom(1); });
-	//$("#zoomout").on('click', function() { zoom(-1); });
+	$("#zoomin").on('click', function() { zoom(1); });
+	$("#zoomout").on('click', function() { zoom(-1); });
 	//$('#tabs').on('click', 'li', function() { openTab($(this).prop('id')); });
 	//document.querySelector("#propertyTab").onclick = function() { openTab('propertyTab'); };
 	//document.querySelector("#imagesTab").onclick = function() { openTab('imagesTab'); };
@@ -142,9 +144,10 @@ function initNodes() {
 		}
 	}
 	//nodeContainer.makeConnections();
-	nodeContainer.add(new Konva.Rect(0,0,100,100,'cool_rect'));
+	//nodeContainer.add(new Konva.Rect(0,0,100,100,'cool_rect'));
 	stage.add(nodeContainer);
-	
+	debuglayer = new Konva.Layer();
+	stage.add(debuglayer);
 	drawAllConnections();
 }
 
@@ -330,9 +333,48 @@ function newPanelElement(x, y, panel, image) {
 }
 
 function zoom(zoomModifier) {
+
+	function centerViewOrigin() {
+		/*resetOrigin();
+		nodeContainer.offsetX((($("#view").outerWidth() - 280)/2 - nodeContainer.x())/nodeContainer.scaleX());
+		nodeContainer.offsetY((($("#view").outerHeight()/2) - nodeContainer.y())/nodeContainer.scaleY());
+		nodeContainer.x(nodeContainer.x() - nodeContainer.offsetX()*nodeContainer.scaleX());
+		nodeContainer.y(nodeContainer.y() - nodeContainer.offsetY()*nodeContainer.scaleY());
+		console.log(nodeContainer.offsetX(), nodeContainer.offsetY(), nodeContainer.x(), nodeContainer.y());*/
+		let screenCenter = {
+			x: ($('#view').outerWidth() - 280)/2 - stage.x(),
+			y: $('#view').outerHeight()/2 - stage.y()
+		};
+		let oldPos = {
+			x: nodeContainer.x(),
+			y: nodeContainer.y()
+		};
+		let newOffset = {
+			x: screenCenter.x - oldPos.x,
+			y: screenCenter.y - oldPos.y
+		};
+		nodeContainer.offsetX(newOffset.x / nodeContainer.scaleX());
+		nodeContainer.offsetY(newOffset.y / nodeContainer.scaleY());
+
+		nodeContainer.x(oldPos.x + newOffset.x);
+		nodeContainer.y(oldPos.y + newOffset.y);
+
+		debuglayer.clear();
+		debuglayer.add(new Konva.Rect({width:10,height:10,x:screenCenter.x, y:screenCenter.y, fill:'red'}));
+		debuglayer.draw();
+		//stage.add(debuglayer);
+	}
+
+	function resetOrigin() {
+		nodeContainer.x(nodeContainer.offsetX()*nodeContainer.scaleX());
+		nodeContainer.y(nodeContainer.offsetY()*nodeContainer.scaleY());
+		nodeContainer.offsetX(0);
+		nodeContainer.offsetY(0);
+	}
+
 	console.log('zoom!');
-	let sx = nodeContainer.scaleX() + zoomModifier*0.1;
-	let sy = nodeContainer.scaleY() + zoomModifier*0.1;
+	//let sx = nodeContainer.scaleX() + zoomModifier*0.1;
+	//let sy = nodeContainer.scaleY() + zoomModifier*0.1;
 	//console.log(zoomModifier);
 	//nodeContainer.scaleX(sx);
 	//nodeContainer.scaleY(sy);
@@ -346,6 +388,8 @@ function zoom(zoomModifier) {
 	//viewScale = zoomStep[zoomNumber];
 	//console.log(viewScale);
 
+	centerViewOrigin();
+
 	nodeContainer.tween = new Konva.Tween({
 		node: nodeContainer,
 		scaleX: zoomStep[zoomNumber],
@@ -354,6 +398,8 @@ function zoom(zoomModifier) {
 		duration: 0.1
 	});
 	nodeContainer.tween.play();
+
+	
 /*
 	createjs.Tween.get(viewContainer, {override: true})
 		.to({ scaleX: viewScale, scaleY: viewScale }, zoomspeed, createjs.Ease.cubicOut);

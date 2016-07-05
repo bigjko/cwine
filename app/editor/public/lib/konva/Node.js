@@ -5,10 +5,13 @@
 
 import Konva from 'konva';
 
-const headerHeight = 35;
+const headerHeight = 40;
+const snapThreshold = 10;
 
 export default class Node extends Konva.Group {
     constructor(options) {
+        if (options.width === undefined) options.width = 100;
+        if (options.height === undefined) options.width = 100;
         super({options});
         this.sockets = [];
         this.ctrldrag = false;
@@ -19,8 +22,8 @@ export default class Node extends Konva.Group {
         this.draggable(true);
         this.dragBoundFunc(function(pos) {
             return {
-                x: pos.x/100*100,
-                y: pos.y/100*100
+                x: Math.round(pos.x / snapThreshold) * snapThreshold,
+                y: Math.round(pos.y / snapThreshold) * snapThreshold
             }
         });
         this.name(obj.name);
