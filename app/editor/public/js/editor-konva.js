@@ -1,5 +1,6 @@
 import Konva from 'konva';
 import Node from '../lib/konva/Node';
+import Panel from '../lib/konva/Panel';
 
 const sizesX = [368,768,1168,1568];
 
@@ -47,6 +48,8 @@ exports.init = function(obj, onselect, onchange, addnode) {
 		container: 'view',
 		width: width,
 		height: height,
+		scaleX: 0.4,
+		scaleY: 0.4,
 		draggable: true
 	});
 
@@ -117,10 +120,7 @@ exports.updateAll = function() {
 };
 
 function initNodes() {
-	nodeContainer = new Konva.Layer({
-		scaleX:0.4,
-		scaleY:0.4
-	});
+	nodeContainer = new Konva.Layer();
 	nodeContainer.nodes = [];
 	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
@@ -134,7 +134,7 @@ function initNodes() {
 				console.log("Added panel!");
 				panels[p].width = sizesX[panels[p].size - 1];
 				panels[p].height = 450;
-				node = new Node(panels[p]);
+				node = new Panel(panels[p]);
 			}
 			//var panel = new Panel(panels[p]);
 			nodeContainer.add(node);
@@ -143,11 +143,7 @@ function initNodes() {
 			nodeContainer.nodes.push(null);
 		}
 	}
-	//nodeContainer.makeConnections();
-	//nodeContainer.add(new Konva.Rect(0,0,100,100,'cool_rect'));
 	stage.add(nodeContainer);
-	debuglayer = new Konva.Layer();
-	stage.add(debuglayer);
 	drawAllConnections();
 }
 
@@ -335,34 +331,25 @@ function newPanelElement(x, y, panel, image) {
 function zoom(zoomModifier) {
 
 	function centerViewOrigin() {
-		/*resetOrigin();
-		nodeContainer.offsetX((($("#view").outerWidth() - 280)/2 - nodeContainer.x())/nodeContainer.scaleX());
-		nodeContainer.offsetY((($("#view").outerHeight()/2) - nodeContainer.y())/nodeContainer.scaleY());
-		nodeContainer.x(nodeContainer.x() - nodeContainer.offsetX()*nodeContainer.scaleX());
-		nodeContainer.y(nodeContainer.y() - nodeContainer.offsetY()*nodeContainer.scaleY());
-		console.log(nodeContainer.offsetX(), nodeContainer.offsetY(), nodeContainer.x(), nodeContainer.y());*/
+		console.log(stage.x(), stage.y());
+
 		let screenCenter = {
 			x: ($('#view').outerWidth() - 280)/2 - stage.x(),
 			y: $('#view').outerHeight()/2 - stage.y()
 		};
-		let oldPos = {
-			x: nodeContainer.x(),
-			y: nodeContainer.y()
-		};
 		let newOffset = {
-			x: screenCenter.x - oldPos.x,
-			y: screenCenter.y - oldPos.y
+			x: stage.offsetX() + screenCenter.x / stage.scaleX(),
+			y: stage.offsetY() + screenCenter.y / stage.scaleY()
 		};
-		nodeContainer.offsetX(newOffset.x / nodeContainer.scaleX());
-		nodeContainer.offsetY(newOffset.y / nodeContainer.scaleY());
+		stage.offsetX(newOffset.x);
+		stage.offsetY(newOffset.y);
 
-		nodeContainer.x(oldPos.x + newOffset.x);
-		nodeContainer.y(oldPos.y + newOffset.y);
+		stage.x(stage.x() + screenCenter.x);
+		stage.y(stage.y() + screenCenter.y);
 
-		debuglayer.clear();
-		debuglayer.add(new Konva.Rect({width:10,height:10,x:screenCenter.x, y:screenCenter.y, fill:'red'}));
-		debuglayer.draw();
-		//stage.add(debuglayer);
+		stage.draw();
+		
+		console.log(screenCenter.x, screenCenter.y, stage.x(), stage.y(), newOffset.x, newOffset.y);
 	}
 
 	function resetOrigin() {
@@ -390,14 +377,14 @@ function zoom(zoomModifier) {
 
 	centerViewOrigin();
 
-	nodeContainer.tween = new Konva.Tween({
-		node: nodeContainer,
+	stage.tween = new Konva.Tween({
+		node: stage,
 		scaleX: zoomStep[zoomNumber],
 		scaleY: zoomStep[zoomNumber],
 		easing: Konva.Easings.EaseIn,
 		duration: 0.1
 	});
-	nodeContainer.tween.play();
+	stage.tween.play();
 
 	
 /*
