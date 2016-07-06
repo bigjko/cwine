@@ -82,6 +82,7 @@ exports.init = function(obj, onselect, onchange, addnode) {
 	});*/
 	$(document).keydown(function(e) {
 	  console.log("keydown:");
+	  
 	  if (e.keyCode == 83 && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
 	    e.preventDefault();
 	    console.log("CTRL+S");
@@ -120,7 +121,7 @@ exports.updateAll = function() {
 };
 
 function initNodes() {
-	nodeContainer = new Konva.Layer();
+	nodeContainer = new Konva.Layer({name: 'nodeContainer'});
 	nodeContainer.nodes = [];
 	nodeContainer.startnode = config.startnode;
 	for (var p=0; p<panels.length;p++) {
@@ -131,10 +132,20 @@ function initNodes() {
 					node = new Node(panels[p]);
 				}
 			} else {
-				console.log("Added panel!");
-				panels[p].width = sizesX[panels[p].size - 1];
-				panels[p].height = 450;
-				node = new Panel(panels[p]);
+				//console.log("Added panel!");
+				let panObj = panels[p];
+				panObj.width = sizesX[panObj.size - 1];
+				if (panObj.image !== undefined) {
+					panObj.elements.unshift({
+						image: panObj.image,
+						position: {x:0, y:0},
+						width: panObj.width
+					});
+					panObj.image = undefined;
+				}
+				panObj.height = 560 * (368/400);
+				node = new Panel(panObj);
+				node.setup(panObj);
 			}
 			//var panel = new Panel(panels[p]);
 			nodeContainer.add(node);
@@ -161,7 +172,7 @@ window.onresize = function(event) {
 function clearAll() {
 
 	function clearEvents(disObj) {
-		console.log(disObj);
+		//console.log(disObj);
 		disObj.removeAllEventListeners();
 		for (var i=0; i < disObj.children.length; i++) {
 			if (disObj.children[i].children !== undefined) {
@@ -230,13 +241,13 @@ function drawAllConnections() {
 		nodeContainer.children[c].drawConnections();
 	}*/
 	stage.find('.socket').each(function(shape) {
-		console.log(shape.goto);
+		//console.log(shape.goto);
 	})
 }
 
 exports.newNode = function(x, y, type) {
 	let pos = nodeContainer.globalToLocal(x,y);
-	console.log('new node', pos.x, pos.y);
+	//console.log('new node', pos.x, pos.y);
 	let obj = {
 		type: type,
 		editor: { position: { x: x, y: y } }
@@ -293,7 +304,7 @@ exports.getImageSize = function(sel) {
 			height = panel.panelbitmap.image.height;
 		}
 	}
-	console.log(width, height);
+	//console.log(width, height);
 	return { width: width, height: height };
 };
 
@@ -303,7 +314,7 @@ function newPanelElement(x, y, panel, image) {
 		x: x/(panel.panelbitmap.image.width*panel.panelbitmap.scaleX),
 		y: y/(panel.panelbitmap.image.height*panel.panelbitmap.scaleY)
 	};
-	console.log(elm.position);
+	//console.log(elm.position);
 	elm.image = image;
 	//default alignment option! for now
 	elm.bubble_type = "down";
@@ -331,7 +342,7 @@ function newPanelElement(x, y, panel, image) {
 function zoom(zoomModifier) {
 
 	function centerViewOrigin() {
-		console.log(stage.x(), stage.y());
+		//console.log(stage.x(), stage.y());
 
 		let screenCenter = {
 			x: ($('#view').outerWidth() - 280)/2 - stage.x(),
@@ -349,7 +360,7 @@ function zoom(zoomModifier) {
 
 		stage.draw();
 		
-		console.log(screenCenter.x, screenCenter.y, stage.x(), stage.y(), newOffset.x, newOffset.y);
+		//console.log(screenCenter.x, screenCenter.y, stage.x(), stage.y(), newOffset.x, newOffset.y);
 	}
 
 	function resetOrigin() {
@@ -359,7 +370,7 @@ function zoom(zoomModifier) {
 		nodeContainer.offsetY(0);
 	}
 
-	console.log('zoom!');
+	//console.log('zoom!');
 	//let sx = nodeContainer.scaleX() + zoomModifier*0.1;
 	//let sy = nodeContainer.scaleY() + zoomModifier*0.1;
 	//console.log(zoomModifier);
@@ -415,16 +426,16 @@ const drop = function (ev) {
     if (ev.target == stage.canvas) {
     	//console.log("Dropped on STAGE! Cool!", ev.clientX, ev.clientY);
     	var local = nodeContainer.globalToLocal(ev.clientX, ev.clientY);
-    	console.log(local);
+    	//console.log(local);
     	//console.log(ev.dataTransfer.getData("text/plain"));
     	var pnl = nodeContainer.getObjectUnderPoint(local.x, local.y);
     	if (pnl !== null && pnl instanceof createjs.Bitmap) pnl = pnl.parent;
     	//console.log(pnl);
     	if (pnl instanceof Panel) {
     		var pos = pnl.globalToLocal(ev.clientX, ev.clientY);
-    		console.log(pos);
+    		//console.log(pos);
     		if (ev.originalEvent.ctrlKey) {
-    			console.log('replace image!');
+    			//console.log('replace image!');
     			//pnl.image = ev.dataTransfer.getData("text/plain");
     			pnl.newImage(newimage);
     			let sel = {node: nodeContainer.nodes.indexOf(pnl)};

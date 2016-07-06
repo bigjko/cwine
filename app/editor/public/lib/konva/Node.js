@@ -8,27 +8,45 @@ import Konva from 'konva';
 const headerHeight = 40;
 const snapThreshold = 10;
 
+const selectFill = '#005480';
+const selectStroke = '#355';
+
 export default class Node extends Konva.Group {
     constructor(options) {
-        if (options.width === undefined) options.width = 100;
-        if (options.height === undefined) options.width = 100;
+        //if (options.width === undefined) options.width = 100;
+        //if (options.height === undefined) options.width = 100;
         super(options);
         this.sockets = [];
         this.ctrldrag = false;
-        this.setup(options);
+        //this.setup(options);
     }
 
     setup(obj) {
-        console.log('setup node');
+        //console.log('setup node');
         this.draggable(true);
         this.dragBoundFunc(function(pos) {
+            let stage = this.getStage();
+            let diff = { x: stage.x() % snapThreshold, y: stage.y() % snapThreshold };
+            console.log(diff);
             return {
-                x: Math.round(pos.x / snapThreshold) * snapThreshold,
-                y: Math.round(pos.y / snapThreshold) * snapThreshold
+                x: Math.round((pos.x-diff.x) / snapThreshold) * snapThreshold + diff.x,
+                y: Math.round((pos.y-diff.y) / snapThreshold) * snapThreshold + diff.y
             }
-        });
+        }.bind(this));
         this.name(obj.name);
         this.type = obj.type;
+        this.width(obj.width);
+        this.height(obj.height);
+        this.content = new Konva.Group({
+            x:0,
+            y:0,
+            clip: {
+                x:0,
+                y:0,
+                height:this.height(),
+                width:this.width()
+            }
+        });
         if (obj.editor !== undefined) {
             this.x(obj.editor.position.x);
             this.y(obj.editor.position.y);
@@ -42,27 +60,29 @@ export default class Node extends Konva.Group {
         if (obj.goto != -1) this.goto = obj.goto;
         //this.shape = new createjs.Shape();
         //this.shape.graphics.ss(2).s('#222').f('#444').dr(0,0,100,100);
-        if (obj.bg || obj.bg === undefined) {
-        if (!obj.outline) { obj.stroke = undefined; obj.strokeWidth = undefined; }
-        else { obj.stroke = 'black'; obj.strokeWidth = 1 };
+        if (obj.bg || obj.bg === undefined) obj.fill = '#444';
+        if (obj.outline || obj.outline === undefined) { obj.stroke = 'black'; obj.strokeWidth = 4 }
+        else { obj.stroke = undefined; obj.strokeWidth = undefined; }
         let rect = new Konva.Rect({
             x:0,
             y:0,
             width:obj.width,
             height:obj.height,
-            fill:'#444',
+            fill:obj.fill,
             stroke:obj.stroke,
             strokeWidth:obj.strokeWidth,
             name: 'bgRect'
         });
         this.add(rect);
-        }
+        this.add(this.content);
         if (obj.header || obj.header === undefined) { this.add(generateHeader(obj.width, this.name())); }
         this.on('mousemove', function(evt) {
             this.setSelection(true);
+            evt.cancelBubble = true;
         }.bind(this));
         this.on('mouseout', function(evt) {
             this.setSelection(false);
+            evt.cancelBubble = true;
         }.bind(this));
 
         //this.add(newBubble(90,75,25));
@@ -78,7 +98,7 @@ export default class Node extends Konva.Group {
             
         }
         this.addChild(this.shape);*/
-        let socket = this.addSocket(this.width()+10, this.height()/2, this.goto, this, 12, '#000');
+        let socket = this.addSocket(this.width(), this.height()/2, this.goto, this, 12, '#000');
         this.add(socket);
         //socket.owner = this;
         //this.sockets.push(socket);
@@ -88,10 +108,10 @@ export default class Node extends Konva.Group {
         let rect = this.findOne('.bgRect');
         let head = this.findOne('.headerRect');
         if (val) {
-            rect.stroke('blue');
-            rect.fill('yellow');
-            head.stroke('blue');
-            head.fill('yellow');
+            rect.stroke(selectStroke);
+            rect.fill(selectFill);
+            head.stroke(selectStroke);
+            head.fill(selectFill);
             this.parent.draw();
         } else {
             rect.stroke('black');
@@ -102,11 +122,25 @@ export default class Node extends Konva.Group {
         }
     }
 
+    updateSize(width, height) {
+        this.width(width);
+        this.height(height);
+        let rect = this.findOne('.bgRect');
+        rect.width(width);
+        rect.height(height);
+        let socket = this.findOne('.socket');
+        socket.x(width);
+        socket.y(height/2);
+        this.content.clipWidth(width);
+        this.content.clipHeight(height);
+    }
+
     addSocket(x, y, goto, addTo, radius, color) {
 
         let socket = new Konva.Circle({
            x: x,
            y: y,
+           offsetX: -radius,
            radius: radius,
            fill: '#999',
            stroke: '#666',
@@ -169,10 +203,10 @@ function generateHeader(width, text) {
     });
     let title = new Konva.Text({
         x:5,
-        y:headerHeight*0.2/2,
+        y:headerHeight*0.4/2,
         text: text,
         fill: '#ccc',
-        fontSize: headerHeight * 0.8
+        fontSize: headerHeight * 0.6
     });
     let rect = new Konva.Rect({
         name: 'headerRect',
@@ -182,7 +216,7 @@ function generateHeader(width, text) {
         height: headerHeight,
         fill: '#333',
         stroke: 'black',
-        strokeWidth: 1,
+        strokeWidth: 4,
         opacity:0.7
     });
 
