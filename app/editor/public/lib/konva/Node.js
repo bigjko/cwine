@@ -47,6 +47,7 @@ export default class Node extends Konva.Group {
                 width:this.width()
             }
         });
+        this.under = new Konva.Group({visible:false});
         if (obj.editor !== undefined) {
             this.x(obj.editor.position.x);
             this.y(obj.editor.position.y);
@@ -73,15 +74,16 @@ export default class Node extends Konva.Group {
             strokeWidth:obj.strokeWidth,
             name: 'bgRect'
         });
+        this.add(this.under);
         this.add(rect);
         this.add(this.content);
         if (obj.header || obj.header === undefined) { this.add(generateHeader(obj.width, this.name())); }
         this.on('mousemove', function(evt) {
-            this.setSelection(true);
+            this.highlight(true);
             evt.cancelBubble = true;
         }.bind(this));
         this.on('mouseout', function(evt) {
-            this.setSelection(false);
+            this.highlight(false);
             evt.cancelBubble = true;
         }.bind(this));
 
@@ -104,7 +106,25 @@ export default class Node extends Konva.Group {
         //this.sockets.push(socket);
     }
 
-    setSelection(val) {
+    select(val) {
+        let rect = this.findOne('.bgRect');
+        let head = this.findOne('.headerRect');
+        if (val) {
+            this.selected = true;
+            rect.stroke('yellow');
+            head.stroke('yellow');
+            head.fill('yellow');
+        } else {
+            this.selected = false;
+            rect.stroke('black');
+            rect.fill('#444');
+            head.stroke('black');
+            head.fill('#333');
+        }
+    }
+
+    highlight(val) {
+        if (this.selected) return;
         let rect = this.findOne('.bgRect');
         let head = this.findOne('.headerRect');
         if (val) {

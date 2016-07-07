@@ -25,10 +25,13 @@ export default class Panel extends Node {
                     elemObj = updateOldElement(elemObj, this);
 
                     var element = new Element(elemObj);
+                    var underelement = new Element(elemObj);
                     element.setup(elemObj);
-
+                    underelement.setup(elemObj);
                     //this.elements.push(element);
+                    this.under.add(underelement);
                     this.content.add(element);
+                    
                     this.elements.push(element);
                     //console.log(element.children.length);
                     /*let socketpos = {

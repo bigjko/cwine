@@ -155,15 +155,25 @@ function initNodes() {
 		}
 	}
 	stage.add(nodeContainer);
+	stage.on('click', function(evt) {
+		handleClick();
+	});
 	drawAllConnections();
+}
+
+function handleClick(evt) {
+	console.log(evt.target);
+	evt.cancelBubble = true;
 }
 
 window.onresize = function(event) {
     let view = $("#view");
     let sidebar = $("#sidebar");
 
-    stage.width = view.outerWidth();
-    stage.height = view.outerHeight();
+    stage.width(view.outerWidth());
+    stage.height(view.outerHeight());
+
+	stage.draw();
 
 	//stage.getChildByName("dragBox").graphics.beginFill("#999").drawRect(0,0,stage.canvas.width, stage.canvas.height);
     //stage.update();

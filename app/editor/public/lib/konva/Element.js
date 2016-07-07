@@ -90,7 +90,7 @@ export default class Element extends Node {
         }
     }*/
 
-    setSelection(val) {
+   	highlight(val) {
         let rect = this.findOne('.bgRect');
         let head = this.findOne('.headerRect');
         if (val) {
