@@ -1,3 +1,4 @@
+var $ = require('jquery');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -30,7 +31,9 @@ function init() {
 	);
 }
 
-init();
+window.onload = function() {
+	init();
+}
 
 // main.js
 

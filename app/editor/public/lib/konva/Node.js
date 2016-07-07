@@ -112,14 +112,13 @@ export default class Node extends Konva.Group {
             rect.fill(selectFill);
             head.stroke(selectStroke);
             head.fill(selectFill);
-            this.parent.draw();
         } else {
             rect.stroke('black');
             rect.fill('#444');
             head.stroke('black');
             head.fill('#333');
-            this.parent.draw();
         }
+        this.getStage().find('.nodeContainer').draw();
     }
 
     updateSize(width, height) {

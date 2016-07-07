@@ -16,6 +16,7 @@
 	<!-- FONT
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
 	<link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600" rel="stylesheet" type="text/css">
+	<link href="https://fonts.googleapis.com/css?family=Caveat:400,700" rel="stylesheet">
 
 	<!-- CSS
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -28,9 +29,6 @@
 	–––––––––––––––––––––––––––––––––––––––––––––––––– -->
 	<link rel="icon" type="image/png" href="images/favicon.png">
 
-	<script src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
-	<script src="https://code.createjs.com/tweenjs-0.6.1.min.js"></script>
-	
 </head>
 <body>
 	<!-- Primary Page Layout
@@ -38,7 +36,11 @@
 	<header>
 		<h6 class="noselect">cwine v0.01</h6>
 	</header>
-	
+	<div class="font-preload" style="display:none;">
+		<span style="font-family:KomikaHand;"></span>
+		<span style="font-family:KomikaHand; font-weight:bold"></span>
+		<span style="font-family:KomikaHand; font-style:italic"></span>
+	</div>
 	<div id="progress">
 		<p>loading..</p>
 		<div id="progress_bg"><div id="progress_bar" style="height:100%; width:0%;"></div></div>
@@ -47,11 +49,7 @@
 	<div id="view"></div>
 
 	<div id="react"></div>
-	<div class="font-preload" style="display:none;">
-		<span style="font-family:KomikaHand;"></span>
-		<span style="font-family:KomikaHand; font-weight:bold"></span>
-		<span style="font-family:KomikaHand; font-style:italic"></span>
-	</div>
+	
 
 	<script src="bundle/editor-bundle.js"></script>
 </body>
