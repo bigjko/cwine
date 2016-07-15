@@ -156,7 +156,7 @@ function initNodes() {
 	}
 	stage.add(nodeContainer);
 	stage.on('click', function(evt) {
-		handleClick();
+		handleClick(evt);
 	});
 	drawAllConnections();
 }
